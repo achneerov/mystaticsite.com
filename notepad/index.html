@@ -10,73 +10,80 @@
 
   <!-- Header with blue background and shadow -->
   <header class="bg-blue-500 shadow">
-    <nav class="container mx-auto flex justify-between items-center py-4">
+    <nav class="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center py-4 space-y-2 sm:space-y-0">
       <!-- Font and size selectors -->
-      <div class="flex items-center space-x-6">
-        <label for="font-selector" class="text-white text-sm">Font:</label>
-        <select id="font-selector" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 ease-in-out hover:bg-blue-700">
-          <!-- Serif Fonts -->
-          <optgroup label="Serif Fonts">
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Palatino Linotype">Palatino Linotype</option>
-            <option value="Book Antiqua">Book Antiqua</option>
-            <option value="Cambria">Cambria</option>
-          </optgroup>
-          
-          <!-- Sans-Serif Fonts -->
-          <optgroup label="Sans-Serif Fonts">
-            <option value="Arial">Arial</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Helvetica">Helvetica</option>
-            <option value="Tahoma">Tahoma</option>
-            <option value="Trebuchet MS">Trebuchet MS</option>
-            <option value="Geneva">Geneva</option>
-          </optgroup>
-          
-          <!-- Monospace Fonts -->
-          <optgroup label="Monospace Fonts">
-            <option value="Courier New">Courier New</option>
-            <option value="Lucida Console">Lucida Console</option>
-            <option value="Monaco">Monaco</option>
-          </optgroup>
-          
-          <!-- Cursive/Decorative Fonts -->
-          <optgroup label="Decorative Fonts">
-            <option value="Comic Sans MS">Comic Sans MS</option>
-            <option value="Brush Script MT">Brush Script MT</option>
-          </optgroup>
-        </select>
+      <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 w-full sm:w-auto">
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
+          <label for="font-selector" class="text-white text-sm whitespace-nowrap">Font:</label>
+          <select id="font-selector" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 ease-in-out hover:bg-blue-700 w-full sm:w-auto">
+            <!-- Font options remain the same as previous version -->
+            <optgroup label="Serif Fonts">
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Palatino Linotype">Palatino Linotype</option>
+              <option value="Book Antiqua">Book Antiqua</option>
+              <option value="Cambria">Cambria</option>
+            </optgroup>
+            
+            <!-- Sans-Serif Fonts -->
+            <optgroup label="Sans-Serif Fonts">
+              <option value="Arial">Arial</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Helvetica">Helvetica</option>
+              <option value="Tahoma">Tahoma</option>
+              <option value="Trebuchet MS">Trebuchet MS</option>
+              <option value="Geneva">Geneva</option>
+            </optgroup>
+            
+            <!-- Monospace Fonts -->
+            <optgroup label="Monospace Fonts">
+              <option value="Courier New">Courier New</option>
+              <option value="Lucida Console">Lucida Console</option>
+              <option value="Monaco">Monaco</option>
+            </optgroup>
+            
+            <!-- Cursive/Decorative Fonts -->
+            <optgroup label="Decorative Fonts">
+              <option value="Comic Sans MS">Comic Sans MS</option>
+              <option value="Brush Script MT">Brush Script MT</option>
+            </optgroup>
+          </select>
+        </div>
 
-        <label for="font-size-selector" class="text-white text-sm">Size:</label>
-        <select id="font-size-selector" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 ease-in-out hover:bg-blue-700">
-          <optgroup label="Small Sizes">
-            <option value="10">10px</option>
-            <option value="12">12px</option>
-            <option value="14">14px</option>
-          </optgroup>
-          <optgroup label="Medium Sizes">
-            <option value="16">16px</option>
-            <option value="18">18px</option>
-            <option value="20">20px</option>
-            <option value="22">22px</option>
-          </optgroup>
-          <optgroup label="Large Sizes">
-            <option value="24">24px</option>
-            <option value="28">28px</option>
-            <option value="32">32px</option>
-            <option value="36">36px</option>
-          </optgroup>
-          <optgroup label="Extra Large Sizes">
-            <option value="42">42px</option>
-            <option value="48">48px</option>
-            <option value="56">56px</option>
-          </optgroup>
-        </select>
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
+          <label for="font-size-selector" class="text-white text-sm whitespace-nowrap">Size:</label>
+          <select id="font-size-selector" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 ease-in-out hover:bg-blue-700 w-full sm:w-auto">
+            <!-- Size options remain the same as previous version -->
+            <optgroup label="Small Sizes">
+              <option value="10">10px</option>
+              <option value="12">12px</option>
+              <option value="14">14px</option>
+            </optgroup>
+            <optgroup label="Medium Sizes">
+              <option value="16">16px</option>
+              <option value="18">18px</option>
+              <option value="20">20px</option>
+              <option value="22">22px</option>
+            </optgroup>
+            <optgroup label="Large Sizes">
+              <option value="24">24px</option>
+              <option value="28">28px</option>
+              <option value="32">32px</option>
+              <option value="36">36px</option>
+            </optgroup>
+            <optgroup label="Extra Large Sizes">
+              <option value="42">42px</option>
+              <option value="48">48px</option>
+              <option value="56">56px</option>
+            </optgroup>
+          </select>
+        </div>
       </div>
 
       <!-- Directory Link -->
-      <a href="../index.html" class="text-white text-sm hover:text-gray-200 transition">Directory</a>
+      <div class="w-full sm:w-auto text-center sm:text-right">
+        <a href="../index.html" class="text-white text-sm hover:text-gray-200 transition inline-block">Directory</a>
+      </div>
     </nav>
   </header>
 
@@ -86,7 +93,7 @@
   </div>
 
   <script>
-    // Function to update the URL with the selected font and size
+    // Entire previous JavaScript remains the same
     function updateURLParams() {
       const fontSelector = document.getElementById('font-selector');
       const fontSizeSelector = document.getElementById('font-size-selector');
@@ -106,7 +113,6 @@
       window.history.pushState({}, '', url);
     }
 
-    // Function to apply the font and size from the URL params
     function applyFontAndSizeFromURL() {
       const urlParams = new URLSearchParams(window.location.search);
       const font = urlParams.get('font');
@@ -124,13 +130,57 @@
       }
     }
 
+    function saveToLocalStorage() {
+      const textArea = document.getElementById('text-area');
+      const fontSelector = document.getElementById('font-selector');
+      const fontSizeSelector = document.getElementById('font-size-selector');
+
+      // Save text content, font, and font size
+      const savedData = {
+        text: textArea.value,
+        font: fontSelector.value,
+        fontSize: fontSizeSelector.value
+      };
+
+      localStorage.setItem('notepadData', JSON.stringify(savedData));
+    }
+
+    function loadFromLocalStorage() {
+      const savedDataString = localStorage.getItem('notepadData');
+      if (savedDataString) {
+        const savedData = JSON.parse(savedDataString);
+        
+        // Restore text content
+        document.getElementById('text-area').value = savedData.text;
+
+        // Restore font
+        if (savedData.font) {
+          document.getElementById('font-selector').value = savedData.font;
+          document.getElementById('text-area').style.fontFamily = savedData.font;
+        }
+
+        // Restore font size
+        if (savedData.fontSize) {
+          document.getElementById('font-size-selector').value = savedData.fontSize;
+          document.getElementById('text-area').style.fontSize = savedData.fontSize + 'px';
+        }
+      }
+    }
+
     // Apply font and size from URL when the page loads
     window.onload = function() {
+      // First, load from local storage
+      loadFromLocalStorage();
+
+      // Then apply URL params (which will override local storage if present)
       applyFontAndSizeFromURL();
 
       // Add event listeners to the selectors to update the URL and text area on change
       document.getElementById('font-selector').addEventListener('change', updateURLParams);
       document.getElementById('font-size-selector').addEventListener('change', updateURLParams);
+
+      // Save to local storage every 5 seconds
+      setInterval(saveToLocalStorage, 5000);
     }
   </script>
 
