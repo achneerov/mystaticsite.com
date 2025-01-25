@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Basic Notepad</title>
+  <title>Enhanced Notepad</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 h-screen flex flex-col">
@@ -15,20 +15,63 @@
       <div class="flex items-center space-x-6">
         <label for="font-selector" class="text-white text-sm">Font:</label>
         <select id="font-selector" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 ease-in-out hover:bg-blue-700">
-          <option value="Arial">Arial</option>
-          <option value="Courier New">Courier New</option>
-          <option value="Georgia">Georgia</option>
-          <option value="Times New Roman">Times New Roman</option>
-          <option value="Verdana">Verdana</option>
+          <!-- Serif Fonts -->
+          <optgroup label="Serif Fonts">
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Palatino Linotype">Palatino Linotype</option>
+            <option value="Book Antiqua">Book Antiqua</option>
+            <option value="Cambria">Cambria</option>
+          </optgroup>
+          
+          <!-- Sans-Serif Fonts -->
+          <optgroup label="Sans-Serif Fonts">
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Geneva">Geneva</option>
+          </optgroup>
+          
+          <!-- Monospace Fonts -->
+          <optgroup label="Monospace Fonts">
+            <option value="Courier New">Courier New</option>
+            <option value="Lucida Console">Lucida Console</option>
+            <option value="Monaco">Monaco</option>
+          </optgroup>
+          
+          <!-- Cursive/Decorative Fonts -->
+          <optgroup label="Decorative Fonts">
+            <option value="Comic Sans MS">Comic Sans MS</option>
+            <option value="Brush Script MT">Brush Script MT</option>
+          </optgroup>
         </select>
 
         <label for="font-size-selector" class="text-white text-sm">Size:</label>
         <select id="font-size-selector" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 ease-in-out hover:bg-blue-700">
-          <option value="14">14px</option>
-          <option value="16">16px</option>
-          <option value="18">18px</option>
-          <option value="20">20px</option>
-          <option value="22">22px</option>
+          <optgroup label="Small Sizes">
+            <option value="10">10px</option>
+            <option value="12">12px</option>
+            <option value="14">14px</option>
+          </optgroup>
+          <optgroup label="Medium Sizes">
+            <option value="16">16px</option>
+            <option value="18">18px</option>
+            <option value="20">20px</option>
+            <option value="22">22px</option>
+          </optgroup>
+          <optgroup label="Large Sizes">
+            <option value="24">24px</option>
+            <option value="28">28px</option>
+            <option value="32">32px</option>
+            <option value="36">36px</option>
+          </optgroup>
+          <optgroup label="Extra Large Sizes">
+            <option value="42">42px</option>
+            <option value="48">48px</option>
+            <option value="56">56px</option>
+          </optgroup>
         </select>
       </div>
 
