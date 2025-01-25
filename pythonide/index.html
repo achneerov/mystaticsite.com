@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python IDE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-blue-500 shadow">
+        <nav class="container mx-auto flex justify-center py-4">
+          <a href="../index.html" class="mx-4 text-white hover:text-gray-200">Directory</a>
+        </nav>
+      </header>
+    <div class="container mx-auto p-4">
+        <textarea id="code" class="w-full h-64 p-2 mb-4 border rounded" placeholder="Enter Python code here..."></textarea>
+        <div class="flex space-x-2 mb-4">
+            <button id="run" class="bg-blue-500 text-white px-4 py-2 rounded flex items-center justify-center space-x-2">
+                <span id="run-text">Run</span>
+                <svg id="spinner" class="hidden w-4 h-4 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+            </button>
+            <button id="clear" class="bg-red-500 text-white px-4 py-2 rounded">Clear</button>
+        </div>
+        <pre id="output" class="bg-white p-4 border rounded"></pre>
+    </div>
+
+    <script>
+        async function runPython() {
+            // Get elements
+            const runButton = document.getElementById('run');
+            const runText = document.getElementById('run-text');
+            const spinner = document.getElementById('spinner');
+            const code = document.getElementById('code').value;
+            const output = document.getElementById('output');
+
+            // Show spinner and hide "Run" text
+            spinner.classList.remove('hidden');
+            runText.classList.add('hidden');
+            runButton.disabled = true;
+
+            try {
+                let pyodide = await loadPyodide();
+
+                // Capture stdout
+                pyodide.runPython(`
+import sys
+from io import StringIO
+
+class CaptureStdout:
+    def __init__(self):
+        self.output = StringIO()
+
+    def write(self, text):
+        self.output.write(text)
+
+    def getvalue(self):
+        return self.output.getvalue()
+
+capture = CaptureStdout()
+sys.stdout = capture
+`);
+
+                // Run user code
+                pyodide.runPython(code);
+
+                // Get captured output
+                const stdout = pyodide.runPython('capture.getvalue()');
+                output.textContent = stdout;
+                output.classList.remove('text-red-500');
+            } catch (err) {
+                output.textContent = err.toString();
+                output.classList.add('text-red-500');
+            } finally {
+                // Hide spinner and show "Run" text again
+                spinner.classList.add('hidden');
+                runText.classList.remove('hidden');
+                runButton.disabled = false;
+            }
+        }
+
+        // Save content to local storage every 5 seconds
+        setInterval(() => {
+            const code = document.getElementById('code').value;
+            localStorage.setItem('pythonCode', code);
+        }, 5000);
+
+        // Load content from local storage on page load
+        window.addEventListener('load', () => {
+            const savedCode = localStorage.getItem('pythonCode');
+            if (savedCode) {
+                document.getElementById('code').value = savedCode;
+            }
+        });
+
+        // Event listeners for buttons
+        document.getElementById('run').addEventListener('click', runPython);
+        document.getElementById('clear').addEventListener('click', () => {
+            document.getElementById('code').value = '';
+            document.getElementById('output').textContent = '';
+            localStorage.removeItem('pythonCode');
+        });
+    </script>
+</body>
+</html>
