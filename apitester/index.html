@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans p-8">
+
+    <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h1 class="text-2xl font-semibold mb-4">API Tester</h1>
+
+        <form id="apiTesterForm" class="space-y-4">
+            <div class="flex flex-col">
+                <label for="url" class="text-sm font-medium text-gray-700">API URL</label>
+                <input id="url" type="text" class="p-2 border border-gray-300 rounded-lg" placeholder="Enter the API URL">
+            </div>
+
+            <div class="flex flex-col">
+                <label for="method" class="text-sm font-medium text-gray-700">Request Method</label>
+                <select id="method" class="p-2 border border-gray-300 rounded-lg">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+            </div>
+
+            <div class="flex flex-col">
+                <label for="headers" class="text-sm font-medium text-gray-700">Headers (Optional)</label>
+                <textarea id="headers" rows="4" class="p-2 border border-gray-300 rounded-lg" placeholder='{"key": "value"}'></textarea>
+            </div>
+
+            <div class="flex flex-col">
+                <label for="body" class="text-sm font-medium text-gray-700">Body (Optional, for POST/PUT)</label>
+                <textarea id="body" rows="4" class="p-2 border border-gray-300 rounded-lg" placeholder='{"key": "value"}'></textarea>
+            </div>
+
+            <button id="sendRequestBtn" type="button" class="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Send Request</button>
+        </form>
+
+        <div class="mt-6" id="responseSection">
+            <h2 class="text-lg font-semibold">Response</h2>
+            <pre id="responseOutput" class="bg-gray-200 p-4 rounded-lg overflow-auto"></pre>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sendRequestBtn').addEventListener('click', async function () {
+            const url = document.getElementById('url').value;
+            const method = document.getElementById('method').value;
+            const headers = document.getElementById('headers').value ? JSON.parse(document.getElementById('headers').value) : {};
+            const body = document.getElementById('body').value ? JSON.parse(document.getElementById('body').value) : null;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...headers,
+                    },
+                    body: method === 'POST' || method === 'PUT' ? JSON.stringify(body) : null,
+                });
+
+                const responseData = await response.json();
+                document.getElementById('responseOutput').textContent = JSON.stringify(responseData, null, 2);
+            } catch (error) {
+                document.getElementById('responseOutput').textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
