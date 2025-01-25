@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basic Notepad</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+
+  <!-- Header with blue background and shadow -->
+  <header class="bg-blue-500 shadow">
+    <nav class="container mx-auto flex justify-between items-center py-4">
+      <!-- Font and size selectors -->
+      <div class="flex items-center space-x-6">
+        <label for="font-selector" class="text-white text-sm">Font:</label>
+        <select id="font-selector" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 ease-in-out hover:bg-blue-700">
+          <option value="Arial">Arial</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Verdana">Verdana</option>
+        </select>
+
+        <label for="font-size-selector" class="text-white text-sm">Size:</label>
+        <select id="font-size-selector" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 ease-in-out hover:bg-blue-700">
+          <option value="14">14px</option>
+          <option value="16">16px</option>
+          <option value="18">18px</option>
+          <option value="20">20px</option>
+          <option value="22">22px</option>
+        </select>
+      </div>
+
+      <!-- Directory Link -->
+      <a href="../index.html" class="text-white text-sm hover:text-gray-200 transition">Directory</a>
+    </nav>
+  </header>
+
+  <!-- Text area for typing -->
+  <div class="flex-1 overflow-hidden">
+    <textarea id="text-area" class="w-full h-full p-4 bg-white text-black border-none outline-none" placeholder="Start typing here..."></textarea>
+  </div>
+
+  <script>
+    // Function to update the URL with the selected font and size
+    function updateURLParams() {
+      const fontSelector = document.getElementById('font-selector');
+      const fontSizeSelector = document.getElementById('font-size-selector');
+      const font = fontSelector.value;
+      const fontSize = fontSizeSelector.value;
+
+      // Update the URL with the selected font and size as parameters
+      const url = new URL(window.location);
+      url.searchParams.set('font', font);
+      url.searchParams.set('size', fontSize);
+
+      // Apply changes to the text area in real-time
+      document.getElementById('text-area').style.fontFamily = font;
+      document.getElementById('text-area').style.fontSize = fontSize + 'px';
+
+      // Push the updated URL to the browser without reloading the page
+      window.history.pushState({}, '', url);
+    }
+
+    // Function to apply the font and size from the URL params
+    function applyFontAndSizeFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const font = urlParams.get('font');
+      const fontSize = urlParams.get('size');
+
+      // If font and size are available in the URL, apply them
+      if (font) {
+        document.getElementById('font-selector').value = font;
+        document.getElementById('text-area').style.fontFamily = font;
+      }
+
+      if (fontSize) {
+        document.getElementById('font-size-selector').value = fontSize;
+        document.getElementById('text-area').style.fontSize = fontSize + 'px';
+      }
+    }
+
+    // Apply font and size from URL when the page loads
+    window.onload = function() {
+      applyFontAndSizeFromURL();
+
+      // Add event listeners to the selectors to update the URL and text area on change
+      document.getElementById('font-selector').addEventListener('change', updateURLParams);
+      document.getElementById('font-size-selector').addEventListener('change', updateURLParams);
+    }
+  </script>
+
+</body>
+</html>
