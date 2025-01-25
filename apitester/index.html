@@ -3,71 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Tester</title>
+    <title>API Request Tester</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans p-8">
 
-    <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-        <h1 class="text-2xl font-semibold mb-4">API Tester</h1>
-
-        <form id="apiTesterForm" class="space-y-4">
-            <div class="flex flex-col">
-                <label for="url" class="text-sm font-medium text-gray-700">API URL</label>
-                <input id="url" type="text" class="p-2 border border-gray-300 rounded-lg" placeholder="Enter the API URL">
+<header class="bg-blue-500 shadow">
+    <nav class="container mx-auto flex justify-center py-4">
+      <a href="../index.html" class="mx-4 text-white hover:text-gray-200">Directory</a>
+    </nav>
+  </header>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <div class="container mx-auto px-4 py-10 max-w-4xl">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">API Request Tester</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">URL</label>
+                    <input 
+                        type="text" 
+                        id="urlInput"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter API endpoint"
+                        value="https://jsonplaceholder.typicode.com/todos/1"
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Method</label>
+                    <select 
+                        id="methodSelect"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PATCH">PATCH</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="flex flex-col">
-                <label for="method" class="text-sm font-medium text-gray-700">Request Method</label>
-                <select id="method" class="p-2 border border-gray-300 rounded-lg">
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>
-                </select>
+            <div id="headersContainer" class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-sm font-medium text-gray-700">Headers</label>
+                    <button 
+                        id="addHeaderBtn"
+                        class="text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                    >
+                        + Add Header
+                    </button>
+                </div>
+                <div id="headerInputs">
+                    <div class="header-input-group flex space-x-2 mb-2">
+                        <input 
+                            type="text"
+                            class="header-key flex-1 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                            placeholder="Key"
+                            value="Content-Type"
+                        >
+                        <input 
+                            type="text"
+                            class="header-value flex-1 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                            placeholder="Value"
+                            value="application/json"
+                        >
+                        <button class="remove-header text-red-500 hover:text-red-700">×</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex flex-col">
-                <label for="headers" class="text-sm font-medium text-gray-700">Headers (Optional)</label>
-                <textarea id="headers" rows="4" class="p-2 border border-gray-300 rounded-lg" placeholder='{"key": "value"}'></textarea>
+            <div id="bodyContainer" class="mb-4 hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Request Body</label>
+                <textarea 
+                    id="bodyInput"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                    placeholder="Enter JSON request body"
+                ></textarea>
             </div>
 
-            <div class="flex flex-col">
-                <label for="body" class="text-sm font-medium text-gray-700">Body (Optional, for POST/PUT)</label>
-                <textarea id="body" rows="4" class="p-2 border border-gray-300 rounded-lg" placeholder='{"key": "value"}'></textarea>
+            <div class="flex justify-center mb-4">
+                <button 
+                    id="sendRequestBtn"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center"
+                >
+                    Send Request
+                </button>
             </div>
 
-            <button id="sendRequestBtn" type="button" class="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Send Request</button>
-        </form>
+            <div id="errorContainer" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"></div>
 
-        <div class="mt-6" id="responseSection">
-            <h2 class="text-lg font-semibold">Response</h2>
-            <pre id="responseOutput" class="bg-gray-200 p-4 rounded-lg overflow-auto"></pre>
+            <div id="responseContainer" class="hidden bg-gray-50 border border-gray-200 rounded-md p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-semibold text-gray-700">Response</h3>
+                    <button 
+                        id="copyResponseBtn"
+                        class="text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                    >
+                        Copy Response
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <p class="font-medium">Status:</p>
+                        <p id="responseStatus" class="font-bold"></p>
+                    </div>
+                    <div>
+                        <p class="font-medium">Response Headers:</p>
+                        <pre id="responseHeaders" class="text-xs overflow-auto max-h-40"></pre>
+                    </div>
+                    <div>
+                        <p class="font-medium">Response Body:</p>
+                        <pre id="responseBody" class="text-xs overflow-auto max-h-40"></pre>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('sendRequestBtn').addEventListener('click', async function () {
-            const url = document.getElementById('url').value;
-            const method = document.getElementById('method').value;
-            const headers = document.getElementById('headers').value ? JSON.parse(document.getElementById('headers').value) : {};
-            const body = document.getElementById('body').value ? JSON.parse(document.getElementById('body').value) : null;
+        // DOM Elements
+        const urlInput = document.getElementById('urlInput');
+        const methodSelect = document.getElementById('methodSelect');
+        const headerInputs = document.getElementById('headerInputs');
+        const addHeaderBtn = document.getElementById('addHeaderBtn');
+        const bodyContainer = document.getElementById('bodyContainer');
+        const bodyInput = document.getElementById('bodyInput');
+        const sendRequestBtn = document.getElementById('sendRequestBtn');
+        const errorContainer = document.getElementById('errorContainer');
+        const responseContainer = document.getElementById('responseContainer');
+        const responseStatus = document.getElementById('responseStatus');
+        const responseHeaders = document.getElementById('responseHeaders');
+        const responseBody = document.getElementById('responseBody');
+        const copyResponseBtn = document.getElementById('copyResponseBtn');
+
+        // Toggle body input visibility based on method
+        methodSelect.addEventListener('change', () => {
+            bodyContainer.classList.toggle('hidden', methodSelect.value === 'GET');
+        });
+
+        // Add header button
+        addHeaderBtn.addEventListener('click', () => {
+            const headerGroup = document.createElement('div');
+            headerGroup.classList.add('header-input-group', 'flex', 'space-x-2', 'mb-2');
+            headerGroup.innerHTML = `
+                <input 
+                    type="text"
+                    class="header-key flex-1 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                    placeholder="Key"
+                >
+                <input 
+                    type="text"
+                    class="header-value flex-1 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                    placeholder="Value"
+                >
+                <button class="remove-header text-red-500 hover:text-red-700">×</button>
+            `;
+            headerInputs.appendChild(headerGroup);
+
+            // Remove header functionality
+            headerGroup.querySelector('.remove-header').addEventListener('click', () => {
+                headerGroup.remove();
+            });
+        });
+
+        // Remove initial header functionality
+        document.querySelector('.remove-header')?.addEventListener('click', (e) => {
+            e.target.closest('.header-input-group').remove();
+        });
+
+        // Send request
+        sendRequestBtn.addEventListener('click', async () => {
+            // Reset previous state
+            errorContainer.classList.add('hidden');
+            errorContainer.textContent = '';
+            responseContainer.classList.add('hidden');
+            sendRequestBtn.disabled = true;
+            sendRequestBtn.innerHTML = 'Sending...';
 
             try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...headers,
-                    },
-                    body: method === 'POST' || method === 'PUT' ? JSON.stringify(body) : null,
+                // Collect headers
+                const headers = {};
+                document.querySelectorAll('.header-input-group').forEach(group => {
+                    const key = group.querySelector('.header-key').value.trim();
+                    const value = group.querySelector('.header-value').value.trim();
+                    if (key) headers[key] = value;
                 });
 
+                // Prepare request options
+                const requestOptions = {
+                    method: methodSelect.value,
+                    headers: headers
+                };
+
+                // Add body for non-GET methods
+                if (methodSelect.value !== 'GET' && bodyInput.value.trim()) {
+                    requestOptions.body = bodyInput.value.trim();
+                }
+
+                // Send request
+                const response = await fetch(urlInput.value, requestOptions);
+
+                // Process response
                 const responseData = await response.json();
-                document.getElementById('responseOutput').textContent = JSON.stringify(responseData, null, 2);
+                
+                // Display response
+                responseStatus.textContent = response.status;
+                responseStatus.className = `font-bold ${response.status >= 200 && response.status < 300 ? 'text-green-600' : 'text-red-600'}`;
+                
+                // Display headers
+                const headersObj = Object.fromEntries(response.headers.entries());
+                responseHeaders.textContent = JSON.stringify(headersObj, null, 2);
+                
+                // Display body
+                responseBody.textContent = JSON.stringify(responseData, null, 2);
+                
+                // Show response container
+                responseContainer.classList.remove('hidden');
+
             } catch (error) {
-                document.getElementById('responseOutput').textContent = `Error: ${error.message}`;
+                // Display error
+                errorContainer.textContent = error.message;
+                errorContainer.classList.remove('hidden');
+            } finally {
+                // Reset button
+                sendRequestBtn.disabled = false;
+                sendRequestBtn.innerHTML = 'Send Request';
             }
+        });
+
+        // Copy response
+        copyResponseBtn.addEventListener('click', () => {
+            const responseToCopy = {
+                status: responseStatus.textContent,
+                headers: JSON.parse(responseHeaders.textContent),
+                body: JSON.parse(responseBody.textContent)
+            };
+            navigator.clipboard.writeText(JSON.stringify(responseToCopy, null, 2));
         });
     </script>
 </body>
