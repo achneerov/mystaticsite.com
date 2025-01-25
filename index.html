@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Static Site</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <header class="bg-blue-500 shadow">
+      <nav class="container mx-auto flex justify-center py-4">
+        <a href="index.html" class="mx-4 text-white hover:text-gray-200">Directory</a>
+        <a href="news.html" class="mx-4 text-white hover:text-gray-200">News</a>
+        <a href="about.html" class="mx-4 text-white hover:text-gray-200">About</a>
+      </nav>
+    </header>
+
+    <main class="flex-grow container mx-auto py-12 flex justify-center items-center">
+      <div class="bg-white shadow-md rounded-2xl p-6 max-w-lg w-full text-center">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Welcome to the Main Index</h1>
+        <p class="text-gray-600 mb-4">Navigate to one of the following pages:</p>
+        <div class="space-y-4">
+            <a 
+                href="./followercheck/index.html" 
+                class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all">
+                Follower Check
+            </a>
+            <a 
+                href="./test2/index.html" 
+                class="block w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg transition-all">
+                Test 2
+            </a>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-gray-300 pt-6 pb-4">
+      <div class="text-center space-y-2">
+        <p class="text-gray-600">&copy; 2025. All rights reserved.</p>
+        <p class="text-gray-600">Created by Alexander Chneerov</p>
+      </div>
+    </footer>
+
+  </body>
+</html>
