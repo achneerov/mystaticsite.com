@@ -14,6 +14,6 @@ export function decodeAtbash(input, alphabetStr) {
         }
     }
     return [
-        [`Atbash Cipher (Alphabet: ${alphabetStr})`, decoded]
+        [`Atbash Cipher - Using alphabet: ${alphabetStr}`, decoded]
     ];
 }

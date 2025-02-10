@@ -206,10 +206,11 @@
             // Display results
             allResults.forEach(([description, decoded]) => {
                 const row = document.createElement('tr');
+                const tooltipContent = description.replace(/,/g, ', ');  // Add spaces after commas for better readability
                 row.innerHTML = `
                     <td class="py-2 border-t">${decoded}</td>
                     <td class="py-2 border-t">
-                        <span class="cursor-help text-blue-500" data-tippy-content="${description}">
+                        <span class="cursor-help text-blue-500" data-tippy-content="${tooltipContent}">
                             ℹ️
                         </span>
                     </td>

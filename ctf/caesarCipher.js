@@ -17,7 +17,7 @@ export function decodeCaesar(input, alphabetStr) {
             }
         }
         results.push([
-            `Caesar Cipher (Shift ${shift}, Alphabet: ${alphabetStr})`,
+            `Caesar Cipher - Shift ${shift} - Using alphabet: ${alphabetStr}`,
             decoded
         ]);
     }
