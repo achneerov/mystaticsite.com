@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Kernel Convolution Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-500 shadow">
+        <nav class="container mx-auto flex justify-center py-4">
+            <a href="../index.html" class="mx-4 text-white hover:text-gray-200">Directory</a>
+        </nav>
+    </header>
+    <main class="container mx-auto px-4 mt-10 flex-grow">
+        <h1 class="text-3xl font-bold text-center mb-8">Image Kernel Convolution Tool</h1>
+        <div class="space-y-6">
+            <div class="border p-6 rounded-lg bg-white shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h2 class="text-xl font-semibold mb-4">Kernel Values (3x3)</h2>
+                        <div class="grid grid-cols-3 gap-2 max-w-xs">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
+                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
+                        </div>
+                        <div class="space-y-4 mt-4">
+                            <div>
+                                <button id="applyButton" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                    Apply Kernel
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                                <button id="uploadButton" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                                    Upload Image
+                                </button>
+                                <button id="downloadButton" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                    Download Result
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="border p-4 rounded">
+                            <h3 class="font-semibold mb-2">Original Image</h3>
+                            <canvas id="originalCanvas" class="w-full"></canvas>
+                        </div>
+                        <div class="border p-4 rounded">
+                            <h3 class="font-semibold mb-2">Processed Image</h3>
+                            <canvas id="processedCanvas" class="w-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="py-4 mt-auto">
+        <div class="text-center space-y-2">
+            <p class="text-gray-600">&copy; <span id="currentYear"></span>. All rights reserved.</p>
+            <p class="text-gray-600">Created by Alexander Chneerov</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        const originalCanvas = document.getElementById('originalCanvas');
+        const processedCanvas = document.getElementById('processedCanvas');
+        const applyButton = document.getElementById('applyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const uploadButton = document.getElementById('uploadButton');
+        const imageUpload = document.getElementById('imageUpload');
+        const kernelInputs = document.querySelectorAll('.kernel-input');
+
+        const originalCtx = originalCanvas.getContext('2d');
+        const processedCtx = processedCanvas.getContext('2d');
+
+        // Load and process the image
+        const img = new Image();
+        img.src = '/api/placeholder/400/300';  // Placeholder image
+        img.onload = function() {
+            // Set canvas sizes
+            originalCanvas.width = img.width;
+            originalCanvas.height = img.height;
+            processedCanvas.width = img.width;
+            processedCanvas.height = img.height;
+
+            // Draw original image
+            originalCtx.drawImage(img, 0, 0);
+        };
+
+        function getKernelValues() {
+            return Array.from(kernelInputs).map(input => parseFloat(input.value));
+        }
+
+        function applyKernel() {
+            const kernel = getKernelValues();
+            const imageData = originalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
+            const output = processedCtx.createImageData(imageData);
+
+            for (let y = 1; y < imageData.height - 1; y++) {
+                for (let x = 1; x < imageData.width - 1; x++) {
+                    const px = (y * imageData.width + x) * 4;
+                    
+                    for (let c = 0; c < 3; c++) {  // Process RGB channels
+                        let sum = 0;
+                        for (let ky = -1; ky <= 1; ky++) {
+                            for (let kx = -1; kx <= 1; kx++) {
+                                const idx = ((y + ky) * imageData.width + (x + kx)) * 4 + c;
+                                sum += imageData.data[idx] * kernel[(ky + 1) * 3 + (kx + 1)];
+                            }
+                        }
+                        output.data[px + c] = Math.min(Math.max(sum, 0), 255);
+                    }
+                    output.data[px + 3] = 255;  // Alpha channel
+                }
+            }
+
+            processedCtx.putImageData(output, 0, 0);
+        }
+
+        function downloadResult() {
+            const link = document.createElement('a');
+            link.download = 'processed_image.png';
+            link.href = processedCanvas.toDataURL();
+            link.click();
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        uploadButton.addEventListener('click', () => imageUpload.click());
+        imageUpload.addEventListener('change', handleImageUpload);
+        applyButton.addEventListener('click', applyKernel);
+        downloadButton.addEventListener('click', downloadResult);
+    </script>
+</body>
+</html>
