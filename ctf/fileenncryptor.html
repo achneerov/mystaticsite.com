@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Encryption/Decryption</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        input[type="file"], input[type="password"] {
+            display: block;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.5rem 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .error {
+            color: red;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>File Encryption/Decryption</h1>
+        
+        <div class="section">
+            <h2>Encrypt File</h2>
+            <input type="file" id="encryptFile">
+            <input type="password" id="encryptPassword" placeholder="Enter password">
+            <button onclick="encryptFile()">Encrypt</button>
+            <div id="encryptError" class="error"></div>
+        </div>
+
+        <div class="section">
+            <h2>Decrypt File</h2>
+            <input type="file" id="decryptFile">
+            <input type="password" id="decryptPassword" placeholder="Enter password">
+            <button onclick="decryptFile()">Decrypt</button>
+            <div id="decryptError" class="error"></div>
+        </div>
+    </div>
+
+    <script>
+        async function encryptFile() {
+            const fileInput = document.getElementById('encryptFile');
+            const passwordInput = document.getElementById('encryptPassword');
+            const errorDiv = document.getElementById('encryptError');
+
+            try {
+                errorDiv.textContent = '';
+                
+                if (!fileInput.files.length) {
+                    throw new Error('Please select a file');
+                }
+                
+                if (!passwordInput.value) {
+                    throw new Error('Please enter a password');
+                }
+
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = async (e) => {
+                    try {
+                        // Convert file to Base64
+                        const base64Data = e.target.result.split(',')[1];
+                        
+                        // Encrypt the file data
+                        const encrypted = CryptoJS.AES.encrypt(base64Data, passwordInput.value).toString();
+                        
+                        // Create metadata object
+                        const metadata = {
+                            filename: file.name,
+                            type: file.type,
+                            encrypted: encrypted
+                        };
+                        
+                        // Convert to JSON and create blob
+                        const jsonData = JSON.stringify(metadata);
+                        const blob = new Blob([jsonData], { type: 'application/json' });
+                        
+                        // Create download link
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = file.name + '.alexencrypted';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    } catch (err) {
+                        errorDiv.textContent = 'Encryption failed: ' + err.message;
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            } catch (err) {
+                errorDiv.textContent = err.message;
+            }
+        }
+
+        async function decryptFile() {
+            const fileInput = document.getElementById('decryptFile');
+            const passwordInput = document.getElementById('decryptPassword');
+            const errorDiv = document.getElementById('decryptError');
+
+            try {
+                errorDiv.textContent = '';
+                
+                if (!fileInput.files.length) {
+                    throw new Error('Please select a file');
+                }
+                
+                if (!passwordInput.value) {
+                    throw new Error('Please enter a password');
+                }
+
+                const file = fileInput.files[0];
+                
+                if (!file.name.endsWith('.alexencrypted')) {
+                    throw new Error('Invalid file type. Please select an encrypted file (.alexencrypted)');
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = async (e) => {
+                    try {
+                        // Parse the JSON metadata
+                        const metadata = JSON.parse(e.target.result);
+                        
+                        // Decrypt the file data
+                        const decrypted = CryptoJS.AES.decrypt(metadata.encrypted, passwordInput.value);
+                        const decryptedData = decrypted.toString(CryptoJS.enc.Utf8);
+                        
+                        if (!decryptedData) {
+                            throw new Error('Incorrect password or corrupted file');
+                        }
+
+                        // Convert Base64 back to blob
+                        const byteString = atob(decryptedData);
+                        const ab = new ArrayBuffer(byteString.length);
+                        const ia = new Uint8Array(ab);
+                        
+                        for (let i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                        }
+                        
+                        const blob = new Blob([ab], { type: metadata.type });
+                        
+                        // Create download link
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = metadata.filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    } catch (err) {
+                        errorDiv.textContent = 'Decryption failed: ' + err.message;
+                    }
+                };
+
+                reader.readAsText(file);
+            } catch (err) {
+                errorDiv.textContent = err.message;
+            }
+        }
+    </script>
+</body>
+</html>
