@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light-border.css"/>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <header class="bg-blue-500 shadow">
@@ -121,9 +122,61 @@
         </div>
     </footer>
 
-    <script type="module">
-        import { decodeCaesar } from './caesarCipher.js';
-        import { decodeAtbash } from './atbashCipher.js';
+    <script>
+        // Helper function to escape HTML
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Caesar cipher decoder
+        function decodeCaesar(input, alphabetStr) {
+            const results = [];
+            const alphabet = alphabetStr.split(',').map(c => c.trim().toUpperCase());
+            
+            // Try all 26 possible shifts
+            for (let shift = 0; shift < 26; shift++) {
+                let decoded = '';
+                for (let i = 0; i < input.length; i++) {
+                    const char = input[i].toUpperCase();
+                    if (alphabet.includes(char)) {
+                        const currentIndex = alphabet.indexOf(char);
+                        const newIndex = (currentIndex - shift + 26) % 26;
+                        decoded += input[i] === char ? alphabet[newIndex] : alphabet[newIndex].toLowerCase();
+                    } else {
+                        decoded += input[i];
+                    }
+                }
+                results.push([
+                    `Caesar Cipher - Shift ${shift} - Using alphabet: ${alphabetStr}`,
+                    decoded
+                ]);
+            }
+            return results;
+        }
+
+        // Atbash cipher decoder
+        function decodeAtbash(input, alphabetStr) {
+            const alphabet = alphabetStr.split(',').map(c => c.trim().toUpperCase());
+            const reversed = [...alphabet].reverse();
+            let decoded = '';
+            
+            for (let i = 0; i < input.length; i++) {
+                const char = input[i].toUpperCase();
+                if (alphabet.includes(char)) {
+                    const index = alphabet.indexOf(char);
+                    decoded += input[i] === char ? reversed[index] : reversed[index].toLowerCase();
+                } else {
+                    decoded += input[i];
+                }
+            }
+            
+            return [[`Atbash Cipher - Using alphabet: ${alphabetStr}`, decoded]];
+        }
 
         // Initialize tooltips
         function initTooltips() {
@@ -131,7 +184,9 @@
                 placement: 'right',
                 arrow: true,
                 theme: 'light-border',
-                interactive: true
+                interactive: true,
+                allowHTML: false,
+                maxWidth: 500
             });
         }
 
@@ -206,23 +261,36 @@
             // Display results
             allResults.forEach(([description, decoded]) => {
                 const row = document.createElement('tr');
-                const tooltipContent = description.replace(/,/g, ', ');  // Add spaces after commas for better readability
-                row.innerHTML = `
-                    <td class="py-2 border-t">${decoded}</td>
-                    <td class="py-2 border-t">
-                        <span class="cursor-help text-blue-500" data-tippy-content="${tooltipContent}">
-                            ℹ️
-                        </span>
-                    </td>
-                `;
+                const tooltipContent = escapeHtml(description);
+                
+                // Create elements properly
+                const decodedCell = document.createElement('td');
+                decodedCell.className = 'py-2 border-t';
+                decodedCell.textContent = decoded;
+                
+                const infoCell = document.createElement('td');
+                infoCell.className = 'py-2 border-t';
+                
+                const tooltipSpan = document.createElement('span');
+                tooltipSpan.className = 'cursor-help text-blue-500';
+                tooltipSpan.setAttribute('data-tippy-content', tooltipContent);
+                tooltipSpan.textContent = 'ℹ️';
+                
+                infoCell.appendChild(tooltipSpan);
+                row.appendChild(decodedCell);
+                row.appendChild(infoCell);
                 resultsBody.appendChild(row);
             });
 
+            // Initialize tooltips after adding new results
             initTooltips();
         });
 
         // Set current year
         document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Initialize tooltips on page load
+        initTooltips();
     </script>
 </body>
 </html>
