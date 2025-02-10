@@ -31,11 +31,11 @@
 
                 <div class="mb-4">
                     <button id="toggleSettings" class="text-blue-600 hover:text-blue-800">
-                        Hide Custom Settings
+                        Show Custom Settings
                     </button>
                 </div>
 
-                <div id="customSettings" class="mb-4 p-4 bg-gray-50 rounded-md">
+                <div id="customSettings" class="mb-4 p-4 bg-gray-50 rounded-md hidden">
                     <h3 class="font-medium mb-2">Select Decoders:</h3>
                     <div class="space-y-4">
                         <!-- Caesar Cipher Section -->
@@ -64,10 +64,10 @@
                                            value="Z,Y,X,W,V,U,T,S,R,Q,P,O,N,M,L,K,J,I,H,G,F,E,D,C,B,A" readonly>
                                 </div>
                                 <div class="alphabet-option">
-                                    <input type="checkbox" checked>
+                                    <input type="checkbox">
                                     <span class="ml-2">Custom</span>
                                     <input type="text" class="ml-2 w-full border rounded px-2" 
-                                           value="a,b,c">
+                                           value="a,b,c" placeholder="Enter comma-separated characters">
                                 </div>
                             </div>
                         </div>
@@ -86,10 +86,10 @@
                                            value="A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z" readonly>
                                 </div>
                                 <div class="alphabet-option">
-                                    <input type="checkbox" checked>
+                                    <input type="checkbox">
                                     <span class="ml-2">Custom</span>
                                     <input type="text" class="ml-2 w-full border rounded px-2" 
-                                           value="a,b,c">
+                                           value="a,b,c" placeholder="Enter comma-separated characters">
                                 </div>
                             </div>
                         </div>
@@ -137,15 +137,16 @@
         function decodeCaesar(input, alphabetStr) {
             const results = [];
             const alphabet = alphabetStr.split(',').map(c => c.trim().toUpperCase());
+            const maxShift = alphabet.length;
             
-            // Try all 26 possible shifts
-            for (let shift = 0; shift < 26; shift++) {
+            // Try all possible shifts
+            for (let shift = 0; shift < maxShift; shift++) {
                 let decoded = '';
                 for (let i = 0; i < input.length; i++) {
                     const char = input[i].toUpperCase();
                     if (alphabet.includes(char)) {
                         const currentIndex = alphabet.indexOf(char);
-                        const newIndex = (currentIndex - shift + 26) % 26;
+                        const newIndex = (currentIndex - shift + maxShift) % maxShift;
                         decoded += input[i] === char ? alphabet[newIndex] : alphabet[newIndex].toLowerCase();
                     } else {
                         decoded += input[i];
@@ -215,10 +216,17 @@
         }
 
         // Validate alphabet format
-        function validateAlphabet(alphabet) {
+        function validateAlphabet(alphabet, isStandard = false) {
             const letters = alphabet.split(',').map(l => l.trim().toUpperCase());
-            if (letters.length !== 26) return false;
-            return new Set(letters).size === 26;
+            if (letters.length === 0) return false;
+            
+            // For standard alphabets (A-Z), require 26 unique characters
+            if (isStandard && (letters.length !== 26 || new Set(letters).size !== 26)) {
+                return false;
+            }
+            
+            // For custom alphabets, just check for uniqueness
+            return new Set(letters).size === letters.length;
         }
 
         // Decode function
@@ -237,7 +245,8 @@
                 const caesarAlphabets = getSelectedAlphabets('caesar');
                 
                 for (const alphabet of caesarAlphabets) {
-                    if (!validateAlphabet(alphabet)) {
+                    const isStandard = alphabet.split(',').length === 26;
+                    if (!validateAlphabet(alphabet, isStandard)) {
                         alert(`Invalid alphabet format: ${alphabet}`);
                         return;
                     }
@@ -250,7 +259,8 @@
                 const atbashAlphabets = getSelectedAlphabets('atbash');
                 
                 for (const alphabet of atbashAlphabets) {
-                    if (!validateAlphabet(alphabet)) {
+                    const isStandard = alphabet.split(',').length === 26;
+                    if (!validateAlphabet(alphabet, isStandard)) {
                         alert(`Invalid alphabet format: ${alphabet}`);
                         return;
                     }
@@ -263,7 +273,6 @@
                 const row = document.createElement('tr');
                 const tooltipContent = escapeHtml(description);
                 
-                // Create elements properly
                 const decodedCell = document.createElement('td');
                 decodedCell.className = 'py-2 border-t';
                 decodedCell.textContent = decoded;
