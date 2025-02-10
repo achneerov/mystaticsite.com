@@ -3,21 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>whatever</title>
+    <title>CTF Tools</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <header class="bg-blue-500 shadow">
-      <nav class="container mx-auto flex justify-center py-4">
-        <a href="../index.html" class="mx-4 text-white hover:text-gray-200">My Other Sites</a>
-      </nav>
+        <nav class="container mx-auto flex justify-center py-4">
+            <a href="index.html" class="mx-4 text-white hover:text-gray-200">Home</a>
+            <a href="decode.html" class="mx-4 text-white hover:text-gray-200">Decoder</a>
+            <a href="../index.html" class="mx-4 text-white hover:text-gray-200">My Other Sites</a>
+        </nav>
     </header>
     <main class="container mx-auto px-4 mt-10 flex-grow">
-        <h1 class="text-3xl font-bold text-center mb-8">test</h1>
+        <h1 class="text-3xl font-bold text-center mb-8">CTF Tools Collection</h1>
         <div class="space-y-6">
             <article class="border p-6 rounded-lg bg-white shadow-lg">
-                <h2 class="text-xl font-semibold mb-2">test h2</h2>
-                <p class="text-gray-700">This is a test</p>
+                <h2 class="text-xl font-semibold mb-2">Welcome to CTF Tools</h2>
+                <p class="text-gray-700">A collection of useful tools for CTF challenges. Currently featuring:</p>
+                <ul class="list-disc ml-6 mt-2">
+                    <li class="text-gray-700">Cipher Decoder - Automatically try different decodings on your input</li>
+                </ul>
             </article>
         </div>
     </main>
@@ -27,7 +32,6 @@
             <p class="text-gray-600">Created by Alex with ❤️</p>
         </div>
     </footer>
-
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>

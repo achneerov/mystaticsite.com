@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Decoder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="words.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-500 shadow">
+        <nav class="container mx-auto flex justify-center py-4">
+            <a href="index.html" class="mx-4 text-white hover:text-gray-200">Home</a>
+            <a href="decode.html" class="mx-4 text-white hover:text-gray-200">Decoder</a>
+            <a href="../index.html" class="mx-4 text-white hover:text-gray-200">My Other Sites</a>
+        </nav>
+    </header>
+    <main class="container mx-auto px-4 mt-10 flex-grow">
+        <h1 class="text-3xl font-bold text-center mb-8">Cipher Decoder</h1>
+        <div class="max-w-3xl mx-auto space-y-6">
+            <div class="border p-6 rounded-lg bg-white shadow-lg">
+                <div class="mb-4">
+                    <label for="input" class="block text-sm font-medium text-gray-700 mb-2">Enter encoded text:</label>
+                    <textarea id="input" class="w-full p-2 border rounded-md" rows="3"></textarea>
+                </div>
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <div>
+                        <label for="minShift" class="block text-sm font-medium text-gray-700">Min Shift:</label>
+                        <input type="number" id="minShift" value="1" min="1" max="25" class="mt-1 p-1 border rounded-md w-20">
+                    </div>
+                    <div>
+                        <label for="maxShift" class="block text-sm font-medium text-gray-700">Max Shift:</label>
+                        <input type="number" id="maxShift" value="25" min="1" max="25" class="mt-1 p-1 border rounded-md w-20">
+                    </div>
+                    <div>
+                        <label for="threshold" class="block text-sm font-medium text-gray-700">Word Match Threshold:</label>
+                        <input type="number" id="threshold" value="2" min="1" max="10" class="mt-1 p-1 border rounded-md w-20">
+                    </div>
+                </div>
+                <button onclick="decodeText()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Decode</button>
+            </div>
+            <div id="results" class="border p-6 rounded-lg bg-white shadow-lg space-y-4">
+                <h2 class="text-xl font-semibold">Results</h2>
+                <div id="caesarResults">
+                    <h3 class="text-lg font-medium mb-2">Caesar Cipher Attempts</h3>
+                    <div id="caesarOutput" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="py-4 mt-auto">
+        <div class="text-center space-y-2">
+            <p class="text-gray-600">&copy; <span id="currentYear"></span>. All rights reserved.</p>
+            <p class="text-gray-600">Created by Alex with ❤️</p>
+        </div>
+    </footer>
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        function caesarShift(str, shift) {
+            return str.replace(/[a-zA-Z]/g, function(char) {
+                const isUpperCase = char === char.toUpperCase();
+                const base = isUpperCase ? 'A'.charCodeAt(0) : 'a'.charCodeAt(0);
+                const shifted = (char.charCodeAt(0) - base + shift) % 26;
+                const newChar = String.fromCharCode(((shifted + 26) % 26) + base);
+                return newChar;
+            });
+        }
+
+        function countEnglishWords(text) {
+            const words = text.toLowerCase().match(/[a-z]+/g) || [];
+            return words.filter(word => wordSet.has(word)).length;
+        }
+
+        function decodeText() {
+            const input = document.getElementById('input').value;
+            const minShift = parseInt(document.getElementById('minShift').value);
+            const maxShift = parseInt(document.getElementById('maxShift').value);
+            const threshold = parseInt(document.getElementById('threshold').value);
+            
+            const results = [];
+            
+            // Try Caesar shifts
+            for (let shift = minShift; shift <= maxShift; shift++) {
+                const decoded = caesarShift(input, shift);
+                const wordCount = countEnglishWords(decoded);
+                
+                if (wordCount >= threshold) {
+                    results.push({
+                        shift: shift,
+                        text: decoded,
+                        wordCount: wordCount
+                    });
+                }
+            }
+            
+            // Sort results by word count
+            results.sort((a, b) => b.wordCount - a.wordCount);
+            
+            // Display results
+            const outputDiv = document.getElementById('caesarOutput');
+            outputDiv.innerHTML = results.length > 0 
+                ? results.map(result => `
+                    <div class="p-3 border rounded-md">
+                        <div class="font-medium">Shift ${result.shift} (${result.wordCount} words matched):</div>
+                        <div class="mt-1 text-gray-700">${result.text}</div>
+                    </div>
+                `).join('')
+                : '<div class="text-gray-700">No likely matches found. Try adjusting the threshold.</div>';
+        }
+    </script>
+</body>
+</html>
