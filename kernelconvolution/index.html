@@ -16,46 +16,63 @@
         <h1 class="text-3xl font-bold text-center mb-8">Image Kernel Convolution Tool</h1>
         <div class="space-y-6">
             <div class="border p-6 rounded-lg bg-white shadow-lg">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-4">
-                        <h2 class="text-xl font-semibold mb-4">Kernel Values (3x3)</h2>
-                        <div class="grid grid-cols-3 gap-2 max-w-xs">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
-                            <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
-                        </div>
-                        <div class="space-y-4 mt-4">
-                            <div>
-                                <button id="applyButton" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                                    Apply Kernel
-                                </button>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <input type="file" id="imageUpload" accept="image/*" class="hidden">
-                                <button id="uploadButton" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
-                                    Upload Image
-                                </button>
-                                <button id="downloadButton" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                                    Download Result
-                                </button>
-                            </div>
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold">Kernel Values (3x3)</h2>
+                    
+                    <!-- Custom Tailwind Dropdown -->
+                    <div class="relative inline-block w-full max-w-xs">
+                        <button id="dropdownButton" type="button" class="w-full bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                            <span class="block truncate" id="dropdownText">Custom</span>
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                                </svg>
+                            </span>
+                        </button>
+                        <div id="dropdownMenu" class="hidden absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none">
+                            <div class="cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-blue-50" data-value="custom">Custom</div>
+                            <div class="cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-blue-50" data-value="sobel_x">Sobel X</div>
+                            <div class="cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-blue-50" data-value="sobel_y">Sobel Y</div>
+                            <div class="cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-blue-50" data-value="gaussian">Gaussian Blur</div>
+                            <div class="cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-blue-50" data-value="sharpen">Sharpen</div>
+                            <div class="cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-blue-50" data-value="edge">Edge Detection</div>
                         </div>
                     </div>
+
+                    <div class="grid grid-cols-3 gap-2 max-w-xs">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="-1" step="0.1">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="0" step="0.1">
+                        <input type="number" class="kernel-input w-full p-4 border rounded text-lg" value="1" step="0.1">
+                    </div>
+                    <button id="applyButton" class="max-w-xs w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Apply Kernel
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-6 mt-6">
                     <div class="space-y-4">
                         <div class="border p-4 rounded">
                             <h3 class="font-semibold mb-2">Original Image</h3>
                             <canvas id="originalCanvas" class="w-full"></canvas>
                         </div>
+                        <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                        <button id="uploadButton" class="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                            Upload Image
+                        </button>
+                    </div>
+                    <div class="space-y-4">
                         <div class="border p-4 rounded">
                             <h3 class="font-semibold mb-2">Processed Image</h3>
                             <canvas id="processedCanvas" class="w-full"></canvas>
                         </div>
+                        <button id="downloadButton" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            Download Result
+                        </button>
                     </div>
                 </div>
             </div>
@@ -78,27 +95,62 @@
         const uploadButton = document.getElementById('uploadButton');
         const imageUpload = document.getElementById('imageUpload');
         const kernelInputs = document.querySelectorAll('.kernel-input');
+        const dropdownButton = document.getElementById('dropdownButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const dropdownText = document.getElementById('dropdownText');
+
+        const kernels = {
+            sobel_x: [-1, 0, 1, -2, 0, 2, -1, 0, 1],
+            sobel_y: [-1, -2, -1, 0, 0, 0, 1, 2, 1],
+            gaussian: [1/16, 2/16, 1/16, 2/16, 4/16, 2/16, 1/16, 2/16, 1/16],
+            sharpen: [0, -1, 0, -1, 5, -1, 0, -1, 0],
+            edge: [-1, -1, -1, -1, 8, -1, -1, -1, -1]
+        };
 
         const originalCtx = originalCanvas.getContext('2d');
         const processedCtx = processedCanvas.getContext('2d');
 
-        // Load and process the image
         const img = new Image();
-        img.src = 'test_image.png';  // Placeholder image
+        img.src = 'test_image.png';
         img.onload = function() {
-            // Set canvas sizes
             originalCanvas.width = img.width;
             originalCanvas.height = img.height;
             processedCanvas.width = img.width;
             processedCanvas.height = img.height;
-
-            // Draw original image
             originalCtx.drawImage(img, 0, 0);
         };
 
         function getKernelValues() {
             return Array.from(kernelInputs).map(input => parseFloat(input.value));
         }
+
+        function setKernelValues(values) {
+            kernelInputs.forEach((input, i) => {
+                input.value = values[i];
+            });
+        }
+
+        // Dropdown functionality
+        dropdownButton.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+
+        dropdownMenu.querySelectorAll('div').forEach(option => {
+            option.addEventListener('click', () => {
+                const value = option.dataset.value;
+                dropdownText.textContent = option.textContent;
+                dropdownMenu.classList.add('hidden');
+                if (value !== 'custom' && kernels[value]) {
+                    setKernelValues(kernels[value]);
+                }
+            });
+        });
 
         function applyKernel() {
             const kernel = getKernelValues();
@@ -109,7 +161,7 @@
                 for (let x = 1; x < imageData.width - 1; x++) {
                     const px = (y * imageData.width + x) * 4;
                     
-                    for (let c = 0; c < 3; c++) {  // Process RGB channels
+                    for (let c = 0; c < 3; c++) {
                         let sum = 0;
                         for (let ky = -1; ky <= 1; ky++) {
                             for (let kx = -1; kx <= 1; kx++) {
@@ -119,7 +171,7 @@
                         }
                         output.data[px + c] = Math.min(Math.max(sum, 0), 255);
                     }
-                    output.data[px + 3] = 255;  // Alpha channel
+                    output.data[px + 3] = 255;
                 }
             }
 
