@@ -1,7 +1,7 @@
 // atbashCipher.js
-export function decodeAtbash(input) {
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const reversed = alphabet.split('').reverse().join('');
+export function decodeAtbash(input, alphabetStr) {
+    const alphabet = alphabetStr.split(',').map(c => c.trim().toUpperCase());
+    const reversed = [...alphabet].reverse();
     
     let decoded = '';
     for (let i = 0; i < input.length; i++) {
@@ -13,8 +13,7 @@ export function decodeAtbash(input) {
             decoded += input[i];
         }
     }
-    
     return [
-        ['Atbash Cipher (Reverse Alphabet)', decoded]
+        [`Atbash Cipher (Alphabet: ${alphabetStr})`, decoded]
     ];
 }

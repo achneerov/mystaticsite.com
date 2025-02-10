@@ -1,7 +1,7 @@
 // caesarCipher.js
-export function decodeCaesar(input) {
+export function decodeCaesar(input, alphabetStr) {
     const results = [];
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphabet = alphabetStr.split(',').map(c => c.trim().toUpperCase());
     
     // Try all 26 possible shifts
     for (let shift = 0; shift < 26; shift++) {
@@ -17,10 +17,9 @@ export function decodeCaesar(input) {
             }
         }
         results.push([
-            `Caesar Cipher (Shift ${shift})`,
+            `Caesar Cipher (Shift ${shift}, Alphabet: ${alphabetStr})`,
             decoded
         ]);
     }
-    
     return results;
 }

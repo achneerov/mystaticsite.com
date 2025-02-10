@@ -36,15 +36,62 @@
 
                 <div id="customSettings" class="hidden mb-4 p-4 bg-gray-50 rounded-md">
                     <h3 class="font-medium mb-2">Select Decoders:</h3>
-                    <div class="space-y-2">
-                        <label class="flex items-center">
-                            <input type="checkbox" class="decoder-option" value="caesar" checked>
-                            <span class="ml-2">Caesar Cipher</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="decoder-option" value="atbash" checked>
-                            <span class="ml-2">Atbash Cipher</span>
-                        </label>
+                    <div class="space-y-4">
+                        <!-- Caesar Cipher Section -->
+                        <div class="p-4 border rounded">
+                            <label class="flex items-center mb-2">
+                                <input type="checkbox" class="decoder-option" value="caesar" checked>
+                                <span class="ml-2">Caesar Cipher</span>
+                            </label>
+                            <div class="ml-6 space-y-2" id="caesarAlphabets">
+                                <div class="alphabet-option">
+                                    <input type="checkbox" checked>
+                                    <span class="ml-2">Standard A-Z</span>
+                                    <input type="text" class="ml-2 w-full border rounded px-2" 
+                                           value="A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z" readonly>
+                                </div>
+                                <div class="alphabet-option">
+                                    <input type="checkbox">
+                                    <span class="ml-2">ROT13</span>
+                                    <input type="text" class="ml-2 w-full border rounded px-2" 
+                                           value="N,O,P,Q,R,S,T,U,V,W,X,Y,Z,A,B,C,D,E,F,G,H,I,J,K,L,M" readonly>
+                                </div>
+                                <div class="alphabet-option">
+                                    <input type="checkbox">
+                                    <span class="ml-2">Reverse</span>
+                                    <input type="text" class="ml-2 w-full border rounded px-2" 
+                                           value="Z,Y,X,W,V,U,T,S,R,Q,P,O,N,M,L,K,J,I,H,G,F,E,D,C,B,A" readonly>
+                                </div>
+                                <div class="alphabet-option">
+                                    <input type="checkbox">
+                                    <span class="ml-2">Custom</span>
+                                    <input type="text" class="ml-2 w-full border rounded px-2" 
+                                           placeholder="Enter alphabet (comma-separated letters)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Atbash Cipher Section -->
+                        <div class="p-4 border rounded">
+                            <label class="flex items-center mb-2">
+                                <input type="checkbox" class="decoder-option" value="atbash" checked>
+                                <span class="ml-2">Atbash Cipher</span>
+                            </label>
+                            <div class="ml-6 space-y-2" id="atbashAlphabets">
+                                <div class="alphabet-option">
+                                    <input type="checkbox" checked>
+                                    <span class="ml-2">Standard A-Z</span>
+                                    <input type="text" class="ml-2 w-full border rounded px-2" 
+                                           value="A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z" readonly>
+                                </div>
+                                <div class="alphabet-option">
+                                    <input type="checkbox">
+                                    <span class="ml-2">Custom</span>
+                                    <input type="text" class="ml-2 w-full border rounded px-2" 
+                                           placeholder="Enter alphabet (comma-separated letters)">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -96,8 +143,31 @@
                 'Show Custom Settings' : 'Hide Custom Settings';
         });
 
+        // Helper function to get selected alphabets for a cipher
+        function getSelectedAlphabets(cipherId) {
+            const alphabetsDiv = document.getElementById(`${cipherId}Alphabets`);
+            const selectedAlphabets = [];
+            
+            alphabetsDiv.querySelectorAll('.alphabet-option').forEach(option => {
+                const checkbox = option.querySelector('input[type="checkbox"]');
+                const alphabetInput = option.querySelector('input[type="text"]');
+                if (checkbox.checked && alphabetInput.value.trim()) {
+                    selectedAlphabets.push(alphabetInput.value.trim());
+                }
+            });
+            
+            return selectedAlphabets;
+        }
+
+        // Validate alphabet format
+        function validateAlphabet(alphabet) {
+            const letters = alphabet.split(',').map(l => l.trim().toUpperCase());
+            if (letters.length !== 26) return false;
+            return new Set(letters).size === 26;
+        }
+
         // Decode function
-        document.getElementById('decode').addEventListener('click', async function() {
+        document.getElementById('decode').addEventListener('click', function() {
             const input = document.getElementById('input').value;
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
@@ -107,11 +177,30 @@
 
             let allResults = [];
 
+            // Process Caesar Cipher
             if (selectedDecoders.includes('caesar')) {
-                allResults = allResults.concat(decodeCaesar(input));
+                const caesarAlphabets = getSelectedAlphabets('caesar');
+                
+                for (const alphabet of caesarAlphabets) {
+                    if (!validateAlphabet(alphabet)) {
+                        alert(`Invalid alphabet format: ${alphabet}`);
+                        return;
+                    }
+                    allResults = allResults.concat(decodeCaesar(input, alphabet));
+                }
             }
+
+            // Process Atbash Cipher
             if (selectedDecoders.includes('atbash')) {
-                allResults = allResults.concat(decodeAtbash(input));
+                const atbashAlphabets = getSelectedAlphabets('atbash');
+                
+                for (const alphabet of atbashAlphabets) {
+                    if (!validateAlphabet(alphabet)) {
+                        alert(`Invalid alphabet format: ${alphabet}`);
+                        return;
+                    }
+                    allResults = allResults.concat(decodeAtbash(input, alphabet));
+                }
             }
 
             // Display results
