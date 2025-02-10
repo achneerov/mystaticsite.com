@@ -10002,5 +10002,3 @@ const wordsArr = [
 ];
 
 const wordSet = new Set(wordsArr);
-
-export { wordsArr, wordSet };
