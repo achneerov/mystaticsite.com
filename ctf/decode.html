@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Decoder - CTF Tools</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/tippy.umd.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <header class="bg-blue-500 shadow">
@@ -81,7 +82,9 @@
         function initTooltips() {
             tippy('[data-tippy-content]', {
                 placement: 'right',
-                arrow: true
+                arrow: true,
+                theme: 'light-border',
+                interactive: true
             });
         }
 
@@ -130,9 +133,6 @@
 
         // Set current year
         document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-        // Initial decode
-        document.getElementById('decode').click();
     </script>
 </body>
 </html>
