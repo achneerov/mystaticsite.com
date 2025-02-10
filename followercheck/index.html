@@ -85,13 +85,16 @@
         class="table-container text-center text-lg"></div>
     </main>
 
-    <footer class="border-t border-gray-300 pt-6 pb-4">
+    <footer class="py-4 mt-auto">
       <div class="text-center space-y-2">
-        <p class="text-gray-600">&copy; 2025. All rights reserved.</p>
-        <p class="text-gray-600">Created by Alexander Chneerov</p>
+        <p class="text-gray-600">&copy; <span id="currentYear"></span>. All rights reserved.</p>
+        <p class="text-gray-600">Created by Alex with ❤️</p>
       </div>
     </footer>
 
+    <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
     <script src="js/script.js"></script>
   </body>
 </html>
