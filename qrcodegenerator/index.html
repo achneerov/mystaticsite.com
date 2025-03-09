@@ -5,12 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QR Code Generator</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Added favicon references -->
-  <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
-  <link rel="manifest" href="../images/favicon/site.webmanifest">
-  <link rel="shortcut icon" href="../images/favicon/favicon.ico">
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
   <header class="bg-blue-500 shadow">
@@ -136,7 +130,7 @@
           </p>
           
           <div class="relative">
-            <div id="currentApiUrl" class="block bg-gray-100 p-3 rounded mb-4 break-words whitespace-normal word-wrap"></div>
+            <div id="currentApiUrl" class="block bg-gray-100 p-3 rounded mb-4 overflow-x-auto"></div>
             <button id="copyApiBtn" class="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-gray-700 p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
@@ -349,8 +343,8 @@
       const borderWidth = borderWidthInput.value;
       const downloadFormat = downloadFormatSelect.value;
       
-      // Construct API URL with format parameter
-      const apiUrl = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}&format=${downloadFormat}`;
+      // Construct API URL
+      const apiUrl = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}`;
       
       // Show loading indicator
       loadingIndicator.style.display = 'block';
@@ -380,20 +374,20 @@
     // Update API documentation with current values
     function updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth, downloadFormat) {
       // Update the current API URL display
-      currentApiUrlElement.textContent = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}&format=${downloadFormat}`;
+      currentApiUrlElement.textContent = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}`;
       
       // Clear the params table
       paramsTable.innerHTML = '';
       
       // Create parameter rows with current values
       const params = [
-        { name: 'url', desc: 'The URL to encode in the QR code (any valid URL)', value: url },
-        { name: 'size', desc: 'Size of the QR code image in pixels (range: 100-1000)', value: size },
-        { name: 'fgColor', desc: 'Foreground color in hex without # (format: 6-digit hex)', value: fgColor },
-        { name: 'bgColor', desc: 'Background color in hex without # (format: 6-digit hex)', value: bgColor },
-        { name: 'ecLevel', desc: 'Error correction level (values: L, M, Q, H)', value: ecLevel },
-        { name: 'borderWidth', desc: 'Width of the quiet zone border in modules (range: 0-20)', value: borderWidth },
-        { name: 'format', desc: 'Output format (values: svg, png)', value: downloadFormat }
+        { name: 'url', desc: 'The URL to encode in the QR code', value: url },
+        { name: 'size', desc: 'Size of the QR code image (in pixels)', value: size },
+        { name: 'fgColor', desc: 'Foreground color in hex (without #)', value: fgColor },
+        { name: 'bgColor', desc: 'Background color in hex (without #)', value: bgColor },
+        { name: 'ecLevel', desc: 'Error correction level (L, M, Q, H)', value: ecLevel },
+        { name: 'borderWidth', desc: 'Width of the quiet zone border in modules', value: borderWidth },
+        { name: 'downloadFormat', desc: 'Download format (svg or png)', value: downloadFormat }
       ];
       
       // Add rows to the table
