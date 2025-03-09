@@ -232,30 +232,64 @@
       });
     });
     
-    // Download button event - Fixed to properly download the PNG
+    // Download button event - Convert SVG to PNG then download
     downloadBtn.addEventListener('click', function() {
     if (qrImage.src) {
-        // Create a fetch request to get the image as a blob
-        fetch(qrImage.src)
-        .then(response => response.blob())
-        .then(blob => {
-            // Create a blob URL for the image
-            const blobUrl = URL.createObjectURL(blob);
+        // Create a canvas element to convert SVG to PNG
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size to match the QR code size
+        const size = parseInt(sizeInput.value);
+        canvas.width = size;
+        canvas.height = size;
+        
+        // Create a new image to draw the SVG onto the canvas
+        const img = new Image();
+        
+        // Wait for the image to load
+        img.onload = function() {
+        // Fill with background color first (in case the SVG has transparency)
+        ctx.fillStyle = bgColorInput.value;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw the image to the canvas
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Convert canvas to PNG data URL
+        try {
+            const pngDataUrl = canvas.toDataURL('image/png');
             
             // Create and trigger download
             const link = document.createElement('a');
-            link.href = blobUrl;
+            link.href = pngDataUrl;
             link.download = 'qrcode.png';
             document.body.appendChild(link);
             link.click();
             
             // Clean up
             document.body.removeChild(link);
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-        })
-        .catch(err => {
-            console.error('Failed to download image: ', err);
-        });
+        } catch (e) {
+            console.error('Error converting to PNG:', e);
+            
+            // Fallback: try to download the SVG directly
+            const link = document.createElement('a');
+            link.href = qrImage.src;
+            link.download = 'qrcode.svg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        };
+        
+        // Handle load errors
+        img.onerror = function() {
+        console.error('Error loading image for conversion');
+        alert('Could not convert the QR code to PNG. Please try again.');
+        };
+        
+        // Set image source
+        img.src = qrImage.src;
     }
     });
     
