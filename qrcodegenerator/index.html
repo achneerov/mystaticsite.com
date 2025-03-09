@@ -16,7 +16,7 @@
   
   <main class="container mx-auto px-4 py-8 flex-grow">
     <div class="max-w-4xl mx-auto">
-      <h1 class="text-3xl font-bold text-center mb-8">Generate Custom QR Codes</h1>
+      <!-- Removed the "Generate Custom QR Codes" heading -->
       
       <div class="grid md:grid-cols-2 gap-8">
         <!-- Form Section -->
@@ -104,11 +104,9 @@
           </div>
           
           <div class="mt-4 border-t pt-4">
-            <div class="flex justify-center gap-4">
-              <button id="copyBtn" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                Copy URL
-              </button>
-              <button id="downloadBtn" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <div class="flex justify-center">
+              <!-- Removed the Copy URL button and made the download button full width and green -->
+              <button id="downloadBtn" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 Download
               </button>
             </div>
@@ -183,7 +181,6 @@
     const downloadFormatSelect = document.getElementById('downloadFormat');
     const qrImage = document.getElementById('qrImage');
     const loadingIndicator = document.getElementById('loadingIndicator');
-    const copyBtn = document.getElementById('copyBtn');
     const downloadBtn = document.getElementById('downloadBtn');
     const actionMessage = document.getElementById('actionMessage');
     const currentApiUrlElement = document.getElementById('currentApiUrl');
@@ -247,34 +244,6 @@
       }).catch(err => {
         console.error('Failed to copy text: ', err);
       });
-    });
-    
-    // Copy to clipboard button event
-    copyBtn.addEventListener('click', function() {
-      if (!qrImage.src) return;
-      
-      try {
-        // Get current API URL (which is already displayed in the documentation)
-        const apiUrl = currentApiUrlElement.textContent;
-        
-        // Copy to clipboard
-        navigator.clipboard.writeText(apiUrl).then(() => {
-          // Show success message
-          actionMessage.textContent = "URL copied to clipboard!";
-          actionMessage.classList.remove('hidden');
-          
-          // Hide after 3 seconds
-          setTimeout(() => {
-            actionMessage.classList.add('hidden');
-          }, 3000);
-        }).catch(err => {
-          console.error('Failed to copy QR code URL: ', err);
-          alert('Failed to copy to clipboard. Please try again.');
-        });
-      } catch (error) {
-        console.error('Error copying to clipboard:', error);
-        alert('Failed to copy to clipboard. Please try again.');
-      }
     });
     
     // Download button event
@@ -376,7 +345,6 @@
       // Show loading indicator
       loadingIndicator.style.display = 'block';
       qrImage.style.display = 'none';
-      copyBtn.disabled = true;
       downloadBtn.disabled = true;
       
       // Update QR image
@@ -385,7 +353,6 @@
         qrImage.src = apiUrl;
         qrImage.style.display = 'block';
         loadingIndicator.style.display = 'none';
-        copyBtn.disabled = false;
         downloadBtn.disabled = false;
       };
       img.onerror = function() {
