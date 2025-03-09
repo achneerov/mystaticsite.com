@@ -78,6 +78,16 @@
               <div class="text-sm text-gray-500 mt-1">Current: <span id="borderWidthValue">4</span> modules</div>
             </div>
             
+            <div>
+              <label for="downloadFormat" class="block text-sm font-medium text-gray-700 mb-1">Download Format</label>
+              <select id="downloadFormat" name="downloadFormat" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="svg" selected>SVG (vector)</option>
+                <option value="png">PNG (raster)</option>
+              </select>
+              <div class="text-xs text-gray-500 mt-1">SVG for scalable image, PNG for broader compatibility</div>
+            </div>
+            
             <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
               Generate QR Code
             </button>
@@ -94,11 +104,15 @@
           </div>
           
           <div class="mt-4 border-t pt-4">
-            <div class="flex justify-center">
-              <button id="downloadBtn" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                Download PNG
+            <div class="flex justify-center gap-4">
+              <button id="copyBtn" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                Copy URL
+              </button>
+              <button id="downloadBtn" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                Download
               </button>
             </div>
+            <div id="actionMessage" class="mt-2 text-center text-green-600 font-medium hidden">Operation successful!</div>
           </div>
         </div>
       </div>
@@ -166,9 +180,12 @@
     const ecLevelSelect = document.getElementById('ecLevel');
     const borderWidthInput = document.getElementById('borderWidth');
     const borderWidthValue = document.getElementById('borderWidthValue');
+    const downloadFormatSelect = document.getElementById('downloadFormat');
     const qrImage = document.getElementById('qrImage');
     const loadingIndicator = document.getElementById('loadingIndicator');
+    const copyBtn = document.getElementById('copyBtn');
     const downloadBtn = document.getElementById('downloadBtn');
+    const actionMessage = document.getElementById('actionMessage');
     const currentApiUrlElement = document.getElementById('currentApiUrl');
     const paramsTable = document.getElementById('paramsTable');
     const copyApiBtn = document.getElementById('copyApiBtn');
@@ -215,7 +232,7 @@
     });
     
     // Input event listeners for real-time updates
-    [urlInput, sizeInput, fgColorInput, bgColorInput, ecLevelSelect, borderWidthInput].forEach(input => {
+    [urlInput, sizeInput, fgColorInput, bgColorInput, ecLevelSelect, borderWidthInput, downloadFormatSelect].forEach(input => {
       input.addEventListener('input', debounce(generateQRCode, 500));
     });
     
@@ -232,66 +249,115 @@
       });
     });
     
-    // Download button event - Properly download the QR code as PNG
-    downloadBtn.addEventListener('click', async function() {
+    // Copy to clipboard button event
+    copyBtn.addEventListener('click', function() {
       if (!qrImage.src) return;
       
       try {
-        // Create a temporary link for downloading
-        const link = document.createElement('a');
+        // Get current API URL (which is already displayed in the documentation)
+        const apiUrl = currentApiUrlElement.textContent;
         
-        // Get the QR code URL from the current image
-        const qrUrl = new URL(qrImage.src);
-        
-        // Create a new image to ensure it's fully loaded
-        const img = new Image();
-        
-        // Set up a promise to handle image loading
-        const imageLoaded = new Promise((resolve, reject) => {
-          img.onload = () => resolve();
-          img.onerror = () => reject(new Error('Failed to load image'));
-          img.src = qrUrl.href;
+        // Copy to clipboard
+        navigator.clipboard.writeText(apiUrl).then(() => {
+          // Show success message
+          actionMessage.textContent = "URL copied to clipboard!";
+          actionMessage.classList.remove('hidden');
+          
+          // Hide after 3 seconds
+          setTimeout(() => {
+            actionMessage.classList.add('hidden');
+          }, 3000);
+        }).catch(err => {
+          console.error('Failed to copy QR code URL: ', err);
+          alert('Failed to copy to clipboard. Please try again.');
         });
-        
-        // Wait for the image to load
-        await imageLoaded;
-        
-        // Create canvas
-        const canvas = document.createElement('canvas');
-        const size = parseInt(sizeInput.value);
-        canvas.width = size;
-        canvas.height = size;
-        
-        // Get canvas context and draw image
-        const ctx = canvas.getContext('2d');
-        
-        // Fill background first
-        ctx.fillStyle = bgColorInput.value;
-        ctx.fillRect(0, 0, size, size);
-        
-        // Draw the image
-        ctx.drawImage(img, 0, 0, size, size);
-        
-        // Get image data as blob
-        canvas.toBlob(function(blob) {
-          // Create a download link with the blob URL
-          const url = URL.createObjectURL(blob);
-          link.href = url;
-          link.download = 'qrcode.png';
-          
-          // Trigger the download
-          document.body.appendChild(link);
-          link.click();
-          
-          // Clean up
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }, 'image/png');
       } catch (error) {
-        console.error('Error downloading QR code:', error);
-        alert('Failed to download QR code. Please try again.');
+        console.error('Error copying to clipboard:', error);
+        alert('Failed to copy to clipboard. Please try again.');
       }
     });
+    
+    // Download button event
+    downloadBtn.addEventListener('click', function() {
+      if (!qrImage.src) return;
+      
+      try {
+        const format = downloadFormatSelect.value;
+        const filename = `qrcode.${format}`;
+        
+        // Fetch the SVG content
+        fetch(qrImage.src)
+          .then(response => response.text())
+          .then(svgText => {
+            if (format === 'svg') {
+              // For SVG, download directly
+              const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgText)}`;
+              downloadFromDataUrl(dataUrl, filename);
+              
+              // Show success message
+              actionMessage.textContent = `${filename} downloaded!`;
+              actionMessage.classList.remove('hidden');
+              
+              // Hide after 3 seconds
+              setTimeout(() => {
+                actionMessage.classList.add('hidden');
+              }, 3000);
+            } else {
+              // For PNG, convert SVG to PNG using Canvas
+              const size = parseInt(sizeInput.value);
+              convertSvgToPng(svgText, size, size, function(pngDataUrl) {
+                downloadFromDataUrl(pngDataUrl, filename);
+                
+                // Show success message
+                actionMessage.textContent = `${filename} downloaded!`;
+                actionMessage.classList.remove('hidden');
+                
+                // Hide after 3 seconds
+                setTimeout(() => {
+                  actionMessage.classList.add('hidden');
+                }, 3000);
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error downloading:', error);
+            alert(`Failed to download as ${format}. Please try again.`);
+          });
+      } catch (error) {
+        console.error('Error downloading image:', error);
+        alert('Failed to download image. Please try again.');
+      }
+    });
+    
+    // Function to download from data URL
+    function downloadFromDataUrl(dataUrl, filename) {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    
+    // Function to convert SVG to PNG using Canvas
+    function convertSvgToPng(svgText, width, height, callback) {
+      // Create a Canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      
+      // Create an SVG image
+      const img = new Image();
+      img.onload = function() {
+        ctx.drawImage(img, 0, 0, width, height);
+        callback(canvas.toDataURL('image/png'));
+      };
+      
+      // Set the SVG as source
+      const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgText)}`;
+      img.src = dataUrl;
+    }
     
     // Generate QR code function
     function generateQRCode() {
@@ -302,6 +368,7 @@
       const bgColor = bgColorInput.value.replace('#', '');
       const ecLevel = ecLevelSelect.value;
       const borderWidth = borderWidthInput.value;
+      const downloadFormat = downloadFormatSelect.value;
       
       // Construct API URL
       const apiUrl = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}`;
@@ -309,6 +376,7 @@
       // Show loading indicator
       loadingIndicator.style.display = 'block';
       qrImage.style.display = 'none';
+      copyBtn.disabled = true;
       downloadBtn.disabled = true;
       
       // Update QR image
@@ -317,6 +385,7 @@
         qrImage.src = apiUrl;
         qrImage.style.display = 'block';
         loadingIndicator.style.display = 'none';
+        copyBtn.disabled = false;
         downloadBtn.disabled = false;
       };
       img.onerror = function() {
@@ -328,11 +397,11 @@
       img.src = apiUrl;
       
       // Update the API URL display in the documentation section
-      updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth);
+      updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth, downloadFormat);
     }
     
     // Update API documentation with current values
-    function updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth) {
+    function updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth, downloadFormat) {
       // Update the current API URL display
       currentApiUrlElement.textContent = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}`;
       
@@ -346,7 +415,8 @@
         { name: 'fgColor', desc: 'Foreground color in hex (without #)', value: fgColor },
         { name: 'bgColor', desc: 'Background color in hex (without #)', value: bgColor },
         { name: 'ecLevel', desc: 'Error correction level (L, M, Q, H)', value: ecLevel },
-        { name: 'borderWidth', desc: 'Width of the quiet zone border in modules', value: borderWidth }
+        { name: 'borderWidth', desc: 'Width of the quiet zone border in modules', value: borderWidth },
+        { name: 'downloadFormat', desc: 'Download format (svg or png)', value: downloadFormat }
       ];
       
       // Add rows to the table
