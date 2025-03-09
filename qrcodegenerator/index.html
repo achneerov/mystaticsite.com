@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
-  <header class="bg-blue-600 shadow">
+  <header class="bg-blue-500 shadow">
     <nav class="container mx-auto flex justify-between items-center py-4 px-4">
       <h1 class="text-2xl font-bold text-white">QR Code Generator</h1>
       <a href="../index.html" class="text-white hover:text-gray-200">My Other Sites</a>
@@ -234,14 +234,29 @@
     
     // Download button event - Fixed to properly download the PNG
     downloadBtn.addEventListener('click', function() {
-      if (qrImage.src) {
-        const link = document.createElement('a');
-        link.href = qrImage.src;
-        link.download = 'qrcode.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+    if (qrImage.src) {
+        // Create a fetch request to get the image as a blob
+        fetch(qrImage.src)
+        .then(response => response.blob())
+        .then(blob => {
+            // Create a blob URL for the image
+            const blobUrl = URL.createObjectURL(blob);
+            
+            // Create and trigger download
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = 'qrcode.png';
+            document.body.appendChild(link);
+            link.click();
+            
+            // Clean up
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+        })
+        .catch(err => {
+            console.error('Failed to download image: ', err);
+        });
+    }
     });
     
     // Generate QR code function
