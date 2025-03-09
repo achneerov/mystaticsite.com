@@ -232,65 +232,65 @@
       });
     });
     
-    // Download button event - Convert SVG to PNG then download
-    downloadBtn.addEventListener('click', function() {
-    if (qrImage.src) {
-        // Create a canvas element to convert SVG to PNG
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+    // Download button event - Properly download the QR code as PNG
+    downloadBtn.addEventListener('click', async function() {
+      if (!qrImage.src) return;
+      
+      try {
+        // Create a temporary link for downloading
+        const link = document.createElement('a');
         
-        // Set canvas size to match the QR code size
+        // Get the QR code URL from the current image
+        const qrUrl = new URL(qrImage.src);
+        
+        // Create a new image to ensure it's fully loaded
+        const img = new Image();
+        
+        // Set up a promise to handle image loading
+        const imageLoaded = new Promise((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error('Failed to load image'));
+          img.src = qrUrl.href;
+        });
+        
+        // Wait for the image to load
+        await imageLoaded;
+        
+        // Create canvas
+        const canvas = document.createElement('canvas');
         const size = parseInt(sizeInput.value);
         canvas.width = size;
         canvas.height = size;
         
-        // Create a new image to draw the SVG onto the canvas
-        const img = new Image();
+        // Get canvas context and draw image
+        const ctx = canvas.getContext('2d');
         
-        // Wait for the image to load
-        img.onload = function() {
-        // Fill with background color first (in case the SVG has transparency)
+        // Fill background first
         ctx.fillStyle = bgColorInput.value;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, size, size);
         
-        // Draw the image to the canvas
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // Draw the image
+        ctx.drawImage(img, 0, 0, size, size);
         
-        // Convert canvas to PNG data URL
-        try {
-            const pngDataUrl = canvas.toDataURL('image/png');
-            
-            // Create and trigger download
-            const link = document.createElement('a');
-            link.href = pngDataUrl;
-            link.download = 'qrcode.png';
-            document.body.appendChild(link);
-            link.click();
-            
-            // Clean up
-            document.body.removeChild(link);
-        } catch (e) {
-            console.error('Error converting to PNG:', e);
-            
-            // Fallback: try to download the SVG directly
-            const link = document.createElement('a');
-            link.href = qrImage.src;
-            link.download = 'qrcode.svg';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        };
-        
-        // Handle load errors
-        img.onerror = function() {
-        console.error('Error loading image for conversion');
-        alert('Could not convert the QR code to PNG. Please try again.');
-        };
-        
-        // Set image source
-        img.src = qrImage.src;
-    }
+        // Get image data as blob
+        canvas.toBlob(function(blob) {
+          // Create a download link with the blob URL
+          const url = URL.createObjectURL(blob);
+          link.href = url;
+          link.download = 'qrcode.png';
+          
+          // Trigger the download
+          document.body.appendChild(link);
+          link.click();
+          
+          // Clean up
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, 'image/png');
+      } catch (error) {
+        console.error('Error downloading QR code:', error);
+        alert('Failed to download QR code. Please try again.');
+      }
     });
     
     // Generate QR code function
