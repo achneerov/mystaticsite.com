@@ -346,18 +346,21 @@
       const borderWidth = borderWidthInput.value;
       const downloadFormat = downloadFormatSelect.value;
       
-      // Construct API URL
-      const apiUrl = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}`;
+      // For preview, always use SVG format
+      const previewApiUrl = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}&format=svg`;
+      
+      // But include the downloadFormat in the API documentation
+      const fullApiUrl = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}&format=${downloadFormat}`;
       
       // Show loading indicator
       loadingIndicator.style.display = 'block';
       qrImage.style.display = 'none';
       downloadBtn.disabled = true;
       
-      // Update QR image
+      // Update QR image with SVG format for preview
       const img = new Image();
       img.onload = function() {
-        qrImage.src = apiUrl;
+        qrImage.src = previewApiUrl;
         qrImage.style.display = 'block';
         loadingIndicator.style.display = 'none';
         downloadBtn.disabled = false;
@@ -368,16 +371,16 @@
           loadingIndicator.textContent = 'Loading preview...';
         }, 3000);
       };
-      img.src = apiUrl;
+      img.src = previewApiUrl;
       
       // Update the API URL display in the documentation section
-      updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth, downloadFormat);
+      updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth, downloadFormat, fullApiUrl);
     }
     
     // Update API documentation with current values
-    function updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth, downloadFormat) {
+    function updateApiDocumentation(url, size, fgColor, bgColor, ecLevel, borderWidth, downloadFormat, fullApiUrl) {
       // Update the current API URL display
-      currentApiUrlElement.textContent = `${apiBaseUrl}?url=${encodeURIComponent(url)}&size=${size}&fgColor=${fgColor}&bgColor=${bgColor}&ecLevel=${ecLevel}&borderWidth=${borderWidth}`;
+      currentApiUrlElement.textContent = fullApiUrl;
       
       // Clear the params table
       paramsTable.innerHTML = '';
@@ -390,7 +393,7 @@
         { name: 'bgColor', desc: 'Background color in hex without # (6 hex digits)', value: bgColor },
         { name: 'ecLevel', desc: 'Error correction level (L, M, Q, H) - higher levels increase damage resistance', value: ecLevel },
         { name: 'borderWidth', desc: 'Width of the quiet zone border in modules (range: 0-20)', value: borderWidth },
-        { name: 'downloadFormat', desc: 'Download format (svg or png)', value: downloadFormat }
+        { name: 'format', desc: 'Output format (svg or png)', value: downloadFormat }
       ];
       
       // Add rows to the table
