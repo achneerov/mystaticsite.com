@@ -181,7 +181,8 @@
             countries: [],
             startTime: null,
             timerInterval: null,
-            gameActive: false
+            gameActive: false,
+            activeRectangles: [] // Track all rectangles on the map
         };
 
         // Initialize map with world bounds to prevent infinite scrolling
@@ -240,8 +241,21 @@
                 loadingElement.textContent = 'Error loading countries data. Please refresh the page.';
             });
 
+        // Function to clear all rectangles
+        function clearAllRectangles() {
+            // Remove all active rectangles from the map
+            gameState.activeRectangles.forEach(rectangle => {
+                map.removeLayer(rectangle);
+            });
+            // Reset the array
+            gameState.activeRectangles = [];
+        }
+
         // Start game
         function startGame() {
+            // Clear any remaining rectangles from previous games
+            clearAllRectangles();
+            
             // Get number of countries
             const requestedCount = parseInt(countryCountInput.value) || 5;
             
@@ -391,6 +405,7 @@
                 // Highlight the correct area
                 const bounds = L.latLngBounds(gameState.currentCountry.bounds);
                 const rectangle = L.rectangle(bounds, {color: "#4CAF50", weight: 2, fillOpacity: 0.2}).addTo(map);
+                gameState.activeRectangles.push(rectangle); // Add to tracking array
                 
                 updateStats();
                 
@@ -402,6 +417,10 @@
                 
                 setTimeout(() => {
                     map.removeLayer(rectangle);
+                    const index = gameState.activeRectangles.indexOf(rectangle);
+                    if (index > -1) {
+                        gameState.activeRectangles.splice(index, 1);
+                    }
                     selectNextCountry();
                 }, 2000);
             } else {
@@ -420,6 +439,7 @@
             // Show the correct location before moving on
             const bounds = L.latLngBounds(gameState.currentCountry.bounds);
             const rectangle = L.rectangle(bounds, {color: "#FFC107", weight: 2, fillOpacity: 0.2}).addTo(map);
+            gameState.activeRectangles.push(rectangle); // Add to tracking array
             
             showFeedback(`That was ${gameState.currentCountry.name}`, 'incorrect');
             updateStats();
@@ -432,6 +452,10 @@
             
             setTimeout(() => {
                 map.removeLayer(rectangle);
+                const index = gameState.activeRectangles.indexOf(rectangle);
+                if (index > -1) {
+                    gameState.activeRectangles.splice(index, 1);
+                }
                 selectNextCountry();
             }, 2000);
         }
@@ -441,6 +465,9 @@
             if (gameState.timerInterval) {
                 clearInterval(gameState.timerInterval);
             }
+            
+            // Clear all rectangles on restart
+            clearAllRectangles();
             
             // Show start screen
             startScreen.style.display = 'flex';
@@ -457,9 +484,6 @@
         skipButton.addEventListener('click', skipCountry);
         restartButton.addEventListener('click', restartGame);
         startButton.addEventListener('click', startGame);
-        
-        // Set current year in footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
 </body>
 </html>
