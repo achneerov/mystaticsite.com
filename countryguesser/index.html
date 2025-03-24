@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geography Game - Find the Country</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #map {
+            flex-grow: 1;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .score {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .controls button {
+            padding: 8px 15px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #3388ff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background-color: #0066cc;
+        }
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        .target-country {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .correct {
+            background-color: rgba(76, 175, 80, 0.8);
+        }
+        .incorrect {
+            background-color: rgba(244, 67, 54, 0.8);
+        }
+        .hint-button {
+            background-color: #FF9800 !important;
+        }
+        .hint-button:hover {
+            background-color: #F57C00 !important;
+        }
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 2000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Geography Game - Find the Country</h1>
+            <p>Find and click on: <span class="target-country" id="targetCountry">Loading...</span></p>
+        </div>
+        <div id="map"></div>
+        <div class="footer">
+            <div class="score">
+                Score: <span id="correctScore">0</span> correct, <span id="totalAttempts">0</span> attempts
+            </div>
+            <div class="controls">
+                <button id="hintButton" class="hint-button">Hint</button>
+                <button id="skipButton">Skip</button>
+                <button id="restartButton">Restart</button>
+            </div>
+        </div>
+    </div>
+    <div id="feedback" class="feedback"></div>
+    <div id="loading" class="loading">Loading countries data...</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script>
+        // Game state
+        let gameState = {
+            correctCount: 0,
+            totalAttempts: 0,
+            currentCountry: null,
+            countries: [],
+            hintUsed: false,
+            hintRectangle: null
+        };
+
+        // Initialize map
+        const map = L.map('map').setView([20, 0], 2);
+        
+        // Add a plain background without any features
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+        
+        // Add country borders as black lines
+        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: {
+                        color: '#000000',
+                        weight: 1.5,
+                        opacity: 1,
+                        fill: false
+                    }
+                }).addTo(map);
+            })
+            .catch(error => console.error('Error loading country borders:', error));
+
+        // DOM elements
+        const targetCountryElement = document.getElementById('targetCountry');
+        const correctScoreElement = document.getElementById('correctScore');
+        const totalAttemptsElement = document.getElementById('totalAttempts');
+        const feedbackElement = document.getElementById('feedback');
+        const skipButton = document.getElementById('skipButton');
+        const restartButton = document.getElementById('restartButton');
+        const hintButton = document.getElementById('hintButton');
+        const loadingElement = document.getElementById('loading');
+
+        // Load countries from JSON file
+        fetch('countries.json')
+            .then(response => response.json())
+            .then(data => {
+                gameState.countries = data;
+                loadingElement.style.display = 'none';
+                selectRandomCountry();
+            })
+            .catch(error => {
+                console.error('Error loading countries data:', error);
+                loadingElement.textContent = 'Error loading countries data. Please refresh the page.';
+            });
+
+        // Pick a random country
+        function selectRandomCountry() {
+            if (gameState.countries.length === 0) return;
+            
+            // Clear any existing hint
+            if (gameState.hintRectangle) {
+                map.removeLayer(gameState.hintRectangle);
+                gameState.hintRectangle = null;
+            }
+            gameState.hintUsed = false;
+            
+            const randomIndex = Math.floor(Math.random() * gameState.countries.length);
+            gameState.currentCountry = gameState.countries[randomIndex];
+            targetCountryElement.textContent = gameState.currentCountry.name;
+        }
+
+        // Show feedback message
+        function showFeedback(message, isCorrect) {
+            feedbackElement.textContent = message;
+            feedbackElement.classList.remove('correct', 'incorrect');
+            feedbackElement.classList.add(isCorrect ? 'correct' : 'incorrect');
+            feedbackElement.style.opacity = 1;
+            
+            setTimeout(() => {
+                feedbackElement.style.opacity = 0;
+            }, 2000);
+        }
+
+        // Update score display
+        function updateScore() {
+            correctScoreElement.textContent = gameState.correctCount;
+            totalAttemptsElement.textContent = gameState.totalAttempts;
+        }
+
+        // Check if click is within country bounds
+        function isClickInCountry(latlng, country) {
+            const bounds = L.latLngBounds(country.bounds);
+            return bounds.contains(latlng);
+        }
+
+        // Handle map click
+        function onMapClick(e) {
+            if (!gameState.currentCountry) return;
+            
+            gameState.totalAttempts++;
+            
+            if (isClickInCountry(e.latlng, gameState.currentCountry)) {
+                gameState.correctCount++;
+                showFeedback(`Correct! You found ${gameState.currentCountry.name}!`, true);
+                
+                // Highlight the correct area
+                const bounds = L.latLngBounds(gameState.currentCountry.bounds);
+                const rectangle = L.rectangle(bounds, {color: "#4CAF50", weight: 2, fillOpacity: 0.2}).addTo(map);
+                
+                setTimeout(() => {
+                    map.removeLayer(rectangle);
+                    selectRandomCountry();
+                }, 2000);
+            } else {
+                showFeedback(`Incorrect! Try again or skip.`, false);
+            }
+            
+            updateScore();
+        }
+
+        // Skip current country
+        function skipCountry() {
+            if (!gameState.currentCountry) return;
+            
+            gameState.totalAttempts++;
+            updateScore();
+            
+            // Show the correct location before moving on
+            const bounds = L.latLngBounds(gameState.currentCountry.bounds);
+            const rectangle = L.rectangle(bounds, {color: "#FFC107", weight: 2, fillOpacity: 0.2}).addTo(map);
+            
+            showFeedback(`That was ${gameState.currentCountry.name}`, false);
+            
+            setTimeout(() => {
+                map.removeLayer(rectangle);
+                selectRandomCountry();
+            }, 2000);
+        }
+
+        // Show hint (highlight region with translucent rectangle)
+        function showHint() {
+            if (!gameState.currentCountry || gameState.hintUsed) return;
+            
+            gameState.hintUsed = true;
+            const bounds = L.latLngBounds(gameState.currentCountry.bounds);
+            
+            // Create hint rectangle and store reference
+            gameState.hintRectangle = L.rectangle(bounds, {
+                color: "#FF9800", 
+                weight: 1.5, 
+                fillOpacity: 0.1,
+                dashArray: '5,10'
+            }).addTo(map);
+            
+            // Pan to the country area
+            map.fitBounds(bounds, { padding: [50, 50] });
+            
+            showFeedback("Hint: Look in the highlighted area", true);
+        }
+
+        // Restart game
+        function restartGame() {
+            gameState.correctCount = 0;
+            gameState.totalAttempts = 0;
+            updateScore();
+            
+            // Clear any existing hint
+            if (gameState.hintRectangle) {
+                map.removeLayer(gameState.hintRectangle);
+                gameState.hintRectangle = null;
+            }
+            
+            selectRandomCountry();
+            map.setView([20, 0], 2);
+            showFeedback('Game restarted!', true);
+        }
+
+        // Set up event listeners
+        map.on('click', onMapClick);
+        skipButton.addEventListener('click', skipCountry);
+        restartButton.addEventListener('click', restartGame);
+        hintButton.addEventListener('click', showHint);
+    </script>
+</body>
+</html>
