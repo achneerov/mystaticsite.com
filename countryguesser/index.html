@@ -4,65 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geography Game - Find the Country</title>
+    <!-- Favicon links -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="../images/favicon/favicon.ico">
+    <link rel="manifest" href="../images/favicon/site.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="../images/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../images/favicon/android-chrome-512x512.png">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
             height: 100vh;
             overflow: hidden;
         }
-        .container {
+        
+        .game-container {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: calc(100vh - 8rem); /* Adjust for header and footer */
             max-width: 1200px;
             margin: 0 auto;
-            padding: 10px;
             box-sizing: border-box;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
+        
         #map {
             flex-grow: 1;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
-        .footer {
+        
+        .game-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 0.75rem 0;
         }
+        
         .stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            gap: 8px;
+            gap: 0.5rem;
             width: 60%;
         }
-        .stats div {
-            font-size: 16px;
-        }
-        .score, .time, .accuracy {
-            font-weight: bold;
-        }
-        .controls button {
-            padding: 8px 15px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 4px;
-            background-color: #3388ff;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .controls button:hover {
-            background-color: #0066cc;
-        }
+        
         .feedback {
             position: fixed;
             top: 50%;
@@ -78,17 +67,15 @@
             transition: opacity 0.3s;
             z-index: 1000;
         }
-        .target-country {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-        }
+        
         .correct {
             background-color: rgba(76, 175, 80, 0.8);
         }
+        
         .incorrect {
             background-color: rgba(244, 67, 54, 0.8);
         }
+        
         .loading {
             position: fixed;
             top: 50%;
@@ -100,6 +87,7 @@
             border-radius: 8px;
             z-index: 2000;
         }
+        
         .start-screen {
             position: fixed;
             top: 0;
@@ -112,6 +100,7 @@
             align-items: center;
             z-index: 3000;
         }
+        
         .start-form {
             background-color: white;
             padding: 30px;
@@ -120,74 +109,60 @@
             max-width: 400px;
             width: 80%;
         }
-        .start-form h2 {
-            margin-top: 0;
-        }
-        .form-group {
-            margin: 15px 0;
-            text-align: left;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .start-button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .start-button:hover {
-            background-color: #45a049;
-        }
+        
         .game-ended {
             background-color: rgba(33, 150, 243, 0.8);
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Geography Game - Find the Country</h1>
-            <p>Find and click on: <span class="target-country" id="targetCountry">Start the game...</span></p>
-        </div>
-        <div id="map"></div>
-        <div class="footer">
-            <div class="stats">
-                <div class="time">Time: <span id="timer">00:00</span></div>
-                <div class="score">Progress: <span id="progress">0/0</span></div>
-                <div class="accuracy">Click Accuracy: <span id="clickAccuracy">0%</span></div>
-                <div class="accuracy">Round Accuracy: <span id="roundAccuracy">0%</span></div>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-500 shadow">
+        <nav class="container mx-auto flex justify-center py-4">
+            <a href="../index.html" class="mx-4 text-white hover:text-gray-200">My Other Sites</a>
+        </nav>
+    </header>
+    
+    <main class="container mx-auto px-4 mt-4 flex-grow">
+        <div class="game-container">
+            <div class="text-center mb-2">
+                <h1 class="text-2xl font-bold">Geography Game - Find the Country</h1>
+                <p class="text-gray-700">Find and click on: <span class="font-bold text-xl text-gray-800" id="targetCountry">Start the game...</span></p>
             </div>
-            <div class="controls">
-                <button id="skipButton">Skip</button>
-                <button id="restartButton">Restart</button>
+            <div id="map"></div>
+            <div class="game-footer">
+                <div class="stats">
+                    <div class="font-semibold">Time: <span id="timer" class="font-normal">00:00</span></div>
+                    <div class="font-semibold">Progress: <span id="progress" class="font-normal">0/0</span></div>
+                    <div class="font-semibold">Click Accuracy: <span id="clickAccuracy" class="font-normal">0%</span></div>
+                    <div class="font-semibold">Round Accuracy: <span id="roundAccuracy" class="font-normal">0%</span></div>
+                </div>
+                <div class="flex">
+                    <button id="skipButton" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md mr-2">Skip</button>
+                    <button id="restartButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">Restart</button>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
+    
+    <footer class="py-4 mt-auto">
+        <div class="text-center space-y-2">
+            <p class="text-gray-600">&copy; <span id="currentYear"></span>. All rights reserved.</p>
+            <p class="text-gray-600">Created by Alex with ❤️</p>
+        </div>
+    </footer>
+    
     <div id="feedback" class="feedback"></div>
     <div id="loading" class="loading">Loading countries data...</div>
     
     <div id="startScreen" class="start-screen">
         <div class="start-form">
-            <h2>Geography Challenge</h2>
-            <p>Test your geography knowledge by finding countries on the map!</p>
-            <div class="form-group">
-                <label for="countryCount">Number of countries:</label>
-                <input type="number" id="countryCount" min="1" max="50" value="5">
+            <h2 class="text-xl font-bold mb-2">Geography Challenge</h2>
+            <p class="mb-4">Test your geography knowledge by finding countries on the map!</p>
+            <div class="mb-4 text-left">
+                <label for="countryCount" class="block font-semibold mb-1">Number of countries:</label>
+                <input type="number" id="countryCount" min="1" max="50" value="5" class="w-full p-2 border border-gray-300 rounded-md">
             </div>
-            <button id="startButton" class="start-button">Start Game</button>
+            <button id="startButton" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md text-lg">Start Game</button>
         </div>
     </div>
 
@@ -474,6 +449,9 @@
         skipButton.addEventListener('click', skipCountry);
         restartButton.addEventListener('click', restartGame);
         startButton.addEventListener('click', startGame);
+        
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
 </body>
 </html>
