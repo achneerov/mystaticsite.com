@@ -266,7 +266,6 @@
             gameState.roundsCount = 0;
             gameState.successfulRounds = 0;
             gameState.gameActive = true;
-            gameState.currentIndex = 0;
             
             // Hide start screen
             startScreen.style.display = 'none';
@@ -301,10 +300,15 @@
 
         // Select next country from pre-shuffled pool
         function selectNextCountry() {
-            if (!gameState.gameActive || !gameState.countryPool || gameState.currentIndex >= gameState.countryPool.length) return;
+            if (!gameState.gameActive || !gameState.countryPool || gameState.countryPool.length === 0) return;
             
-            gameState.currentCountry = gameState.countryPool[gameState.currentIndex];
-            gameState.currentIndex++;
+            // Get a random country from the remaining pool
+            const randomIndex = Math.floor(Math.random() * gameState.countryPool.length);
+            gameState.currentCountry = gameState.countryPool[randomIndex];
+            
+            // Remove the selected country from the pool to avoid duplicates
+            gameState.countryPool.splice(randomIndex, 1);
+            
             targetCountryElement.textContent = gameState.currentCountry.name;
         }
 
