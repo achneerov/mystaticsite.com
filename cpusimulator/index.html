@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple CPU Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for better readability */
+        body {
+            font-family: 'Inter', sans-serif; /* Default font */
+        }
+        .mono-font {
+            font-family: 'Courier New', Courier, monospace; /* Monospace for code/data */
+        }
+        /* Base styles for instruction area (applies to both textarea and div) */
+        .instruction-area {
+             min-height: 300px;
+             max-height: 400px; /* Limit height */
+             overflow-y: auto; /* Enable scroll if needed */
+             border: 1px solid #e5e7eb;
+             border-radius: 0.375rem;
+             padding: 0.75rem;
+             width: 100%; /* Ensure full width */
+             font-size: 0.875rem; /* text-sm */
+             line-height: 1.25rem; /* leading-5 */
+        }
+        /* Specific style for textarea */
+        #instructions-textarea {
+             background-color: #fff; /* White background for editing */
+        }
+        /* Specific style for display div */
+        #instructions-display {
+             background-color: #f9fafb; /* Light gray background for read-only */
+        }
+        .line {
+            padding: 0.1rem 0.5rem; /* Add some padding to lines */
+            border-radius: 0.25rem;
+            white-space: pre; /* Preserve whitespace */
+            min-height: 1.5em; /* Ensure line height */
+        }
+        /* Style for the highlighted executed line */
+        .highlight-executed {
+            background-color: #fef9c3; /* yellow-100 */
+            transition: background-color 0.5s ease;
+        }
+        /* Style for memory/register display */
+        .data-display {
+             height: 250px; /* Fixed height for scroll */
+             overflow-y: auto; /* Enable vertical scroll */
+             border: 1px solid #e5e7eb; /* Light gray border */
+             padding: 0.75rem; /* p-3 */
+             border-radius: 0.375rem; /* rounded-md */
+             background-color: #f9fafb; /* bg-gray-50 */
+        }
+        .register-display {
+             height: 200px; /* Fixed height */
+             overflow-y: auto;
+             border: 1px solid #e5e7eb;
+             padding: 0.75rem;
+             border-radius: 0.375rem;
+             background-color: #f9fafb;
+        }
+        /* Style buttons */
+        button, .button-label { /* Style label like a button */
+            transition: background-color 0.2s ease-in-out;
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-weight: 700; /* font-bold */
+            color: white;
+            cursor: pointer;
+            display: inline-block; /* Needed for label styling */
+            text-align: center;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        /* Utility class to hide elements */
+        .hidden {
+            display: none;
+        }
+        /* Tooltip specific styles */
+        .tooltip-container .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip-container:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+
+    <div class="container mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-6 text-center text-gray-700">CPU Simulator</h1>
+
+        <div class="flex flex-col md:flex-row gap-6">
+
+            <div class="flex-1">
+                <div class="flex items-center mb-2">
+                    <h2 class="text-lg font-semibold text-gray-600 mr-2">Instructions</h2>
+                    <div class="relative tooltip-container"> <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <div class="tooltip absolute left-0 -ml-2 mt-2 w-72 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-10">
+                            <strong class="block mb-1 font-medium">Available Instructions:</strong>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li><strong>MOV dest, src</strong>: Move data. <code>src</code> can be reg, mem, or immediate. <code>dest</code> can be reg or mem.</li>
+                                <li><strong>ADD Rdest, src</strong>: Add <code>src</code> to register <code>Rdest</code>.</li>
+                                <li><strong>SUB Rdest, src</strong>: Subtract <code>src</code> from register <code>Rdest</code>.</li>
+                                <li><strong>CMP val1, val2</strong>: Compare values, sets Zero flag (Z).</li>
+                                <li><strong>JMP line</strong>: Unconditional jump to 0-based line number.</li>
+                                <li><strong>JE line</strong>: Jump if Equal (Z=1).</li>
+                                <li><strong>JNE line</strong>: Jump if Not Equal (Z=0).</li>
+                                <li><strong>HLT</strong>: Halt execution.</li>
+                            </ul>
+                            <p class="mt-2 border-t border-gray-600 pt-1">Operands: <code>R0</code>-<code>R7</code> (registers), <code>[address]</code> (memory), number (immediate). Comments start with <code>;</code>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <textarea id="instructions-textarea" class="instruction-area mono-font focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter instructions or use the default program."></textarea>
+                <div id="instructions-display" class="instruction-area mono-font hidden">
+                    </div>
+
+                <div class="mt-4 flex flex-wrap gap-4">
+                    <button id="run-button" class="bg-green-500 hover:bg-green-600 button-label">Run to Completion</button>
+                    <button id="step-button" class="bg-blue-500 hover:bg-blue-600 button-label">Step</button>
+                    <button id="reset-button" class="bg-red-500 hover:bg-red-600 button-label">Reset</button>
+                </div>
+                 <div class="mt-4 flex flex-wrap gap-4">
+                    <button id="download-button" class="bg-purple-500 hover:bg-purple-600 button-label">Download .alexembly</button>
+                    <input type="file" id="upload-input" accept=".alexembly,.txt" class="hidden">
+                    <label for="upload-input" id="upload-button" class="bg-indigo-500 hover:bg-indigo-600 button-label">Upload .alexembly</label>
+                 </div>
+
+                 <div id="status-message" class="mt-4 text-sm text-gray-700 font-medium h-6"></div> </div>
+
+            <div class="flex-1 flex flex-col gap-6">
+                <div>
+                    <h2 class="text-lg font-semibold mb-2 text-gray-600">Memory</h2>
+                    <div id="memory-display" class="data-display mono-font text-sm">
+                        Memory is empty.
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-lg font-semibold mb-2 text-gray-600">Registers</h2>
+                    <div id="register-display" class="register-display mono-font text-sm grid grid-cols-2 gap-x-4 gap-y-1">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const instructionsTextArea = document.getElementById('instructions-textarea');
+        const instructionsDisplay = document.getElementById('instructions-display');
+        const runButton = document.getElementById('run-button');
+        const stepButton = document.getElementById('step-button');
+        const resetButton = document.getElementById('reset-button');
+        const downloadButton = document.getElementById('download-button'); // Added
+        const uploadInput = document.getElementById('upload-input');       // Added
+        // const uploadButton = document.getElementById('upload-button'); // Label acts as button
+        const memoryDisplay = document.getElementById('memory-display');
+        const registerDisplay = document.getElementById('register-display');
+        const statusMessage = document.getElementById('status-message');
+
+        // --- Default Program ---
+        const defaultProgram = `
+; Simple program demonstrating all instructions
+; Download this code, modify it, and upload it back!
+MOV R0, 15      ; Load 15 into R0
+MOV R1, 7       ; Load 7 into R1
+ADD R0, R1      ; R0 = R0 + R1 (15 + 7 = 22)
+MOV [100], R0   ; Store R0 (22) into memory address 100
+MOV R2, [100]   ; Load value from address 100 (22) into R2
+SUB R2, 2       ; R2 = R2 - 2 (22 - 2 = 20)
+CMP R1, 7       ; Compare R1 (7) with 7. Sets Zero flag.
+JE 10           ; Jump to line 10 (HLT) if Zero flag is set (it is)
+MOV R3, 99      ; This line should be skipped (line 8)
+JMP 11          ; This line should also be skipped (line 9)
+HLT             ; Halt execution (line 10)
+MOV R4, 111     ; This line is after HLT, should not execute (line 11)
+`; // Note: Line numbers for JMP/JE/JNE are 0-based indices of executable lines
+
+        // --- CPU State ---
+        let registers = {};
+        let memory = {};
+        let flags = { zero: false, compare: 0 };
+        let programCounter = 0;
+        let instructions = [];
+        let lineMap = [];
+        let running = false;
+        let halt = false;
+        let lastExecutedPc = -1;
+
+        // --- View Management ---
+        function showEditableView() {
+            instructionsTextArea.classList.remove('hidden');
+            instructionsDisplay.classList.add('hidden');
+            instructionsDisplay.innerHTML = '';
+            instructionsTextArea.disabled = false;
+            removeHighlight();
+            // Enable file I/O buttons when editable
+            downloadButton.disabled = false;
+            uploadInput.disabled = false; // Enable the hidden input
+            document.getElementById('upload-button').classList.remove('opacity-50', 'cursor-not-allowed'); // Enable label visually
+        }
+
+        function showRunningView() {
+            const rawLines = instructionsTextArea.value.split('\n');
+            instructionsDisplay.innerHTML = '';
+            lineMap = [];
+            let executableIndex = 0;
+
+            rawLines.forEach((line, index) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.classList.add('line');
+                lineDiv.textContent = line || ' ';
+                lineDiv.dataset.rawLineIndex = index;
+                instructionsDisplay.appendChild(lineDiv);
+
+                let instructionPart = line.trim();
+                const commentIndex = instructionPart.indexOf(';');
+                let cleanInstruction = instructionPart;
+                if (commentIndex !== -1) {
+                    cleanInstruction = instructionPart.substring(0, commentIndex).trim();
+                }
+
+                if (cleanInstruction && instructions.length > executableIndex && instructions[executableIndex] === cleanInstruction) {
+                    lineMap[executableIndex] = index;
+                    executableIndex++;
+                }
+            });
+
+            instructionsTextArea.classList.add('hidden');
+            instructionsDisplay.classList.remove('hidden');
+            instructionsTextArea.disabled = true;
+            // Disable file I/O buttons during run/step
+            downloadButton.disabled = true;
+            uploadInput.disabled = true; // Disable the hidden input
+            document.getElementById('upload-button').classList.add('opacity-50', 'cursor-not-allowed'); // Disable label visually
+        }
+
+
+        // --- Initialization ---
+        function initializeState() {
+            instructionsTextArea.value = defaultProgram.trim();
+            showEditableView(); // Start in editable view
+
+            for (let i = 0; i < 8; i++) { registers[`R${i}`] = 0; }
+            memory = {};
+            flags = { zero: false, compare: 0 };
+            programCounter = 0;
+            halt = false;
+            running = false;
+            lastExecutedPc = -1;
+            statusMessage.textContent = 'Ready.';
+            parseInstructions();
+            updateDisplays();
+            // Ensure execution buttons are enabled on reset
+            runButton.disabled = false;
+            stepButton.disabled = false;
+            console.log("Simulator Reset.");
+        }
+
+        // --- Instruction Parsing ---
+        function parseInstructions() {
+            const rawLines = instructionsTextArea.value.split('\n');
+            instructions = [];
+            rawLines.forEach(line => {
+                let instructionPart = line.trim();
+                const commentIndex = instructionPart.indexOf(';');
+                if (commentIndex !== -1) {
+                    instructionPart = instructionPart.substring(0, commentIndex).trim();
+                }
+                if (instructionPart) {
+                    instructions.push(instructionPart);
+                }
+            });
+             console.log("Parsed instructions:", instructions);
+        }
+
+        // --- Display Updates ---
+        function updateRegisterDisplay() {
+            registerDisplay.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const regName = `R${i}`;
+                const value = registers[regName];
+                const div = document.createElement('div');
+                div.textContent = `${regName}: ${value}`;
+                registerDisplay.appendChild(div);
+            }
+            const flagsDiv = document.createElement('div');
+            flagsDiv.classList.add("col-span-2");
+            flagsDiv.textContent = `Flags: Z=${flags.zero ? 1 : 0}`;
+            registerDisplay.appendChild(flagsDiv);
+            const pcDiv = document.createElement('div');
+            pcDiv.classList.add("col-span-2");
+            pcDiv.textContent = `PC (Next): ${programCounter}`;
+            registerDisplay.appendChild(pcDiv);
+        }
+
+        function updateMemoryDisplay() {
+            memoryDisplay.innerHTML = '';
+            const addresses = Object.keys(memory).map(Number).sort((a, b) => a - b);
+            if (addresses.length === 0) {
+                memoryDisplay.textContent = 'Memory is empty.';
+                return;
+            }
+            addresses.forEach(addr => {
+                const div = document.createElement('div');
+                div.textContent = `[${addr}]: ${memory[addr]}`;
+                memoryDisplay.appendChild(div);
+            });
+        }
+
+        function updateDisplays() {
+            updateRegisterDisplay();
+            updateMemoryDisplay();
+        }
+
+        // --- Highlighting ---
+        function removeHighlight() {
+             const highlighted = instructionsDisplay.querySelector('.highlight-executed');
+             if (highlighted) {
+                 highlighted.classList.remove('highlight-executed');
+             }
+        }
+
+        function highlightExecutedLine(pcValue) {
+            removeHighlight();
+            if (pcValue < 0 || pcValue >= instructions.length || pcValue >= lineMap.length || lineMap[pcValue] === undefined) {
+                 console.warn(`Highlighting: Invalid PC or mapping for PC ${pcValue}`);
+                 return;
+             }
+            const rawLineIndex = lineMap[pcValue];
+            const lineElement = instructionsDisplay.querySelector(`.line[data-raw-line-index='${rawLineIndex}']`);
+            if (lineElement) {
+                lineElement.classList.add('highlight-executed');
+                if (lineElement.offsetTop < instructionsDisplay.scrollTop || lineElement.offsetTop + lineElement.offsetHeight > instructionsDisplay.scrollTop + instructionsDisplay.clientHeight) {
+                     lineElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            } else {
+                 console.warn(`Highlighting: Could not find line element for raw index ${rawLineIndex} (PC ${pcValue})`);
+            }
+        }
+
+        // --- Operand Parsing ---
+        function getValue(operand) {
+            // ... (same as before)
+            operand = operand.trim();
+            if (operand.startsWith('R') && registers.hasOwnProperty(operand)) { return registers[operand]; }
+            if (operand.startsWith('[') && operand.endsWith(']')) {
+                const address = parseInt(operand.substring(1, operand.length - 1));
+                if (isNaN(address) || address < 0) { throw new Error(`Invalid memory address: ${operand}`); }
+                return memory[address] || 0;
+            }
+            const immediateValue = parseInt(operand);
+            if (!isNaN(immediateValue)) { return immediateValue; }
+            throw new Error(`Invalid operand: ${operand}`);
+        }
+
+        function setValue(destination, value) {
+            // ... (same as before)
+            destination = destination.trim();
+            value = parseInt(value);
+             if (isNaN(value)) { throw new Error(`Invalid value to set: ${value}`); }
+            if (destination.startsWith('R') && registers.hasOwnProperty(destination)) { registers[destination] = value; return; }
+            if (destination.startsWith('[') && destination.endsWith(']')) {
+                const address = parseInt(destination.substring(1, destination.length - 1));
+                 if (isNaN(address) || address < 0) { throw new Error(`Invalid memory destination: ${destination}`); }
+                memory[address] = value; return;
+            }
+            throw new Error(`Invalid destination operand: ${destination}`);
+        }
+
+        // --- Instruction Execution ---
+        function executeCurrentInstruction() {
+            // ... (same as before)
+            if (halt || programCounter >= instructions.length) { return false; }
+            const instructionLine = instructions[programCounter];
+            const pcBeforeExecution = programCounter;
+            lastExecutedPc = pcBeforeExecution;
+            const parts = instructionLine.match(/([A-Z]+)(?:\s+([^,]+))?(?:,\s*(.*))?/);
+            if (!parts) {
+                 halt = true;
+                 statusMessage.textContent = `Error: Syntax error on instruction ${pcBeforeExecution + 1} ('${instructionLine}')`;
+                 console.error(`Syntax error: ${instructionLine}`);
+                 return false;
+            }
+            const instruction = parts[1]?.toUpperCase();
+            const operand1 = parts[2]?.trim();
+            const operand2 = parts[3]?.trim();
+            let pcIncrement = true;
+            console.log(`PC ${pcBeforeExecution}: Executing: ${instructionLine}`);
+            try {
+                 switch (instruction) {
+                     case 'MOV':
+                        if (!operand1 || !operand2) throw new Error("MOV requires two operands");
+                        setValue(operand1, getValue(operand2));
+                        break;
+                    case 'ADD':
+                        if (!operand1 || !operand2) throw new Error("ADD requires two operands");
+                        if (!operand1.startsWith('R')) throw new Error("ADD destination must be a register");
+                        registers[operand1] = getValue(operand1) + getValue(operand2);
+                        break;
+                    case 'SUB':
+                         if (!operand1 || !operand2) throw new Error("SUB requires two operands");
+                        if (!operand1.startsWith('R')) throw new Error("SUB destination must be a register");
+                        registers[operand1] = getValue(operand1) - getValue(operand2);
+                        break;
+                    case 'CMP':
+                        if (!operand1 || !operand2) throw new Error("CMP requires two operands");
+                        const cmpVal1 = getValue(operand1);
+                        const cmpVal2 = getValue(operand2);
+                        flags.compare = cmpVal1 - cmpVal2;
+                        flags.zero = (flags.compare === 0);
+                        console.log(` > CMP Result: ${cmpVal1} vs ${cmpVal2}. Zero flag: ${flags.zero}`);
+                        break;
+                    case 'JMP':
+                        if (!operand1) throw new Error("JMP requires an address (line number)");
+                        const jmpAddr = parseInt(operand1);
+                        if (isNaN(jmpAddr) || jmpAddr < 0 || jmpAddr >= instructions.length) {
+                             throw new Error(`Invalid JMP address: ${operand1}. Max line: ${instructions.length - 1}`);
+                        }
+                        programCounter = jmpAddr;
+                        pcIncrement = false;
+                        break;
+                    case 'JE':
+                        if (!operand1) throw new Error("JE requires an address (line number)");
+                        if (flags.zero) {
+                            const jeAddr = parseInt(operand1);
+                             if (isNaN(jeAddr) || jeAddr < 0 || jeAddr >= instructions.length) {
+                                throw new Error(`Invalid JE address: ${operand1}. Max line: ${instructions.length - 1}`);
+                            }
+                            programCounter = jeAddr;
+                            pcIncrement = false;
+                            console.log(" > JE condition met. Jumping.");
+                        } else {
+                             console.log(" > JE condition not met.");
+                        }
+                        break;
+                     case 'JNE':
+                        if (!operand1) throw new Error("JNE requires an address (line number)");
+                        if (!flags.zero) {
+                            const jneAddr = parseInt(operand1);
+                             if (isNaN(jneAddr) || jneAddr < 0 || jneAddr >= instructions.length) {
+                                throw new Error(`Invalid JNE address: ${operand1}. Max line: ${instructions.length - 1}`);
+                            }
+                            programCounter = jneAddr;
+                            pcIncrement = false;
+                             console.log(" > JNE condition met. Jumping.");
+                        } else {
+                            console.log(" > JNE condition not met.");
+                        }
+                        break;
+                    case 'HLT':
+                        halt = true;
+                        pcIncrement = false;
+                        statusMessage.textContent = 'Execution halted (HLT).';
+                        console.log(" > Execution halted.");
+                        break;
+                    default:
+                        throw new Error(`Unknown instruction: ${instruction}`);
+                }
+                if (pcIncrement && !halt) { programCounter++; }
+                return true; // Success
+            } catch (error) {
+                halt = true;
+                statusMessage.textContent = `Error on instruction ${pcBeforeExecution + 1} ('${instructionLine}'): ${error.message}`;
+                console.error(`Error executing instruction: ${instructionLine}`, error);
+                return false; // Error
+            }
+        }
+
+        // --- Execution Control ---
+        function step() {
+            // ... (logic to switch view and handle halt/end slightly adjusted)
+            if (running) return;
+
+            if (instructionsTextArea.disabled === false) {
+                 parseInstructions();
+                 if (instructions.length === 0) {
+                     statusMessage.textContent = 'No instructions to execute.';
+                     return;
+                 }
+                 showRunningView();
+                 // Disable run/step/reset during execution view
+                 runButton.disabled = true;
+                 stepButton.disabled = true;
+                 resetButton.disabled = true;
+            }
+
+            if (halt) {
+                 statusMessage.textContent = 'Execution halted. Reset to edit and run again.';
+                 // Re-enable buttons if halted
+                 runButton.disabled = false;
+                 stepButton.disabled = false;
+                 resetButton.disabled = false;
+                 return;
+            }
+            if (programCounter >= instructions.length) {
+                 statusMessage.textContent = 'End of program reached.';
+                 halt = true;
+                 updateDisplays();
+                 highlightExecutedLine(lastExecutedPc);
+                 runButton.disabled = false;
+                 stepButton.disabled = false;
+                 resetButton.disabled = false;
+                 return;
+            }
+
+            statusMessage.textContent = '';
+            const pcBefore = programCounter;
+            executeCurrentInstruction();
+
+            updateDisplays();
+            highlightExecutedLine(pcBefore);
+
+             if (!halt && programCounter >= instructions.length) {
+                 halt = true;
+                 statusMessage.textContent = 'Execution finished (end of program).';
+                 console.log("End of program reached.");
+                 highlightExecutedLine(pcBefore);
+             }
+
+             // Re-enable buttons AFTER step completes if halted or finished
+             if (halt) {
+                  runButton.disabled = false;
+                  stepButton.disabled = false;
+                  resetButton.disabled = false;
+             } else {
+                 // Keep buttons disabled if stepping through running view
+                 runButton.disabled = true;
+                 stepButton.disabled = true; // Re-enable step? Let's keep it disabled until reset.
+                 resetButton.disabled = true;
+                  // Actually, let's re-enable step button for multi-stepping
+                  stepButton.disabled = false;
+             }
+        }
+
+        function run() {
+            // ... (same as before, ensures running view is shown)
+             if (running) return;
+            parseInstructions();
+            if (instructions.length === 0) { statusMessage.textContent = 'No instructions to run.'; return; }
+            programCounter = 0;
+            halt = false;
+            flags = { zero: false, compare: 0 };
+            lastExecutedPc = -1;
+            for (let i = 0; i < 8; i++) { registers[`R${i}`] = 0; }
+            memory = {};
+            showRunningView();
+            running = true;
+            statusMessage.textContent = 'Running...';
+            runButton.disabled = true;
+            stepButton.disabled = true;
+            resetButton.disabled = true;
+            updateDisplays();
+            function runLoop() {
+                if (halt || programCounter >= instructions.length) {
+                    running = false;
+                     runButton.disabled = false;
+                     stepButton.disabled = false;
+                     resetButton.disabled = false;
+                     if (!statusMessage.textContent.includes('halted') && !statusMessage.textContent.includes('Error')) {
+                         statusMessage.textContent = 'Execution finished.';
+                     }
+                     updateDisplays();
+                     highlightExecutedLine(lastExecutedPc);
+                    return;
+                }
+                const pcBefore = programCounter;
+                const success = executeCurrentInstruction();
+                updateDisplays();
+                highlightExecutedLine(pcBefore);
+                if (!success || halt) {
+                     running = false;
+                     runButton.disabled = false;
+                     stepButton.disabled = false;
+                     resetButton.disabled = false;
+                     return;
+                }
+                setTimeout(runLoop, 10); // Faster execution
+            }
+            runLoop();
+        }
+
+        // --- File I/O Functions ---
+        function downloadCode() {
+            const code = instructionsTextArea.value;
+            const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'program.alexembly');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url); // Clean up blob URL
+            statusMessage.textContent = 'Code downloaded as program.alexembly';
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return; // No file selected
+            }
+
+            // Optional: Check file extension
+            if (!file.name.endsWith('.alexembly') && !file.name.endsWith('.txt')) {
+                 statusMessage.textContent = 'Error: Please upload a .alexembly or .txt file.';
+                 // Clear the input value so the same file can be re-uploaded if needed
+                 event.target.value = null;
+                 return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileContent = e.target.result;
+                instructionsTextArea.value = fileContent; // Load content into textarea
+                statusMessage.textContent = `File '${file.name}' uploaded successfully.`;
+                // Reset the simulator state completely with the new code
+                initializeState(); // Easiest way to reset everything based on new text
+                // Alternatively, just parse and reset PC/flags/memory if desired
+                // parseInstructions();
+                // programCounter = 0;
+                // halt = false;
+                // flags = { zero: false, compare: 0 };
+                // memory = {};
+                // for (let i = 0; i < 8; i++) { registers[`R${i}`] = 0; }
+                // updateDisplays();
+                // showEditableView(); // Ensure we are in editable view after upload
+            };
+            reader.onerror = function(e) {
+                 statusMessage.textContent = 'Error reading file.';
+                 console.error("File reading error:", e);
+            };
+            reader.readAsText(file);
+
+            // Clear the input value so the same file can be re-uploaded after modification
+            event.target.value = null;
+        }
+
+
+        // --- Event Listeners ---
+        stepButton.addEventListener('click', step);
+        runButton.addEventListener('click', run);
+        resetButton.addEventListener('click', initializeState);
+        downloadButton.addEventListener('click', downloadCode); // Added
+        uploadInput.addEventListener('change', handleFileUpload); // Added
+
+        // --- Initial Setup ---
+        initializeState();
+
+    </script>
+
+</body>
+</html>
