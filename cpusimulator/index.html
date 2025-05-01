@@ -166,9 +166,8 @@
         const runButton = document.getElementById('run-button');
         const stepButton = document.getElementById('step-button');
         const resetButton = document.getElementById('reset-button');
-        const downloadButton = document.getElementById('download-button'); // Added
-        const uploadInput = document.getElementById('upload-input');       // Added
-        // const uploadButton = document.getElementById('upload-button'); // Label acts as button
+        const downloadButton = document.getElementById('download-button');
+        const uploadInput = document.getElementById('upload-input');
         const memoryDisplay = document.getElementById('memory-display');
         const registerDisplay = document.getElementById('register-display');
         const statusMessage = document.getElementById('status-message');
@@ -209,10 +208,9 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
             instructionsDisplay.innerHTML = '';
             instructionsTextArea.disabled = false;
             removeHighlight();
-            // Enable file I/O buttons when editable
             downloadButton.disabled = false;
-            uploadInput.disabled = false; // Enable the hidden input
-            document.getElementById('upload-button').classList.remove('opacity-50', 'cursor-not-allowed'); // Enable label visually
+            uploadInput.disabled = false;
+            document.getElementById('upload-button').classList.remove('opacity-50', 'cursor-not-allowed');
         }
 
         function showRunningView() {
@@ -244,32 +242,38 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
             instructionsTextArea.classList.add('hidden');
             instructionsDisplay.classList.remove('hidden');
             instructionsTextArea.disabled = true;
-            // Disable file I/O buttons during run/step
             downloadButton.disabled = true;
-            uploadInput.disabled = true; // Disable the hidden input
-            document.getElementById('upload-button').classList.add('opacity-50', 'cursor-not-allowed'); // Disable label visually
+            uploadInput.disabled = true;
+            document.getElementById('upload-button').classList.add('opacity-50', 'cursor-not-allowed');
         }
 
 
         // --- Initialization ---
+        // Resets the simulator to its initial state with the default program
         function initializeState() {
-            instructionsTextArea.value = defaultProgram.trim();
-            showEditableView(); // Start in editable view
+            instructionsTextArea.value = defaultProgram.trim(); // Set default program
+            resetCPUState(); // Reset CPU state variables
+            showEditableView(); // Ensure editable view is shown
+            statusMessage.textContent = 'Ready.';
+            parseInstructions(); // Parse the default program
+            updateDisplays(); // Update register/memory display
+            // Ensure execution buttons are enabled
+            runButton.disabled = false;
+            stepButton.disabled = false;
+            console.log("Simulator Reset.");
+        }
 
-            for (let i = 0; i < 8; i++) { registers[`R${i}`] = 0; }
+        // --- Reset CPU State Helper ---
+        // Resets only the CPU execution state (registers, memory, flags, etc.)
+        // Does NOT change the code in the textarea.
+        function resetCPUState() {
+             for (let i = 0; i < 8; i++) { registers[`R${i}`] = 0; }
             memory = {};
             flags = { zero: false, compare: 0 };
             programCounter = 0;
             halt = false;
             running = false;
             lastExecutedPc = -1;
-            statusMessage.textContent = 'Ready.';
-            parseInstructions();
-            updateDisplays();
-            // Ensure execution buttons are enabled on reset
-            runButton.disabled = false;
-            stepButton.disabled = false;
-            console.log("Simulator Reset.");
         }
 
         // --- Instruction Parsing ---
@@ -339,7 +343,10 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
         function highlightExecutedLine(pcValue) {
             removeHighlight();
             if (pcValue < 0 || pcValue >= instructions.length || pcValue >= lineMap.length || lineMap[pcValue] === undefined) {
-                 console.warn(`Highlighting: Invalid PC or mapping for PC ${pcValue}`);
+                 // Don't warn if pcValue is simply out of bounds (e.g., after last instruction)
+                 if (pcValue >= 0 && pcValue < instructions.length) {
+                    console.warn(`Highlighting: Invalid mapping for PC ${pcValue}`);
+                 }
                  return;
              }
             const rawLineIndex = lineMap[pcValue];
@@ -356,7 +363,6 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
 
         // --- Operand Parsing ---
         function getValue(operand) {
-            // ... (same as before)
             operand = operand.trim();
             if (operand.startsWith('R') && registers.hasOwnProperty(operand)) { return registers[operand]; }
             if (operand.startsWith('[') && operand.endsWith(']')) {
@@ -370,7 +376,6 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
         }
 
         function setValue(destination, value) {
-            // ... (same as before)
             destination = destination.trim();
             value = parseInt(value);
              if (isNaN(value)) { throw new Error(`Invalid value to set: ${value}`); }
@@ -385,7 +390,6 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
 
         // --- Instruction Execution ---
         function executeCurrentInstruction() {
-            // ... (same as before)
             if (halt || programCounter >= instructions.length) { return false; }
             const instructionLine = instructions[programCounter];
             const pcBeforeExecution = programCounter;
@@ -484,7 +488,6 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
 
         // --- Execution Control ---
         function step() {
-            // ... (logic to switch view and handle halt/end slightly adjusted)
             if (running) return;
 
             if (instructionsTextArea.disabled === false) {
@@ -494,15 +497,13 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
                      return;
                  }
                  showRunningView();
-                 // Disable run/step/reset during execution view
                  runButton.disabled = true;
-                 stepButton.disabled = true;
+                 stepButton.disabled = true; // Keep step disabled initially in running view? No, enable below.
                  resetButton.disabled = true;
             }
 
             if (halt) {
                  statusMessage.textContent = 'Execution halted. Reset to edit and run again.';
-                 // Re-enable buttons if halted
                  runButton.disabled = false;
                  stepButton.disabled = false;
                  resetButton.disabled = false;
@@ -533,32 +534,23 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
                  highlightExecutedLine(pcBefore);
              }
 
-             // Re-enable buttons AFTER step completes if halted or finished
              if (halt) {
                   runButton.disabled = false;
                   stepButton.disabled = false;
                   resetButton.disabled = false;
              } else {
-                 // Keep buttons disabled if stepping through running view
+                 // Keep Run/Reset disabled, but re-enable Step for next step
                  runButton.disabled = true;
-                 stepButton.disabled = true; // Re-enable step? Let's keep it disabled until reset.
+                 stepButton.disabled = false;
                  resetButton.disabled = true;
-                  // Actually, let's re-enable step button for multi-stepping
-                  stepButton.disabled = false;
              }
         }
 
         function run() {
-            // ... (same as before, ensures running view is shown)
              if (running) return;
             parseInstructions();
             if (instructions.length === 0) { statusMessage.textContent = 'No instructions to run.'; return; }
-            programCounter = 0;
-            halt = false;
-            flags = { zero: false, compare: 0 };
-            lastExecutedPc = -1;
-            for (let i = 0; i < 8; i++) { registers[`R${i}`] = 0; }
-            memory = {};
+            resetCPUState(); // Reset CPU state for a clean run
             showRunningView();
             running = true;
             statusMessage.textContent = 'Running...';
@@ -590,13 +582,14 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
                      resetButton.disabled = false;
                      return;
                 }
-                setTimeout(runLoop, 10); // Faster execution
+                setTimeout(runLoop, 10);
             }
             runLoop();
         }
 
         // --- File I/O Functions ---
         function downloadCode() {
+            // Ensure we download from the editable textarea, even if currently hidden
             const code = instructionsTextArea.value;
             const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
@@ -607,20 +600,16 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            URL.revokeObjectURL(url); // Clean up blob URL
+            URL.revokeObjectURL(url);
             statusMessage.textContent = 'Code downloaded as program.alexembly';
         }
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
-            if (!file) {
-                return; // No file selected
-            }
+            if (!file) { return; }
 
-            // Optional: Check file extension
             if (!file.name.endsWith('.alexembly') && !file.name.endsWith('.txt')) {
                  statusMessage.textContent = 'Error: Please upload a .alexembly or .txt file.';
-                 // Clear the input value so the same file can be re-uploaded if needed
                  event.target.value = null;
                  return;
             }
@@ -628,27 +617,29 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
             const reader = new FileReader();
             reader.onload = function(e) {
                 const fileContent = e.target.result;
-                instructionsTextArea.value = fileContent; // Load content into textarea
-                statusMessage.textContent = `File '${file.name}' uploaded successfully.`;
-                // Reset the simulator state completely with the new code
-                initializeState(); // Easiest way to reset everything based on new text
-                // Alternatively, just parse and reset PC/flags/memory if desired
-                // parseInstructions();
-                // programCounter = 0;
-                // halt = false;
-                // flags = { zero: false, compare: 0 };
-                // memory = {};
-                // for (let i = 0; i < 8; i++) { registers[`R${i}`] = 0; }
-                // updateDisplays();
-                // showEditableView(); // Ensure we are in editable view after upload
+                // Load content into the textarea (even if hidden)
+                instructionsTextArea.value = fileContent;
+                statusMessage.textContent = `File '${file.name}' uploaded. Resetting state.`;
+
+                // Reset CPU state but keep the new code
+                resetCPUState();
+                parseInstructions(); // Parse the newly loaded code
+                updateDisplays();
+                showEditableView(); // Ensure we are back in editable view
+
+                // Make sure execution buttons are enabled after upload
+                runButton.disabled = false;
+                stepButton.disabled = false;
+                resetButton.disabled = false; // Keep reset enabled
+
+                console.log("File loaded and simulator state reset.");
             };
             reader.onerror = function(e) {
                  statusMessage.textContent = 'Error reading file.';
                  console.error("File reading error:", e);
+                 showEditableView(); // Ensure editable view on error too
             };
             reader.readAsText(file);
-
-            // Clear the input value so the same file can be re-uploaded after modification
             event.target.value = null;
         }
 
@@ -656,9 +647,9 @@ MOV R4, 111     ; This line is after HLT, should not execute (line 11)
         // --- Event Listeners ---
         stepButton.addEventListener('click', step);
         runButton.addEventListener('click', run);
-        resetButton.addEventListener('click', initializeState);
-        downloadButton.addEventListener('click', downloadCode); // Added
-        uploadInput.addEventListener('change', handleFileUpload); // Added
+        resetButton.addEventListener('click', initializeState); // Full reset to default
+        downloadButton.addEventListener('click', downloadCode);
+        uploadInput.addEventListener('change', handleFileUpload);
 
         // --- Initial Setup ---
         initializeState();
