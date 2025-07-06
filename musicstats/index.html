@@ -1868,14 +1868,30 @@
                 const dailyData = calculateDailyStats();
                 const sortedDays = Object.keys(dailyData).sort();
 
-                // Group by week or month for better visualization
-                const groupedData = {};
-                sortedDays.forEach((day) => {
-                    const date = new Date(day);
-                    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-                    if (!groupedData[key]) groupedData[key] = 0;
-                    groupedData[key] += dailyData[day].time / (1000 * 60 * 60); // Convert to hours
-                });
+                // Determine selected period
+                const periodSelect = document.getElementById("periodSelect");
+                const period = periodSelect ? periodSelect.value : "all";
+
+                let groupedData = {};
+                let labelFormat = "month"; // default
+
+                if (period === "last7" || period === "last30") {
+                    // Group by day (YYYY-MM-DD)
+                    labelFormat = "day";
+                    sortedDays.forEach((day) => {
+                        groupedData[day] =
+                            dailyData[day].time / (1000 * 60 * 60); // hours
+                    });
+                } else {
+                    // Group by month (YYYY-MM)
+                    sortedDays.forEach((day) => {
+                        const date = new Date(day);
+                        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+                        if (!groupedData[key]) groupedData[key] = 0;
+                        groupedData[key] +=
+                            dailyData[day].time / (1000 * 60 * 60); // hours
+                    });
+                }
 
                 if (charts.timeChart) charts.timeChart.destroy();
 
@@ -1915,7 +1931,21 @@
                             x: {
                                 ticks: {
                                     color: "white",
-                                    maxTicksLimit: 8,
+                                    maxTicksLimit:
+                                        labelFormat === "day" ? 14 : 8,
+                                    callback: function (value, index, values) {
+                                        // Format label as "MMM D" for day, "YYYY-MM" for month
+                                        const label =
+                                            this.getLabelForValue(value);
+                                        if (labelFormat === "day") {
+                                            const d = new Date(label);
+                                            if (!isNaN(d)) {
+                                                return `${d.getMonth() + 1}/${d.getDate()}`;
+                                            }
+                                            return label;
+                                        }
+                                        return label;
+                                    },
                                 },
                                 grid: { color: "rgba(255,255,255,0.1)" },
                             },
