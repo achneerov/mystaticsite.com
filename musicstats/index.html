@@ -4,8 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>My Spotify Stats</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
         <style>
             * {
                 margin: 0;
@@ -37,34 +37,26 @@
                 color: #1db954;
             }
 
-            /* Upload Screen Styles */
-            .upload-screen {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                min-height: 60vh;
-            }
-
-            .upload-area {
-                border: 3px dashed #1db954;
-                border-radius: 20px;
-                padding: 60px 40px;
-                text-align: center;
-                background: rgba(25, 20, 20, 0.8);
-                backdrop-filter: blur(10px);
-                transition: all 0.3s ease;
-                cursor: pointer;
-                max-width: 600px;
-                width: 100%;
-            }
-
-            .upload-area:hover,
-            .upload-area.dragover {
-                border-color: #1ed760;
+            .upload-container {
                 background: rgba(25, 20, 20, 0.9);
-                transform: translateY(-5px);
-                box-shadow: 0 10px 30px rgba(29, 185, 84, 0.3);
+                border-radius: 15px;
+                padding: 40px;
+                text-align: center;
+                border: 2px dashed #1db954;
+                margin: 40px auto;
+                max-width: 600px;
+                transition: all 0.3s ease;
+            }
+
+            .upload-container:hover {
+                border-color: #1ed760;
+                background: rgba(25, 20, 20, 0.95);
+            }
+
+            .upload-container.dragover {
+                border-color: #1ed760;
+                background: rgba(29, 185, 84, 0.1);
+                transform: scale(1.02);
             }
 
             .upload-icon {
@@ -74,36 +66,45 @@
             }
 
             .upload-text {
-                font-size: 1.5rem;
-                margin-bottom: 10px;
-                color: #1db954;
+                font-size: 1.2rem;
+                margin-bottom: 20px;
             }
 
-            .upload-subtext {
-                color: #ccc;
-                margin-bottom: 30px;
+            .upload-input {
+                display: none;
             }
 
-            .upload-btn {
+            .upload-button {
                 background: #1db954;
                 color: white;
                 border: none;
-                padding: 15px 30px;
+                padding: 12px 30px;
                 border-radius: 25px;
-                font-size: 1.2rem;
+                font-size: 1.1rem;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                font-weight: bold;
+                margin: 10px;
             }
 
-            .upload-btn:hover {
+            .upload-button:hover {
                 background: #1ed760;
                 transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
             }
 
-            #file-input {
-                display: none;
+            .back-button {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border: 1px solid #1db954;
+                padding: 10px 20px;
+                border-radius: 20px;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-bottom: 20px;
+            }
+
+            .back-button:hover {
+                background: rgba(29, 185, 84, 0.2);
             }
 
             .processing {
@@ -112,24 +113,37 @@
                 margin: 50px 0;
             }
 
-            .progress-container {
-                width: 100%;
+            .processing-steps {
+                margin-top: 20px;
+                text-align: left;
                 max-width: 400px;
-                margin: 20px auto;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
-                overflow: hidden;
-                height: 20px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
-            .progress-bar-upload {
-                background: #1db954;
-                height: 100%;
-                width: 0%;
-                transition: width 0.3s ease;
+            .processing-step {
+                padding: 10px;
+                margin: 5px 0;
+                border-radius: 5px;
+                transition: all 0.3s ease;
             }
 
-            /* Stats Screen Styles */
+            .processing-step.active {
+                background: rgba(29, 185, 84, 0.2);
+                border-left: 3px solid #1db954;
+            }
+
+            .processing-step.completed {
+                background: rgba(29, 185, 84, 0.1);
+                color: #1db954;
+            }
+
+            .loading {
+                text-align: center;
+                font-size: 1.5rem;
+                margin: 50px 0;
+            }
+
             .stats-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -186,10 +200,6 @@
 
             .time-period {
                 margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                flex-wrap: wrap;
             }
 
             .time-period select {
@@ -199,20 +209,6 @@
                 padding: 10px;
                 border-radius: 5px;
                 font-size: 1rem;
-            }
-
-            .back-btn {
-                background: rgba(255, 255, 255, 0.1);
-                color: white;
-                border: 1px solid #1db954;
-                padding: 10px 20px;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-
-            .back-btn:hover {
-                background: rgba(29, 185, 84, 0.2);
             }
 
             .progress-bar {
@@ -235,29 +231,19 @@
                 border-radius: 5px;
                 padding: 20px;
                 margin: 20px 0;
-                text-align: center;
             }
 
-            .instructions {
-                background: rgba(25, 20, 20, 0.8);
-                border-radius: 10px;
-                padding: 30px;
-                margin: 40px auto;
-                max-width: 800px;
+            .file-info {
+                background: rgba(29, 185, 84, 0.1);
                 border: 1px solid #1db954;
+                border-radius: 5px;
+                padding: 15px;
+                margin: 15px 0;
+                text-align: left;
             }
 
-            .instructions h3 {
+            .file-info h4 {
                 color: #1db954;
-                margin-bottom: 15px;
-            }
-
-            .instructions ol {
-                margin-left: 20px;
-                line-height: 1.6;
-            }
-
-            .instructions li {
                 margin-bottom: 10px;
             }
 
@@ -270,13 +256,9 @@
                     grid-template-columns: 1fr;
                 }
 
-                .upload-area {
-                    padding: 40px 20px;
-                }
-
-                .time-period {
-                    flex-direction: column;
-                    align-items: stretch;
+                .upload-container {
+                    padding: 20px;
+                    margin: 20px auto;
                 }
             }
         </style>
@@ -285,51 +267,103 @@
         <div class="container">
             <div class="header">
                 <h1>🎵 My Spotify Stats</h1>
-                <p>Upload your Spotify data and discover your music listening patterns</p>
+                <p>
+                    Upload your Spotify data to discover your music listening
+                    patterns
+                </p>
             </div>
 
-            <!-- Upload Screen -->
-            <div id="upload-screen" class="upload-screen">
-                <div class="upload-area" id="upload-area">
+            <!-- Upload View -->
+            <div id="uploadView">
+                <div class="upload-container" id="dropZone">
                     <div class="upload-icon">📁</div>
-                    <div class="upload-text">Upload Your Spotify Data</div>
-                    <div class="upload-subtext">
-                        Drag and drop your my_spotify_data.zip file here or click to browse
+                    <div class="upload-text">
+                        <strong
+                            >Upload your Spotify Extended Streaming
+                            History</strong
+                        >
+                        <br />
+                        Drop your .zip file here or click to browse
+                        <br />
+                        <small
+                            >Your data is processed locally - nothing is
+                            uploaded to any server</small
+                        >
                     </div>
-                    <button class="upload-btn" onclick="console.log('🎯 Button clicked'); document.getElementById('file-input').click()">
+                    <input
+                        type="file"
+                        id="fileInput"
+                        class="upload-input"
+                        accept=".zip"
+                    />
+                    <button
+                        class="upload-button"
+                        onclick="document.getElementById('fileInput').click()"
+                    >
                         Choose File
                     </button>
-                    <input type="file" id="file-input" accept=".zip" />
-                </div>
-
-                <div class="instructions">
-                    <h3>How to get your Spotify data:</h3>
-                    <ol>
-                        <li>Go to <a href="https://www.spotify.com/account/privacy/" target="_blank" style="color: #1db954;">Spotify Privacy Settings</a></li>
-                        <li></li>Scroll down to "Download your data"</li>
-                        <li>Request "Extended streaming history" (this can take up to 30 days)</li>
-                        <li>Download the ZIP file when ready</li>
-                        <li>Upload it here to see your stats!</li>
-                    </ol>
-                    <p style="margin-top: 15px; font-size: 0.9em; color: #ccc;">
-                        Your data is processed entirely in your browser - nothing is uploaded to any server!
-                    </p>
+                    <div class="file-info" style="display: none" id="fileInfo">
+                        <h4>How to get your Spotify data:</h4>
+                        <ol>
+                            <li>
+                                Go to
+                                <a
+                                    href="https://www.spotify.com/account/privacy/"
+                                    target="_blank"
+                                    style="color: #1db954"
+                                    >Spotify Privacy Settings</a
+                                >
+                            </li>
+                            <li>Scroll down to "Download your data"</li>
+                            <li>Request "Extended streaming history"</li>
+                            <li>
+                                Wait for Spotify to email you the download link
+                                (can take up to 30 days)
+                            </li>
+                            <li>Download and upload the .zip file here</li>
+                        </ol>
+                    </div>
+                    <button
+                        class="upload-button"
+                        onclick="toggleFileInfo()"
+                        style="background: rgba(255, 255, 255, 0.1)"
+                    >
+                        📋 How to get my data?
+                    </button>
                 </div>
             </div>
 
-            <!-- Processing Screen -->
-            <div id="processing-screen" style="display: none" class="processing">
-                <div>Processing your Spotify data... 🎶</div>
-                <div class="progress-container">
-                    <div class="progress-bar-upload" id="progress-bar"></div>
+            <!-- Processing View -->
+            <div id="processingView" style="display: none">
+                <button class="back-button" onclick="showUploadView()">
+                    ← Back to Upload
+                </button>
+                <div class="processing">
+                    <div>Processing your Spotify data... 🎶</div>
+                    <div class="processing-steps">
+                        <div class="processing-step" id="step1">
+                            📁 Extracting ZIP file...
+                        </div>
+                        <div class="processing-step" id="step2">
+                            🔍 Finding data files...
+                        </div>
+                        <div class="processing-step" id="step3">
+                            📊 Processing listening history...
+                        </div>
+                        <div class="processing-step" id="step4">
+                            🎵 Generating statistics...
+                        </div>
+                    </div>
                 </div>
-                <div id="processing-status">Extracting files...</div>
             </div>
 
-            <!-- Stats Screen -->
-            <div id="stats-screen" style="display: none">
+            <!-- Stats View -->
+            <div id="statsView" style="display: none">
+                <button class="back-button" onclick="showUploadView()">
+                    ← Upload New Data
+                </button>
+
                 <div class="time-period">
-                    <button class="back-btn" onclick="showUploadScreen()">← Upload New File</button>
                     <label for="periodSelect">Time Period: </label>
                     <select id="periodSelect">
                         <option value="all">All Time</option>
@@ -408,11 +442,13 @@
                 </div>
             </div>
 
-            <!-- Error Screen -->
-            <div id="error-screen" style="display: none" class="error">
+            <!-- Error View -->
+            <div id="errorView" style="display: none" class="error">
                 <h3>Error Processing Data</h3>
-                <p id="error-message">Something went wrong while processing your Spotify data.</p>
-                <button class="back-btn" onclick="showUploadScreen()" style="margin-top: 15px;">
+                <p id="errorMessage">
+                    There was an issue processing your Spotify data.
+                </p>
+                <button class="upload-button" onclick="showUploadView()">
                     Try Again
                 </button>
             </div>
@@ -423,196 +459,217 @@
             let filteredData = [];
             let charts = {};
 
-            // Drag and drop functionality
-            const uploadArea = document.getElementById('upload-area');
-            const fileInput = document.getElementById('file-input');
+            // View management
+            function showUploadView() {
+                document.getElementById("uploadView").style.display = "block";
+                document.getElementById("processingView").style.display =
+                    "none";
+                document.getElementById("statsView").style.display = "none";
+                document.getElementById("errorView").style.display = "none";
 
-            console.log('🔧 Setting up event listeners...');
-            console.log('📱 Upload area element:', uploadArea);
-            console.log('📁 File input element:', fileInput);
+                // Clear previous data
+                allData = [];
+                filteredData = [];
 
-            uploadArea.addEventListener('dragover', (e) => {
-                console.log('🎯 Dragover event triggered');
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
+                // Destroy existing charts
+                Object.values(charts).forEach((chart) => chart.destroy());
+                charts = {};
+            }
 
-            uploadArea.addEventListener('dragleave', () => {
-                console.log('🎯 Dragleave event triggered');
-                uploadArea.classList.remove('dragover');
-            });
+            function showProcessingView() {
+                document.getElementById("uploadView").style.display = "none";
+                document.getElementById("processingView").style.display =
+                    "block";
+                document.getElementById("statsView").style.display = "none";
+                document.getElementById("errorView").style.display = "none";
 
-            uploadArea.addEventListener('drop', (e) => {
-                console.log('🎯 Drop event triggered');
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                console.log('📁 Files dropped:', files.length);
-                if (files.length > 0) {
-                    console.log('📁 Processing dropped file:', files[0].name);
-                    handleFile(files[0]);
+                // Reset processing steps
+                ["step1", "step2", "step3", "step4"].forEach((stepId) => {
+                    const step = document.getElementById(stepId);
+                    step.classList.remove("active", "completed");
+                });
+            }
+
+            function showStatsView() {
+                document.getElementById("uploadView").style.display = "none";
+                document.getElementById("processingView").style.display =
+                    "none";
+                document.getElementById("statsView").style.display = "block";
+                document.getElementById("errorView").style.display = "none";
+            }
+
+            function showErrorView(message) {
+                document.getElementById("uploadView").style.display = "none";
+                document.getElementById("processingView").style.display =
+                    "none";
+                document.getElementById("statsView").style.display = "none";
+                document.getElementById("errorView").style.display = "block";
+                document.getElementById("errorMessage").textContent = message;
+            }
+
+            function toggleFileInfo() {
+                const fileInfo = document.getElementById("fileInfo");
+                if (fileInfo.style.display === "none") {
+                    fileInfo.style.display = "block";
+                } else {
+                    fileInfo.style.display = "none";
                 }
-            });
+            }
 
-            uploadArea.addEventListener('click', () => {
-                console.log('🎯 Upload area clicked');
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                console.log('🎯 File input change event triggered');
-                console.log('📁 Files selected:', e.target.files.length);
-                if (e.target.files.length > 0) {
-                    console.log('📁 Processing selected file:', e.target.files[0].name);
-                    handleFile(e.target.files[0]);
-                }
-            });
-
-            async function handleFile(file) {
-                console.log('🔍 Starting file upload debug...');
-                console.log('📁 File name:', file.name);
-                console.log('📊 File size:', file.size, 'bytes');
-                console.log('🔗 File type:', file.type);
-
-                if (!file.name.endsWith('.zip')) {
-                    console.log('❌ File is not a ZIP file');
-                    showError('Please upload a ZIP file containing your Spotify data.');
-                    return;
+            function setProcessingStep(stepNumber) {
+                // Mark previous steps as completed
+                for (let i = 1; i < stepNumber; i++) {
+                    const step = document.getElementById(`step${i}`);
+                    step.classList.remove("active");
+                    step.classList.add("completed");
                 }
 
-                showProcessingScreen();
+                // Mark current step as active
+                const currentStep = document.getElementById(
+                    `step${stepNumber}`,
+                );
+                currentStep.classList.add("active");
+            }
 
+            // File handling
+            async function processZipFile(file) {
                 try {
-                    console.log('📦 Loading JSZip...');
+                    showProcessingView();
+                    setProcessingStep(1);
+
                     const zip = new JSZip();
-                    console.log('📦 JSZip loaded successfully');
+                    const contents = await zip.loadAsync(file);
 
-                    console.log('🔓 Extracting ZIP file...');
-                    const zipContent = await zip.loadAsync(file);
-                    console.log('✅ ZIP file extracted successfully');
+                    setProcessingStep(2);
 
-                    updateProgress(20, 'Extracting ZIP file...');
+                    // Find streaming history files
+                    const streamingFiles = [];
+                    contents.forEach((relativePath, file) => {
+                        // Skip macOS metadata files and directories
+                        if (
+                            relativePath.includes("__MACOSX") ||
+                            relativePath.startsWith("._") ||
+                            relativePath.includes("/._") ||
+                            file.dir
+                        ) {
+                            return;
+                        }
 
-                    console.log('📋 All files in ZIP:');
-                    Object.keys(zipContent.files).forEach(filename => {
-                        console.log('  📄', filename);
+                        if (
+                            relativePath.includes("Streaming_History_Audio") &&
+                            relativePath.endsWith(".json")
+                        ) {
+                            console.log(`Found valid file: ${relativePath}`);
+                            streamingFiles.push({
+                                path: relativePath,
+                                file: file,
+                            });
+                        }
                     });
 
-                    const jsonFiles = [];
-                    const audioHistoryFiles = Object.keys(zipContent.files).filter(filename =>
-                        filename.includes('Streaming_History_Audio') && filename.endsWith('.json')
-                    );
-
-                    console.log('🎵 Found audio history files:', audioHistoryFiles.length);
-                    audioHistoryFiles.forEach(filename => {
-                        console.log('  🎵', filename);
-                    });
-
-                    if (audioHistoryFiles.length === 0) {
-                        console.log('❌ No audio history files found');
-                        throw new Error('No Spotify streaming history files found in the ZIP. Make sure you uploaded the correct file with Extended Streaming History data.');
+                    if (streamingFiles.length === 0) {
+                        throw new Error(
+                            "No Spotify streaming history files found in the ZIP. Make sure you uploaded the Extended Streaming History data.",
+                        );
                     }
 
-                    updateProgress(40, 'Reading streaming history files...');
+                    setProcessingStep(3);
 
-                    // Process each JSON file
-                    for (let i = 0; i < audioHistoryFiles.length; i++) {
-                        const filename = audioHistoryFiles[i];
-                        console.log(`📖 Processing file ${i + 1}/${audioHistoryFiles.length}: ${filename}`);
-
-                        const fileContent = await zipContent.files[filename].async('text');
-                        console.log(`📖 File content length: ${fileContent.length} characters`);
-
-                        const data = JSON.parse(fileContent);
-                        console.log(`📖 Parsed ${data.length} records from ${filename}`);
-
-                        jsonFiles.push(...data);
-
-                        updateProgress(40 + (i / audioHistoryFiles.length) * 40,
-                            `Processing ${filename}...`);
-                    }
-
-                    console.log(`📊 Total records loaded: ${jsonFiles.length}`);
-                    updateProgress(80, 'Analyzing your music data...');
-
-                    // Filter and process data
-                    allData = jsonFiles.filter(item =>
-                        item.master_metadata_track_name &&
-                        item.master_metadata_album_artist_name &&
-                        item.ms_played > 0
+                    // Process each file
+                    const allRecords = [];
+                    console.log(
+                        `Processing ${streamingFiles.length} valid streaming history files...`,
                     );
 
-                    console.log(`📊 Valid records after filtering: ${allData.length}`);
+                    for (const { path, file } of streamingFiles) {
+                        try {
+                            const content = await file.async("text");
+
+                            // Additional check for valid JSON content
+                            if (
+                                !content.trim().startsWith("[") &&
+                                !content.trim().startsWith("{")
+                            ) {
+                                console.warn(
+                                    `Skipping ${path}: Not valid JSON content`,
+                                );
+                                continue;
+                            }
+
+                            const data = JSON.parse(content);
+                            if (Array.isArray(data)) {
+                                console.log(
+                                    `Loaded ${data.length} records from ${path}`,
+                                );
+                                allRecords.push(...data);
+                            } else {
+                                console.warn(
+                                    `Skipping ${path}: Data is not an array`,
+                                );
+                            }
+                        } catch (e) {
+                            console.warn(
+                                `Error processing ${path}:`,
+                                e.message,
+                            );
+                        }
+                    }
+
+                    // Filter valid records
+                    allData = allRecords.filter(
+                        (item) =>
+                            item.master_metadata_track_name &&
+                            item.master_metadata_album_artist_name &&
+                            item.ms_played > 0 &&
+                            item.ts,
+                    );
 
                     if (allData.length === 0) {
-                        console.log('❌ No valid streaming data found');
-                        throw new Error('No valid streaming data found in the files.');
+                        throw new Error(
+                            "No valid listening records found in the uploaded files.",
+                        );
                     }
 
-                    console.log('✅ Data processing complete!');
-                    updateProgress(100, 'Complete!');
+                    setProcessingStep(4);
 
-                    setTimeout(() => {
-                        applyFilter('all');
-                        showStatsScreen();
-                    }, 500);
+                    console.log(
+                        `Successfully processed ${allData.length} valid listening records from ${streamingFiles.length} files`,
+                    );
+                    console.log(
+                        `Data spans from ${new Date(Math.min(...allData.map((item) => new Date(item.ts)))).toLocaleDateString()} to ${new Date(Math.max(...allData.map((item) => new Date(item.ts)))).toLocaleDateString()}`,
+                    );
 
+                    // Short delay to show final step
+                    await new Promise((resolve) => setTimeout(resolve, 500));
+
+                    // Mark final step as completed
+                    document.getElementById("step4").classList.remove("active");
+                    document.getElementById("step4").classList.add("completed");
+
+                    // Initialize stats view
+                    applyFilter("all");
+                    showStatsView();
                 } catch (error) {
-                    console.error('💥 Error processing file:', error);
-                    console.error('💥 Error stack:', error.stack);
-                    showError(error.message || 'Failed to process the uploaded file. Please make sure it\'s a valid Spotify data export.');
+                    console.error("Error processing ZIP file:", error);
+                    showErrorView(error.message);
                 }
             }
 
-            function updateProgress(percent, status) {
-                document.getElementById('progress-bar').style.width = percent + '%';
-                document.getElementById('processing-status').textContent = status;
-            }
-
-            function showUploadScreen() {
-                document.getElementById('upload-screen').style.display = 'block';
-                document.getElementById('processing-screen').style.display = 'none';
-                document.getElementById('stats-screen').style.display = 'none';
-                document.getElementById('error-screen').style.display = 'none';
-
-                // Reset file input
-                fileInput.value = '';
-            }
-
-            function showProcessingScreen() {
-                document.getElementById('upload-screen').style.display = 'none';
-                document.getElementById('processing-screen').style.display = 'block';
-                document.getElementById('stats-screen').style.display = 'none';
-                document.getElementById('error-screen').style.display = 'none';
-
-                updateProgress(0, 'Starting...');
-            }
-
-            function showStatsScreen() {
-                document.getElementById('upload-screen').style.display = 'none';
-                document.getElementById('processing-screen').style.display = 'none';
-                document.getElementById('stats-screen').style.display = 'block';
-                document.getElementById('error-screen').style.display = 'none';
-            }
-
-            function showError(message) {
-                document.getElementById('upload-screen').style.display = 'none';
-                document.getElementById('processing-screen').style.display = 'none';
-                document.getElementById('stats-screen').style.display = 'none';
-                document.getElementById('error-screen').style.display = 'block';
-                document.getElementById('error-message').textContent = message;
-            }
-
+            // Stats functions (same as before but adapted)
             function applyFilter(period) {
                 const now = new Date();
                 let startDate = new Date(0);
 
                 switch (period) {
                     case "last7":
-                        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        startDate = new Date(
+                            now.getTime() - 7 * 24 * 60 * 60 * 1000,
+                        );
                         break;
                     case "last30":
-                        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        startDate = new Date(
+                            now.getTime() - 30 * 24 * 60 * 60 * 1000,
+                        );
                         break;
                     case "2024":
                         startDate = new Date("2024-01-01");
@@ -632,9 +689,12 @@
                     return (
                         itemDate >= startDate &&
                         (period === "all" ||
-                            (period === "2024" && itemDate.getFullYear() === 2024) ||
-                            (period === "2023" && itemDate.getFullYear() === 2023) ||
-                            (period === "2022" && itemDate.getFullYear() === 2022) ||
+                            (period === "2024" &&
+                                itemDate.getFullYear() === 2024) ||
+                            (period === "2023" &&
+                                itemDate.getFullYear() === 2023) ||
+                            (period === "2022" &&
+                                itemDate.getFullYear() === 2022) ||
                             period.startsWith("last"))
                     );
                 });
@@ -644,49 +704,84 @@
 
             function updateStats() {
                 // Basic stats
-                const totalMs = filteredData.reduce((sum, item) => sum + item.ms_played, 0);
+                const totalMs = filteredData.reduce(
+                    (sum, item) => sum + item.ms_played,
+                    0,
+                );
                 const totalHours = Math.round(totalMs / (1000 * 60 * 60));
                 const totalTracks = filteredData.length;
 
-                document.getElementById("totalTime").textContent = `${totalHours}h`;
-                document.getElementById("totalTracks").textContent = `${totalTracks.toLocaleString()} tracks played`;
+                document.getElementById("totalTime").textContent =
+                    `${totalHours}h`;
+                document.getElementById("totalTracks").textContent =
+                    `${totalTracks.toLocaleString()} tracks played`;
 
                 // Average daily listening
-                const days = Math.max(1, Math.ceil(
-                    (new Date() - new Date(Math.min(...filteredData.map(item => new Date(item.ts))))) / (1000 * 60 * 60 * 24)
-                ));
+                const days = Math.max(
+                    1,
+                    Math.ceil(
+                        (new Date() -
+                            new Date(
+                                Math.min(
+                                    ...filteredData.map(
+                                        (item) => new Date(item.ts),
+                                    ),
+                                ),
+                            )) /
+                            (1000 * 60 * 60 * 24),
+                    ),
+                );
                 const avgDailyHours = Math.round((totalHours / days) * 10) / 10;
                 const avgDailyTracks = Math.round(totalTracks / days);
 
-                document.getElementById("avgDaily").textContent = `${avgDailyHours}h`;
-                document.getElementById("avgTracks").textContent = `${avgDailyTracks} tracks per day`;
+                document.getElementById("avgDaily").textContent =
+                    `${avgDailyHours}h`;
+                document.getElementById("avgTracks").textContent =
+                    `${avgDailyTracks} tracks per day`;
 
                 // Unique counts
-                const uniqueArtists = new Set(filteredData.map(item => item.master_metadata_album_artist_name)).size;
-                const uniqueTracks = new Set(filteredData.map(item =>
-                    `${item.master_metadata_track_name}-${item.master_metadata_album_artist_name}`
-                )).size;
+                const uniqueArtists = new Set(
+                    filteredData.map(
+                        (item) => item.master_metadata_album_artist_name,
+                    ),
+                ).size;
+                const uniqueTracks = new Set(
+                    filteredData.map(
+                        (item) =>
+                            `${item.master_metadata_track_name}-${item.master_metadata_album_artist_name}`,
+                    ),
+                ).size;
 
-                document.getElementById("uniqueArtists").textContent = uniqueArtists.toLocaleString();
-                document.getElementById("uniqueTracks").textContent = `${uniqueTracks.toLocaleString()} unique tracks`;
+                document.getElementById("uniqueArtists").textContent =
+                    uniqueArtists.toLocaleString();
+                document.getElementById("uniqueTracks").textContent =
+                    `${uniqueTracks.toLocaleString()} unique tracks`;
 
                 // Platform stats
                 const platforms = {};
                 filteredData.forEach((item) => {
-                    platforms[item.platform] = (platforms[item.platform] || 0) + item.ms_played;
+                    platforms[item.platform] =
+                        (platforms[item.platform] || 0) + item.ms_played;
                 });
 
                 const topPlatform = Object.keys(platforms).reduce(
                     (a, b) => (platforms[a] > platforms[b] ? a : b),
                     "unknown",
                 );
-                document.getElementById("topPlatform").textContent = topPlatform;
+                document.getElementById("topPlatform").textContent =
+                    topPlatform;
 
                 // Skip rate
-                const completedTracks = filteredData.filter(item => item.ms_played > 30000).length; // 30+ seconds
-                const completionRate = Math.round((completedTracks / totalTracks) * 100);
-                document.getElementById("skipRate").textContent = `${completionRate}%`;
-                document.getElementById("completionBar").style.width = `${completionRate}%`;
+                const completedTracks = filteredData.filter(
+                    (item) => item.ms_played > 30000,
+                ).length; // 30+ seconds
+                const completionRate = Math.round(
+                    (completedTracks / totalTracks) * 100,
+                );
+                document.getElementById("skipRate").textContent =
+                    `${completionRate}%`;
+                document.getElementById("completionBar").style.width =
+                    `${completionRate}%`;
 
                 updateTopLists();
                 updateCharts();
@@ -697,7 +792,8 @@
                 const artistPlays = {};
                 filteredData.forEach((item) => {
                     const artist = item.master_metadata_album_artist_name;
-                    artistPlays[artist] = (artistPlays[artist] || 0) + item.ms_played;
+                    artistPlays[artist] =
+                        (artistPlays[artist] || 0) + item.ms_played;
                 });
 
                 const topArtists = Object.entries(artistPlays)
@@ -705,9 +801,11 @@
                     .slice(0, 10);
 
                 document.getElementById("topArtists").innerHTML = topArtists
-                    .map(([artist, ms], index) =>
-                        `<li><span class="rank">${index + 1}.</span>${artist} <br><small>${Math.round(ms / (1000 * 60))} minutes</small></li>`
-                    ).join("");
+                    .map(
+                        ([artist, ms], index) =>
+                            `<li><span class="rank">${index + 1}.</span>${artist} <br><small>${Math.round(ms / (1000 * 60))} minutes</small></li>`,
+                    )
+                    .join("");
 
                 // Top Tracks
                 const trackPlays = {};
@@ -721,16 +819,19 @@
                     .slice(0, 10);
 
                 document.getElementById("topTracks").innerHTML = topTracks
-                    .map(([track, plays], index) =>
-                        `<li><span class="rank">${index + 1}.</span>${track} <br><small>${plays} plays</small></li>`
-                    ).join("");
+                    .map(
+                        ([track, plays], index) =>
+                            `<li><span class="rank">${index + 1}.</span>${track} <br><small>${plays} plays</small></li>`,
+                    )
+                    .join("");
 
                 // Top Albums
                 const albumPlays = {};
                 filteredData.forEach((item) => {
                     if (item.master_metadata_album_album_name) {
                         const album = `${item.master_metadata_album_album_name} - ${item.master_metadata_album_artist_name}`;
-                        albumPlays[album] = (albumPlays[album] || 0) + item.ms_played;
+                        albumPlays[album] =
+                            (albumPlays[album] || 0) + item.ms_played;
                     }
                 });
 
@@ -739,9 +840,11 @@
                     .slice(0, 10);
 
                 document.getElementById("topAlbums").innerHTML = topAlbums
-                    .map(([album, ms], index) =>
-                        `<li><span class="rank">${index + 1}.</span>${album} <br><small>${Math.round(ms / (1000 * 60))} minutes</small></li>`
-                    ).join("");
+                    .map(
+                        ([album, ms], index) =>
+                            `<li><span class="rank">${index + 1}.</span>${album} <br><small>${Math.round(ms / (1000 * 60))} minutes</small></li>`,
+                    )
+                    .join("");
             }
 
             function updateCharts() {
@@ -757,23 +860,31 @@
                     charts.hourly.destroy();
                 }
 
-                const hourlyCtx = document.getElementById("hourlyChart").getContext("2d");
+                const hourlyCtx = document
+                    .getElementById("hourlyChart")
+                    .getContext("2d");
                 charts.hourly = new Chart(hourlyCtx, {
                     type: "bar",
                     data: {
                         labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
-                        datasets: [{
-                            label: "Minutes Listened",
-                            data: hourlyData.map((ms) => Math.round(ms / (1000 * 60))),
-                            backgroundColor: "#1db954",
-                            borderColor: "#1ed760",
-                            borderWidth: 1,
-                        }],
+                        datasets: [
+                            {
+                                label: "Minutes Listened",
+                                data: hourlyData.map((ms) =>
+                                    Math.round(ms / (1000 * 60)),
+                                ),
+                                backgroundColor: "#1db954",
+                                borderColor: "#1ed760",
+                                borderWidth: 1,
+                            },
+                        ],
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: { display: false },
+                        },
                         scales: {
                             y: {
                                 beginAtZero: true,
@@ -793,37 +904,44 @@
                 filteredData.forEach((item) => {
                     const date = new Date(item.ts);
                     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-                    monthlyData[monthKey] = (monthlyData[monthKey] || 0) + item.ms_played;
+                    monthlyData[monthKey] =
+                        (monthlyData[monthKey] || 0) + item.ms_played;
                 });
 
                 const sortedMonths = Object.keys(monthlyData).sort();
                 const monthlyValues = sortedMonths.map((month) =>
-                    Math.round(monthlyData[month] / (1000 * 60 * 60))
+                    Math.round(monthlyData[month] / (1000 * 60 * 60)),
                 );
 
                 if (charts.monthly) {
                     charts.monthly.destroy();
                 }
 
-                const monthlyCtx = document.getElementById("monthlyChart").getContext("2d");
+                const monthlyCtx = document
+                    .getElementById("monthlyChart")
+                    .getContext("2d");
                 charts.monthly = new Chart(monthlyCtx, {
                     type: "line",
                     data: {
                         labels: sortedMonths,
-                        datasets: [{
-                            label: "Hours Listened",
-                            data: monthlyValues,
-                            backgroundColor: "rgba(29, 185, 84, 0.2)",
-                            borderColor: "#1db954",
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4,
-                        }],
+                        datasets: [
+                            {
+                                label: "Hours Listened",
+                                data: monthlyValues,
+                                backgroundColor: "rgba(29, 185, 84, 0.2)",
+                                borderColor: "#1db954",
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                            },
+                        ],
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: { display: false },
+                        },
                         scales: {
                             y: {
                                 beginAtZero: true,
@@ -840,20 +958,54 @@
             }
 
             // Event listeners
-            document.getElementById("periodSelect").addEventListener("change", (e) => {
-                applyFilter(e.target.value);
+            document
+                .getElementById("fileInput")
+                .addEventListener("change", function (e) {
+                    const file = e.target.files[0];
+                    if (file && file.type === "application/zip") {
+                        processZipFile(file);
+                    } else {
+                        showErrorView(
+                            "Please select a valid ZIP file containing your Spotify data.",
+                        );
+                    }
+                });
+
+            document
+                .getElementById("periodSelect")
+                .addEventListener("change", (e) => {
+                    applyFilter(e.target.value);
+                });
+
+            // Drag and drop functionality
+            const dropZone = document.getElementById("dropZone");
+
+            dropZone.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropZone.classList.add("dragover");
             });
 
-            // Check if JSZip is available on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('🔍 Checking if JSZip is available...');
-                if (typeof JSZip === 'undefined') {
-                    console.error('❌ JSZip library failed to load!');
-                    showError('Required library (JSZip) failed to load. Please refresh the page and try again.');
+            dropZone.addEventListener("dragleave", (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("dragover");
+            });
+
+            dropZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("dragover");
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type === "application/zip") {
+                    processZipFile(files[0]);
                 } else {
-                    console.log('✅ JSZip is available');
+                    showErrorView(
+                        "Please drop a valid ZIP file containing your Spotify data.",
+                    );
                 }
             });
+
+            // Initialize with upload view
+            showUploadView();
         </script>
     </body>
 </html>
