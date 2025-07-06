@@ -500,6 +500,7 @@
                     this.dragTimer = null;
                     this.initialMouseX = 0;
                     this.initialMouseY = 0;
+                    this.dragThreshold = 5; // pixels to start drag
 
                     this.init();
                 }
@@ -543,11 +544,69 @@
 
                     // Global mouse events for drag and drop
                     document.addEventListener("mousemove", (e) => {
+                        // Check if we should start dragging based on mouse movement
+                        if (this.draggedTab && !this.isDragging) {
+                            const deltaX = Math.abs(
+                                e.clientX - this.initialMouseX,
+                            );
+                            const deltaY = Math.abs(
+                                e.clientY - this.initialMouseY,
+                            );
+
+                            if (
+                                deltaX > this.dragThreshold ||
+                                deltaY > this.dragThreshold
+                            ) {
+                                if (this.dragTimer) {
+                                    clearTimeout(this.dragTimer);
+                                    this.dragTimer = null;
+                                }
+                                this.initiateDrag(this.draggedTab);
+                            }
+                        }
+
                         if (this.isDragging && this.draggedElement) {
                             this.draggedElement.style.left =
                                 e.clientX - 60 + "px";
                             this.draggedElement.style.top =
                                 e.clientY - 20 + "px";
+
+                            // Check for hover over any tab for better responsiveness
+                            const tabElements = document.querySelectorAll(
+                                ".tab:not(.drag-placeholder):not(.dragging)",
+                            );
+                            let foundHover = false;
+
+                            for (const tabElement of tabElements) {
+                                const rect = tabElement.getBoundingClientRect();
+                                if (
+                                    e.clientX >= rect.left &&
+                                    e.clientX <= rect.right &&
+                                    e.clientY >= rect.top &&
+                                    e.clientY <= rect.bottom
+                                ) {
+                                    this.handleDragOver(e, tabElement);
+                                    foundHover = true;
+                                    break;
+                                }
+                            }
+
+                            // Also check the tabs container for edge cases
+                            if (!foundHover) {
+                                const tabsContainer =
+                                    document.getElementById("tabs");
+                                const containerRect =
+                                    tabsContainer.getBoundingClientRect();
+                                if (
+                                    e.clientX >= containerRect.left &&
+                                    e.clientX <= containerRect.right &&
+                                    e.clientY >= containerRect.top &&
+                                    e.clientY <= containerRect.bottom
+                                ) {
+                                    // Handle dragging at the edges of the tabs container
+                                    this.handleContainerDragOver(e);
+                                }
+                            }
                         }
                     });
 
@@ -559,6 +618,8 @@
                         if (this.isDragging) {
                             this.endDrag();
                         }
+                        // Clean up drag state
+                        this.draggedTab = null;
                     });
                 }
 
@@ -859,6 +920,42 @@
                             tabsContainer.insertBefore(
                                 this.placeholderElement,
                                 targetElement.nextSibling,
+                            );
+                        } else {
+                            tabsContainer.appendChild(this.placeholderElement);
+                        }
+                    }
+                }
+
+                handleContainerDragOver(e) {
+                    if (!this.isDragging || !this.placeholderElement) return;
+
+                    const tabsContainer = document.getElementById("tabs");
+                    const containerRect = tabsContainer.getBoundingClientRect();
+
+                    // If dragging past the end of tabs, move placeholder to end
+                    if (e.clientX > containerRect.right - 50) {
+                        if (this.placeholderElement.parentNode) {
+                            this.placeholderElement.parentNode.removeChild(
+                                this.placeholderElement,
+                            );
+                        }
+                        tabsContainer.appendChild(this.placeholderElement);
+                    }
+                    // If dragging before the first tab, move placeholder to beginning
+                    else if (e.clientX < containerRect.left + 50) {
+                        if (this.placeholderElement.parentNode) {
+                            this.placeholderElement.parentNode.removeChild(
+                                this.placeholderElement,
+                            );
+                        }
+                        const firstTab = tabsContainer.querySelector(
+                            ".tab:not(.drag-placeholder)",
+                        );
+                        if (firstTab) {
+                            tabsContainer.insertBefore(
+                                this.placeholderElement,
+                                firstTab,
                             );
                         } else {
                             tabsContainer.appendChild(this.placeholderElement);
