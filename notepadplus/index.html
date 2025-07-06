@@ -482,8 +482,15 @@
                 }
 
                 createNewTab() {
+                    // First save current tab content before switching
+                    this.updateActiveTabContent();
+
                     this.hideEmptyState();
                     const tab = this.createTab("Untitled");
+
+                    // Clear editor before switching to ensure new tab starts empty
+                    this.editor.value = "";
+
                     this.renderTabs();
                     this.switchToTab(tab.id);
                 }
@@ -546,6 +553,7 @@
                         this.editor.value = "";
                         this.showEmptyState();
                         this.saveToStorage();
+                        this.renderTabs(); // This will clear the tabs container
                         return;
                     }
 
@@ -560,7 +568,10 @@
                 }
 
                 switchToTab(tabId) {
-                    this.updateActiveTabContent();
+                    // Don't save content if we're switching to an empty new tab
+                    if (this.activeTabId && this.activeTabId !== tabId) {
+                        this.updateActiveTabContent();
+                    }
 
                     const tab = this.tabs.find((t) => t.id === tabId);
                     if (!tab) return;
@@ -590,7 +601,7 @@
                         if (this.draggedTab === tabId) {
                             this.initiateDrag(tabId);
                         }
-                    }, 100);
+                    }, 500);
 
                     e.preventDefault();
                 }
