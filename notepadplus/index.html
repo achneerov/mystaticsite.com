@@ -11,30 +11,82 @@
                 box-sizing: border-box;
             }
 
+            :root {
+                --bg-primary: #1e1e1e;
+                --bg-secondary: #2d2d30;
+                --bg-tertiary: #3e3e42;
+                --text-primary: #ffffff;
+                --text-secondary: #cccccc;
+                --text-muted: #999;
+                --border-color: #3e3e42;
+                --accent-color: #007acc;
+                --accent-hover: #1177bb;
+                --button-bg: #0e639c;
+                --button-hover: #1177bb;
+                --success-color: #4caf50;
+                --error-color: #f44336;
+                --shadow: rgba(0, 0, 0, 0.3);
+                --tab-active-bg: #1e1e1e;
+                --tab-inactive-bg: #3e3e42;
+            }
+
+            [data-theme="light"] {
+                --bg-primary: #ffffff;
+                --bg-secondary: #f5f5f5;
+                --bg-tertiary: #e0e0e0;
+                --text-primary: #000000;
+                --text-secondary: #333333;
+                --text-muted: #666666;
+                --border-color: #d0d0d0;
+                --accent-color: #0066cc;
+                --accent-hover: #0052a3;
+                --button-bg: #0066cc;
+                --button-hover: #0052a3;
+                --success-color: #4caf50;
+                --error-color: #d32f2f;
+                --shadow: rgba(0, 0, 0, 0.1);
+                --tab-active-bg: #0066cc;
+                --tab-inactive-bg: #e0e0e0;
+            }
+
             body {
                 font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                background: #1e1e1e;
-                color: #ffffff;
+                background: var(--bg-primary);
+                color: var(--text-primary);
                 height: 100vh;
                 display: flex;
                 flex-direction: column;
-                position: relative;
+                transition:
+                    background-color 0.3s ease,
+                    color 0.3s ease;
             }
 
             .header {
-                background: #2d2d30;
-                border-bottom: 1px solid #3e3e42;
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border-color);
                 padding: 10px 15px;
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                justify-content: space-between;
+                gap: 15px;
                 flex-wrap: wrap;
+                transition:
+                    background-color 0.3s ease,
+                    border-color 0.3s ease;
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                flex: 1;
+                min-width: 0;
             }
 
             .header h1 {
-                color: #ffffff;
+                color: var(--text-primary);
                 font-size: 20px;
-                margin-right: 20px;
+                white-space: nowrap;
             }
 
             .prettify-section {
@@ -42,12 +94,14 @@
                 align-items: center;
                 gap: 10px;
                 flex-wrap: wrap;
+                min-width: 0;
             }
 
             .prettify-label {
-                color: #cccccc;
+                color: var(--text-secondary);
                 font-size: 14px;
                 font-weight: 500;
+                white-space: nowrap;
             }
 
             .prettify-buttons {
@@ -57,7 +111,7 @@
             }
 
             .prettify-btn {
-                background: #0e639c;
+                background: var(--button-bg);
                 color: white;
                 border: none;
                 padding: 6px 12px;
@@ -68,17 +122,52 @@
             }
 
             .prettify-btn:hover {
-                background: #1177bb;
+                background: var(--button-hover);
             }
 
             .prettify-btn:disabled {
-                background: #666;
+                background: var(--text-muted);
                 cursor: not-allowed;
             }
 
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .nav-link {
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-size: 14px;
+                transition: color 0.2s;
+                white-space: nowrap;
+            }
+
+            .nav-link:hover {
+                color: var(--accent-color);
+            }
+
+            .theme-toggle {
+                background: var(--bg-tertiary);
+                border: 1px solid var(--border-color);
+                color: var(--text-primary);
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: all 0.2s;
+                white-space: nowrap;
+            }
+
+            .theme-toggle:hover {
+                background: var(--accent-color);
+                color: white;
+            }
+
             .tab-container {
-                background: #2d2d30;
-                border-bottom: 1px solid #3e3e42;
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border-color);
                 display: flex;
                 align-items: center;
                 padding: 0 15px;
@@ -86,6 +175,9 @@
                 overflow-y: hidden;
                 white-space: nowrap;
                 min-height: 40px;
+                transition:
+                    background-color 0.3s ease,
+                    border-color 0.3s ease;
             }
 
             .tab-container::-webkit-scrollbar {
@@ -93,16 +185,16 @@
             }
 
             .tab-container::-webkit-scrollbar-track {
-                background: #2d2d30;
+                background: var(--bg-secondary);
             }
 
             .tab-container::-webkit-scrollbar-thumb {
-                background: #555;
+                background: var(--text-muted);
                 border-radius: 3px;
             }
 
             .tab-container::-webkit-scrollbar-thumb:hover {
-                background: #777;
+                background: var(--text-secondary);
             }
 
             #tabs {
@@ -113,9 +205,9 @@
             }
 
             .tab {
-                background: #3e3e42;
+                background: var(--tab-inactive-bg);
                 border: none;
-                color: #cccccc;
+                color: var(--text-secondary);
                 padding: 8px 15px;
                 cursor: pointer;
                 border-top-left-radius: 4px;
@@ -133,26 +225,33 @@
                 user-select: none;
                 transition:
                     transform 0.2s ease,
-                    box-shadow 0.2s ease;
+                    box-shadow 0.2s ease,
+                    background-color 0.3s ease,
+                    color 0.3s ease;
             }
 
             .tab.active {
-                background: #1e1e1e;
-                color: #ffffff;
+                background: var(--tab-active-bg);
+                color: var(--text-primary);
+            }
+
+            [data-theme="light"] .tab.active {
+                color: white;
             }
 
             .tab:hover {
-                background: #4e4e52;
+                background: var(--tab-inactive-bg);
+                filter: brightness(1.1);
             }
 
             .tab.active:hover {
-                background: #1e1e1e;
+                background: var(--tab-active-bg);
             }
 
             .tab.dragging {
                 z-index: 1000;
                 transform: scale(1.05) rotate(2deg);
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 8px 16px var(--shadow);
                 opacity: 0.9;
                 position: fixed;
                 pointer-events: none;
@@ -161,7 +260,7 @@
             .tab.drag-placeholder {
                 opacity: 0.5;
                 background: transparent;
-                border: 2px dashed #007acc;
+                border: 2px dashed var(--accent-color);
                 color: transparent;
             }
 
@@ -175,8 +274,8 @@
             }
 
             .tab-name.editing {
-                background: #3e3e42;
-                border: 1px solid #007acc;
+                background: var(--bg-tertiary);
+                border: 1px solid var(--accent-color);
                 outline: none;
                 cursor: text;
             }
@@ -184,7 +283,7 @@
             .tab-close {
                 background: none;
                 border: none;
-                color: #999;
+                color: var(--text-muted);
                 cursor: pointer;
                 font-size: 14px;
                 padding: 2px;
@@ -193,12 +292,12 @@
             }
 
             .tab-close:hover {
-                background: #666;
-                color: #fff;
+                background: var(--text-muted);
+                color: var(--text-primary);
             }
 
             .add-tab-btn {
-                background: #0e639c;
+                background: var(--button-bg);
                 color: white;
                 border: none;
                 padding: 8px 12px;
@@ -207,10 +306,11 @@
                 margin-left: 10px;
                 font-size: 12px;
                 flex-shrink: 0;
+                transition: background 0.2s;
             }
 
             .add-tab-btn:hover {
-                background: #1177bb;
+                background: var(--button-hover);
             }
 
             .editor-container {
@@ -228,8 +328,8 @@
             .editor-textarea {
                 width: 100%;
                 height: 100%;
-                background: #1e1e1e;
-                color: #ffffff;
+                background: var(--bg-primary);
+                color: var(--text-primary);
                 border: none;
                 font-family: "Consolas", "Monaco", "Courier New", monospace;
                 font-size: 14px;
@@ -237,6 +337,13 @@
                 padding: 15px;
                 resize: none;
                 outline: none;
+                transition:
+                    background-color 0.3s ease,
+                    color 0.3s ease;
+            }
+
+            .editor-textarea::placeholder {
+                color: var(--text-muted);
             }
 
             .empty-state {
@@ -244,7 +351,7 @@
                 align-items: center;
                 justify-content: center;
                 height: 100%;
-                color: #666;
+                color: var(--text-muted);
                 font-size: 18px;
             }
 
@@ -259,7 +366,7 @@
                 z-index: 1000;
                 transform: translateX(100%);
                 transition: transform 0.3s ease-in-out;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 4px 12px var(--shadow);
             }
 
             .notification.show {
@@ -267,7 +374,7 @@
             }
 
             .notification.error {
-                background: #f44336;
+                background: var(--error-color);
                 color: white;
             }
 
@@ -278,9 +385,19 @@
                     gap: 10px;
                 }
 
+                .header-left {
+                    width: 100%;
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
                 .prettify-section {
                     width: 100%;
                     justify-content: flex-start;
+                }
+
+                .header-right {
+                    align-self: flex-end;
                 }
 
                 .tab {
@@ -296,43 +413,51 @@
             }
         </style>
     </head>
-    <body>
+    <body data-theme="dark">
         <div class="header">
-            <h1>Notepad Plus</h1>
-            <div class="prettify-section">
-                <span class="prettify-label">Format Selected Text:</span>
-                <div class="prettify-buttons">
-                    <button
-                        class="prettify-btn"
-                        onclick="prettifySelection('html')"
-                    >
-                        HTML
-                    </button>
-                    <button
-                        class="prettify-btn"
-                        onclick="prettifySelection('css')"
-                    >
-                        CSS
-                    </button>
-                    <button
-                        class="prettify-btn"
-                        onclick="prettifySelection('javascript')"
-                    >
-                        JS/TS
-                    </button>
-                    <button
-                        class="prettify-btn"
-                        onclick="prettifySelection('json')"
-                    >
-                        JSON
-                    </button>
-                    <button
-                        class="prettify-btn"
-                        onclick="prettifySelection('csharp')"
-                    >
-                        C#
-                    </button>
+            <div class="header-left">
+                <h1>Notepad Plus</h1>
+                <div class="prettify-section">
+                    <span class="prettify-label">Format Selected Text:</span>
+                    <div class="prettify-buttons">
+                        <button
+                            class="prettify-btn"
+                            onclick="prettifySelection('html')"
+                        >
+                            HTML
+                        </button>
+                        <button
+                            class="prettify-btn"
+                            onclick="prettifySelection('css')"
+                        >
+                            CSS
+                        </button>
+                        <button
+                            class="prettify-btn"
+                            onclick="prettifySelection('javascript')"
+                        >
+                            JS/TS
+                        </button>
+                        <button
+                            class="prettify-btn"
+                            onclick="prettifySelection('json')"
+                        >
+                            JSON
+                        </button>
+                        <button
+                            class="prettify-btn"
+                            onclick="prettifySelection('csharp')"
+                        >
+                            C#
+                        </button>
+                    </div>
                 </div>
+            </div>
+            <div class="header-right">
+                <a href="../index.html" class="nav-link">My Other Sites</a>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    🌙 Dark
+                </button>
             </div>
         </div>
 
@@ -596,12 +721,12 @@
 
                     this.draggedTab = tabId;
 
-                    // Set up a timer to start drag after 100ms
+                    // Set up a timer to start drag after 500ms
                     this.dragTimer = setTimeout(() => {
                         if (this.draggedTab === tabId) {
                             this.initiateDrag(tabId);
                         }
-                    }, 100);
+                    }, 500);
 
                     e.preventDefault();
                 }
@@ -1035,7 +1160,39 @@
                 notepad.createNewTab();
             }
 
+            function toggleTheme() {
+                const body = document.body;
+                const themeToggle = document.querySelector(".theme-toggle");
+
+                if (body.getAttribute("data-theme") === "dark") {
+                    body.setAttribute("data-theme", "light");
+                    themeToggle.innerHTML = "☀️ Light";
+                    localStorage.setItem("notepad-theme", "light");
+                } else {
+                    body.setAttribute("data-theme", "dark");
+                    themeToggle.innerHTML = "🌙 Dark";
+                    localStorage.setItem("notepad-theme", "dark");
+                }
+            }
+
+            // Load saved theme
+            function loadTheme() {
+                const savedTheme =
+                    localStorage.getItem("notepad-theme") || "dark";
+                const body = document.body;
+                const themeToggle = document.querySelector(".theme-toggle");
+
+                body.setAttribute("data-theme", savedTheme);
+                if (savedTheme === "light") {
+                    themeToggle.innerHTML = "☀️ Light";
+                } else {
+                    themeToggle.innerHTML = "🌙 Dark";
+                }
+            }
+
+            // Initialize the application
             const notepad = new NotepadPlus();
+            loadTheme();
 
             window.addEventListener("beforeunload", (e) => {
                 notepad.updateActiveTabContent();
