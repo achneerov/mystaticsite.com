@@ -498,6 +498,8 @@
                     this.placeholderElement = null;
                     this.isDragging = false;
                     this.dragTimer = null;
+                    this.initialMouseX = 0;
+                    this.initialMouseY = 0;
 
                     this.init();
                 }
@@ -725,13 +727,15 @@
                     if (e.button !== 0) return; // Only left mouse button
 
                     this.draggedTab = tabId;
+                    this.initialMouseX = e.clientX;
+                    this.initialMouseY = e.clientY;
 
-                    // Set up a timer to start drag after 500ms
+                    // Set up a timer to start drag after 150ms
                     this.dragTimer = setTimeout(() => {
                         if (this.draggedTab === tabId) {
                             this.initiateDrag(tabId);
                         }
-                    }, 500);
+                    }, 150);
 
                     e.preventDefault();
                 }
@@ -749,6 +753,12 @@
                     this.draggedElement.style.position = "fixed";
                     this.draggedElement.style.zIndex = "1000";
                     this.draggedElement.style.pointerEvents = "none";
+
+                    // Set initial position to prevent jump to top-left corner
+                    this.draggedElement.style.left =
+                        this.initialMouseX - 60 + "px";
+                    this.draggedElement.style.top =
+                        this.initialMouseY - 20 + "px";
 
                     document.body.appendChild(this.draggedElement);
 
