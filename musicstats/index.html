@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My Spotify Stats</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #1db954, #191414);
+                color: white;
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .header h1 {
+                font-size: 3rem;
+                margin-bottom: 10px;
+                color: #1db954;
+            }
+
+            /* Upload Screen Styles */
+            .upload-screen {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 60vh;
+            }
+
+            .upload-area {
+                border: 3px dashed #1db954;
+                border-radius: 20px;
+                padding: 60px 40px;
+                text-align: center;
+                background: rgba(25, 20, 20, 0.8);
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                cursor: pointer;
+                max-width: 600px;
+                width: 100%;
+            }
+
+            .upload-area:hover,
+            .upload-area.dragover {
+                border-color: #1ed760;
+                background: rgba(25, 20, 20, 0.9);
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(29, 185, 84, 0.3);
+            }
+
+            .upload-icon {
+                font-size: 4rem;
+                margin-bottom: 20px;
+                color: #1db954;
+            }
+
+            .upload-text {
+                font-size: 1.5rem;
+                margin-bottom: 10px;
+                color: #1db954;
+            }
+
+            .upload-subtext {
+                color: #ccc;
+                margin-bottom: 30px;
+            }
+
+            .upload-btn {
+                background: #1db954;
+                color: white;
+                border: none;
+                padding: 15px 30px;
+                border-radius: 25px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: bold;
+            }
+
+            .upload-btn:hover {
+                background: #1ed760;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
+            }
+
+            #file-input {
+                display: none;
+            }
+
+            .processing {
+                text-align: center;
+                font-size: 1.5rem;
+                margin: 50px 0;
+            }
+
+            .progress-container {
+                width: 100%;
+                max-width: 400px;
+                margin: 20px auto;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 10px;
+                overflow: hidden;
+                height: 20px;
+            }
+
+            .progress-bar-upload {
+                background: #1db954;
+                height: 100%;
+                width: 0%;
+                transition: width 0.3s ease;
+            }
+
+            /* Stats Screen Styles */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-bottom: 40px;
+            }
+
+            .stat-card {
+                background: rgba(25, 20, 20, 0.8);
+                border-radius: 10px;
+                padding: 20px;
+                border: 1px solid #1db954;
+                backdrop-filter: blur(10px);
+            }
+
+            .stat-card h3 {
+                color: #1db954;
+                margin-bottom: 15px;
+                font-size: 1.5rem;
+            }
+
+            .big-number {
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: #1db954;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                position: relative;
+                height: 300px;
+                margin-top: 15px;
+            }
+
+            .top-list {
+                list-style: none;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+
+            .top-list li {
+                padding: 10px;
+                margin: 5px 0;
+                background: rgba(29, 185, 84, 0.1);
+                border-radius: 5px;
+                border-left: 3px solid #1db954;
+            }
+
+            .rank {
+                color: #1db954;
+                font-weight: bold;
+                margin-right: 10px;
+            }
+
+            .time-period {
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .time-period select {
+                background: #191414;
+                color: white;
+                border: 1px solid #1db954;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 1rem;
+            }
+
+            .back-btn {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border: 1px solid #1db954;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .back-btn:hover {
+                background: rgba(29, 185, 84, 0.2);
+            }
+
+            .progress-bar {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 10px;
+                overflow: hidden;
+                height: 20px;
+                margin-top: 5px;
+            }
+
+            .progress-fill {
+                background: #1db954;
+                height: 100%;
+                transition: width 0.3s ease;
+            }
+
+            .error {
+                background: rgba(255, 0, 0, 0.2);
+                border: 1px solid #ff4444;
+                border-radius: 5px;
+                padding: 20px;
+                margin: 20px 0;
+                text-align: center;
+            }
+
+            .instructions {
+                background: rgba(25, 20, 20, 0.8);
+                border-radius: 10px;
+                padding: 30px;
+                margin: 40px auto;
+                max-width: 800px;
+                border: 1px solid #1db954;
+            }
+
+            .instructions h3 {
+                color: #1db954;
+                margin-bottom: 15px;
+            }
+
+            .instructions ol {
+                margin-left: 20px;
+                line-height: 1.6;
+            }
+
+            .instructions li {
+                margin-bottom: 10px;
+            }
+
+            @media (max-width: 768px) {
+                .header h1 {
+                    font-size: 2rem;
+                }
+
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .upload-area {
+                    padding: 40px 20px;
+                }
+
+                .time-period {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎵 My Spotify Stats</h1>
+                <p>Upload your Spotify data and discover your music listening patterns</p>
+            </div>
+
+            <!-- Upload Screen -->
+            <div id="upload-screen" class="upload-screen">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Upload Your Spotify Data</div>
+                    <div class="upload-subtext">
+                        Drag and drop your my_spotify_data.zip file here or click to browse
+                    </div>
+                    <button class="upload-btn" onclick="console.log('🎯 Button clicked'); document.getElementById('file-input').click()">
+                        Choose File
+                    </button>
+                    <input type="file" id="file-input" accept=".zip" />
+                </div>
+
+                <div class="instructions">
+                    <h3>How to get your Spotify data:</h3>
+                    <ol>
+                        <li>Go to <a href="https://www.spotify.com/account/privacy/" target="_blank" style="color: #1db954;">Spotify Privacy Settings</a></li>
+                        <li></li>Scroll down to "Download your data"</li>
+                        <li>Request "Extended streaming history" (this can take up to 30 days)</li>
+                        <li>Download the ZIP file when ready</li>
+                        <li>Upload it here to see your stats!</li>
+                    </ol>
+                    <p style="margin-top: 15px; font-size: 0.9em; color: #ccc;">
+                        Your data is processed entirely in your browser - nothing is uploaded to any server!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Processing Screen -->
+            <div id="processing-screen" style="display: none" class="processing">
+                <div>Processing your Spotify data... 🎶</div>
+                <div class="progress-container">
+                    <div class="progress-bar-upload" id="progress-bar"></div>
+                </div>
+                <div id="processing-status">Extracting files...</div>
+            </div>
+
+            <!-- Stats Screen -->
+            <div id="stats-screen" style="display: none">
+                <div class="time-period">
+                    <button class="back-btn" onclick="showUploadScreen()">← Upload New File</button>
+                    <label for="periodSelect">Time Period: </label>
+                    <select id="periodSelect">
+                        <option value="all">All Time</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="last30">Last 30 Days</option>
+                        <option value="last7">Last 7 Days</option>
+                    </select>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Listening Time</h3>
+                        <div class="big-number" id="totalTime">0h</div>
+                        <div id="totalTracks">0 tracks played</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Average Daily Listening</h3>
+                        <div class="big-number" id="avgDaily">0h</div>
+                        <div id="avgTracks">0 tracks per day</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Unique Artists</h3>
+                        <div class="big-number" id="uniqueArtists">0</div>
+                        <div id="uniqueTracks">0 unique tracks</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Top Platform</h3>
+                        <div class="big-number" id="topPlatform">-</div>
+                        <div id="platformStats">Platform breakdown</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Top Artists</h3>
+                        <ul class="top-list" id="topArtists"></ul>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Top Tracks</h3>
+                        <ul class="top-list" id="topTracks"></ul>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Top Albums</h3>
+                        <ul class="top-list" id="topAlbums"></ul>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Listening by Hour</h3>
+                        <div class="chart-container">
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Monthly Listening</h3>
+                        <div class="chart-container">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Skip Rate Analysis</h3>
+                        <div id="skipRate" class="big-number">0%</div>
+                        <div>Average completion rate</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="completionBar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Screen -->
+            <div id="error-screen" style="display: none" class="error">
+                <h3>Error Processing Data</h3>
+                <p id="error-message">Something went wrong while processing your Spotify data.</p>
+                <button class="back-btn" onclick="showUploadScreen()" style="margin-top: 15px;">
+                    Try Again
+                </button>
+            </div>
+        </div>
+
+        <script>
+            let allData = [];
+            let filteredData = [];
+            let charts = {};
+
+            // Drag and drop functionality
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+
+            console.log('🔧 Setting up event listeners...');
+            console.log('📱 Upload area element:', uploadArea);
+            console.log('📁 File input element:', fileInput);
+
+            uploadArea.addEventListener('dragover', (e) => {
+                console.log('🎯 Dragover event triggered');
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                console.log('🎯 Dragleave event triggered');
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                console.log('🎯 Drop event triggered');
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                console.log('📁 Files dropped:', files.length);
+                if (files.length > 0) {
+                    console.log('📁 Processing dropped file:', files[0].name);
+                    handleFile(files[0]);
+                }
+            });
+
+            uploadArea.addEventListener('click', () => {
+                console.log('🎯 Upload area clicked');
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                console.log('🎯 File input change event triggered');
+                console.log('📁 Files selected:', e.target.files.length);
+                if (e.target.files.length > 0) {
+                    console.log('📁 Processing selected file:', e.target.files[0].name);
+                    handleFile(e.target.files[0]);
+                }
+            });
+
+            async function handleFile(file) {
+                console.log('🔍 Starting file upload debug...');
+                console.log('📁 File name:', file.name);
+                console.log('📊 File size:', file.size, 'bytes');
+                console.log('🔗 File type:', file.type);
+
+                if (!file.name.endsWith('.zip')) {
+                    console.log('❌ File is not a ZIP file');
+                    showError('Please upload a ZIP file containing your Spotify data.');
+                    return;
+                }
+
+                showProcessingScreen();
+
+                try {
+                    console.log('📦 Loading JSZip...');
+                    const zip = new JSZip();
+                    console.log('📦 JSZip loaded successfully');
+
+                    console.log('🔓 Extracting ZIP file...');
+                    const zipContent = await zip.loadAsync(file);
+                    console.log('✅ ZIP file extracted successfully');
+
+                    updateProgress(20, 'Extracting ZIP file...');
+
+                    console.log('📋 All files in ZIP:');
+                    Object.keys(zipContent.files).forEach(filename => {
+                        console.log('  📄', filename);
+                    });
+
+                    const jsonFiles = [];
+                    const audioHistoryFiles = Object.keys(zipContent.files).filter(filename =>
+                        filename.includes('Streaming_History_Audio') && filename.endsWith('.json')
+                    );
+
+                    console.log('🎵 Found audio history files:', audioHistoryFiles.length);
+                    audioHistoryFiles.forEach(filename => {
+                        console.log('  🎵', filename);
+                    });
+
+                    if (audioHistoryFiles.length === 0) {
+                        console.log('❌ No audio history files found');
+                        throw new Error('No Spotify streaming history files found in the ZIP. Make sure you uploaded the correct file with Extended Streaming History data.');
+                    }
+
+                    updateProgress(40, 'Reading streaming history files...');
+
+                    // Process each JSON file
+                    for (let i = 0; i < audioHistoryFiles.length; i++) {
+                        const filename = audioHistoryFiles[i];
+                        console.log(`📖 Processing file ${i + 1}/${audioHistoryFiles.length}: ${filename}`);
+
+                        const fileContent = await zipContent.files[filename].async('text');
+                        console.log(`📖 File content length: ${fileContent.length} characters`);
+
+                        const data = JSON.parse(fileContent);
+                        console.log(`📖 Parsed ${data.length} records from ${filename}`);
+
+                        jsonFiles.push(...data);
+
+                        updateProgress(40 + (i / audioHistoryFiles.length) * 40,
+                            `Processing ${filename}...`);
+                    }
+
+                    console.log(`📊 Total records loaded: ${jsonFiles.length}`);
+                    updateProgress(80, 'Analyzing your music data...');
+
+                    // Filter and process data
+                    allData = jsonFiles.filter(item =>
+                        item.master_metadata_track_name &&
+                        item.master_metadata_album_artist_name &&
+                        item.ms_played > 0
+                    );
+
+                    console.log(`📊 Valid records after filtering: ${allData.length}`);
+
+                    if (allData.length === 0) {
+                        console.log('❌ No valid streaming data found');
+                        throw new Error('No valid streaming data found in the files.');
+                    }
+
+                    console.log('✅ Data processing complete!');
+                    updateProgress(100, 'Complete!');
+
+                    setTimeout(() => {
+                        applyFilter('all');
+                        showStatsScreen();
+                    }, 500);
+
+                } catch (error) {
+                    console.error('💥 Error processing file:', error);
+                    console.error('💥 Error stack:', error.stack);
+                    showError(error.message || 'Failed to process the uploaded file. Please make sure it\'s a valid Spotify data export.');
+                }
+            }
+
+            function updateProgress(percent, status) {
+                document.getElementById('progress-bar').style.width = percent + '%';
+                document.getElementById('processing-status').textContent = status;
+            }
+
+            function showUploadScreen() {
+                document.getElementById('upload-screen').style.display = 'block';
+                document.getElementById('processing-screen').style.display = 'none';
+                document.getElementById('stats-screen').style.display = 'none';
+                document.getElementById('error-screen').style.display = 'none';
+
+                // Reset file input
+                fileInput.value = '';
+            }
+
+            function showProcessingScreen() {
+                document.getElementById('upload-screen').style.display = 'none';
+                document.getElementById('processing-screen').style.display = 'block';
+                document.getElementById('stats-screen').style.display = 'none';
+                document.getElementById('error-screen').style.display = 'none';
+
+                updateProgress(0, 'Starting...');
+            }
+
+            function showStatsScreen() {
+                document.getElementById('upload-screen').style.display = 'none';
+                document.getElementById('processing-screen').style.display = 'none';
+                document.getElementById('stats-screen').style.display = 'block';
+                document.getElementById('error-screen').style.display = 'none';
+            }
+
+            function showError(message) {
+                document.getElementById('upload-screen').style.display = 'none';
+                document.getElementById('processing-screen').style.display = 'none';
+                document.getElementById('stats-screen').style.display = 'none';
+                document.getElementById('error-screen').style.display = 'block';
+                document.getElementById('error-message').textContent = message;
+            }
+
+            function applyFilter(period) {
+                const now = new Date();
+                let startDate = new Date(0);
+
+                switch (period) {
+                    case "last7":
+                        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        break;
+                    case "last30":
+                        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        break;
+                    case "2024":
+                        startDate = new Date("2024-01-01");
+                        break;
+                    case "2023":
+                        startDate = new Date("2023-01-01");
+                        break;
+                    case "2022":
+                        startDate = new Date("2022-01-01");
+                        break;
+                    default:
+                        startDate = new Date(0);
+                }
+
+                filteredData = allData.filter((item) => {
+                    const itemDate = new Date(item.ts);
+                    return (
+                        itemDate >= startDate &&
+                        (period === "all" ||
+                            (period === "2024" && itemDate.getFullYear() === 2024) ||
+                            (period === "2023" && itemDate.getFullYear() === 2023) ||
+                            (period === "2022" && itemDate.getFullYear() === 2022) ||
+                            period.startsWith("last"))
+                    );
+                });
+
+                updateStats();
+            }
+
+            function updateStats() {
+                // Basic stats
+                const totalMs = filteredData.reduce((sum, item) => sum + item.ms_played, 0);
+                const totalHours = Math.round(totalMs / (1000 * 60 * 60));
+                const totalTracks = filteredData.length;
+
+                document.getElementById("totalTime").textContent = `${totalHours}h`;
+                document.getElementById("totalTracks").textContent = `${totalTracks.toLocaleString()} tracks played`;
+
+                // Average daily listening
+                const days = Math.max(1, Math.ceil(
+                    (new Date() - new Date(Math.min(...filteredData.map(item => new Date(item.ts))))) / (1000 * 60 * 60 * 24)
+                ));
+                const avgDailyHours = Math.round((totalHours / days) * 10) / 10;
+                const avgDailyTracks = Math.round(totalTracks / days);
+
+                document.getElementById("avgDaily").textContent = `${avgDailyHours}h`;
+                document.getElementById("avgTracks").textContent = `${avgDailyTracks} tracks per day`;
+
+                // Unique counts
+                const uniqueArtists = new Set(filteredData.map(item => item.master_metadata_album_artist_name)).size;
+                const uniqueTracks = new Set(filteredData.map(item =>
+                    `${item.master_metadata_track_name}-${item.master_metadata_album_artist_name}`
+                )).size;
+
+                document.getElementById("uniqueArtists").textContent = uniqueArtists.toLocaleString();
+                document.getElementById("uniqueTracks").textContent = `${uniqueTracks.toLocaleString()} unique tracks`;
+
+                // Platform stats
+                const platforms = {};
+                filteredData.forEach((item) => {
+                    platforms[item.platform] = (platforms[item.platform] || 0) + item.ms_played;
+                });
+
+                const topPlatform = Object.keys(platforms).reduce(
+                    (a, b) => (platforms[a] > platforms[b] ? a : b),
+                    "unknown",
+                );
+                document.getElementById("topPlatform").textContent = topPlatform;
+
+                // Skip rate
+                const completedTracks = filteredData.filter(item => item.ms_played > 30000).length; // 30+ seconds
+                const completionRate = Math.round((completedTracks / totalTracks) * 100);
+                document.getElementById("skipRate").textContent = `${completionRate}%`;
+                document.getElementById("completionBar").style.width = `${completionRate}%`;
+
+                updateTopLists();
+                updateCharts();
+            }
+
+            function updateTopLists() {
+                // Top Artists
+                const artistPlays = {};
+                filteredData.forEach((item) => {
+                    const artist = item.master_metadata_album_artist_name;
+                    artistPlays[artist] = (artistPlays[artist] || 0) + item.ms_played;
+                });
+
+                const topArtists = Object.entries(artistPlays)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10);
+
+                document.getElementById("topArtists").innerHTML = topArtists
+                    .map(([artist, ms], index) =>
+                        `<li><span class="rank">${index + 1}.</span>${artist} <br><small>${Math.round(ms / (1000 * 60))} minutes</small></li>`
+                    ).join("");
+
+                // Top Tracks
+                const trackPlays = {};
+                filteredData.forEach((item) => {
+                    const track = `${item.master_metadata_track_name} - ${item.master_metadata_album_artist_name}`;
+                    trackPlays[track] = (trackPlays[track] || 0) + 1;
+                });
+
+                const topTracks = Object.entries(trackPlays)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10);
+
+                document.getElementById("topTracks").innerHTML = topTracks
+                    .map(([track, plays], index) =>
+                        `<li><span class="rank">${index + 1}.</span>${track} <br><small>${plays} plays</small></li>`
+                    ).join("");
+
+                // Top Albums
+                const albumPlays = {};
+                filteredData.forEach((item) => {
+                    if (item.master_metadata_album_album_name) {
+                        const album = `${item.master_metadata_album_album_name} - ${item.master_metadata_album_artist_name}`;
+                        albumPlays[album] = (albumPlays[album] || 0) + item.ms_played;
+                    }
+                });
+
+                const topAlbums = Object.entries(albumPlays)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10);
+
+                document.getElementById("topAlbums").innerHTML = topAlbums
+                    .map(([album, ms], index) =>
+                        `<li><span class="rank">${index + 1}.</span>${album} <br><small>${Math.round(ms / (1000 * 60))} minutes</small></li>`
+                    ).join("");
+            }
+
+            function updateCharts() {
+                // Hourly listening pattern
+                const hourlyData = new Array(24).fill(0);
+                filteredData.forEach((item) => {
+                    const hour = new Date(item.ts).getHours();
+                    hourlyData[hour] += item.ms_played;
+                });
+
+                // Destroy existing chart if it exists
+                if (charts.hourly) {
+                    charts.hourly.destroy();
+                }
+
+                const hourlyCtx = document.getElementById("hourlyChart").getContext("2d");
+                charts.hourly = new Chart(hourlyCtx, {
+                    type: "bar",
+                    data: {
+                        labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+                        datasets: [{
+                            label: "Minutes Listened",
+                            data: hourlyData.map((ms) => Math.round(ms / (1000 * 60))),
+                            backgroundColor: "#1db954",
+                            borderColor: "#1ed760",
+                            borderWidth: 1,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                                ticks: { color: "#fff" },
+                            },
+                            x: {
+                                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                                ticks: { color: "#fff" },
+                            },
+                        },
+                    },
+                });
+
+                // Monthly listening pattern
+                const monthlyData = {};
+                filteredData.forEach((item) => {
+                    const date = new Date(item.ts);
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+                    monthlyData[monthKey] = (monthlyData[monthKey] || 0) + item.ms_played;
+                });
+
+                const sortedMonths = Object.keys(monthlyData).sort();
+                const monthlyValues = sortedMonths.map((month) =>
+                    Math.round(monthlyData[month] / (1000 * 60 * 60))
+                );
+
+                if (charts.monthly) {
+                    charts.monthly.destroy();
+                }
+
+                const monthlyCtx = document.getElementById("monthlyChart").getContext("2d");
+                charts.monthly = new Chart(monthlyCtx, {
+                    type: "line",
+                    data: {
+                        labels: sortedMonths,
+                        datasets: [{
+                            label: "Hours Listened",
+                            data: monthlyValues,
+                            backgroundColor: "rgba(29, 185, 84, 0.2)",
+                            borderColor: "#1db954",
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                                ticks: { color: "#fff" },
+                            },
+                            x: {
+                                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                                ticks: { color: "#fff", maxTicksLimit: 8 },
+                            },
+                        },
+                    },
+                });
+            }
+
+            // Event listeners
+            document.getElementById("periodSelect").addEventListener("change", (e) => {
+                applyFilter(e.target.value);
+            });
+
+            // Check if JSZip is available on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('🔍 Checking if JSZip is available...');
+                if (typeof JSZip === 'undefined') {
+                    console.error('❌ JSZip library failed to load!');
+                    showError('Required library (JSZip) failed to load. Please refresh the page and try again.');
+                } else {
+                    console.log('✅ JSZip is available');
+                }
+            });
+        </script>
+    </body>
+</html>
