@@ -4,6 +4,11 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Notepad Plus</title>
+        <!-- Prettier libraries -->
+        <script src="https://unpkg.com/prettier@2.8.8/standalone.js"></script>
+        <script src="https://unpkg.com/prettier@2.8.8/parser-html.js"></script>
+        <script src="https://unpkg.com/prettier@2.8.8/parser-postcss.js"></script>
+        <script src="https://unpkg.com/prettier@2.8.8/parser-babel.js"></script>
         <style>
             * {
                 margin: 0;
@@ -962,22 +967,39 @@
                     try {
                         switch (language) {
                             case "json":
-                                return JSON.stringify(
-                                    JSON.parse(code),
-                                    null,
-                                    2,
-                                );
+                                return prettier.format(code, {
+                                    parser: "json",
+                                    plugins: prettierPlugins,
+                                });
 
                             case "html":
-                                return this.formatHtml(code);
+                                return prettier.format(code, {
+                                    parser: "html",
+                                    plugins: prettierPlugins,
+                                    printWidth: 80,
+                                    tabWidth: 2,
+                                });
 
                             case "css":
-                                return this.formatCss(code);
+                                return prettier.format(code, {
+                                    parser: "css",
+                                    plugins: prettierPlugins,
+                                    printWidth: 80,
+                                    tabWidth: 2,
+                                });
 
                             case "javascript":
-                                return this.formatJavaScript(code);
+                                return prettier.format(code, {
+                                    parser: "babel",
+                                    plugins: prettierPlugins,
+                                    printWidth: 80,
+                                    tabWidth: 2,
+                                    semi: true,
+                                    singleQuote: false,
+                                });
 
                             case "csharp":
+                                // Keep the C# formatter since Prettier doesn't support it
                                 return this.formatCSharp(code);
 
                             default:
@@ -988,102 +1010,6 @@
                             `Failed to format ${language}: ${e.message}`,
                         );
                     }
-                }
-
-                formatHtml(html) {
-                    let formatted = "";
-                    let indent = 0;
-                    const tab = "  ";
-
-                    html = html.replace(/></g, ">\n<");
-                    const lines = html.split("\n");
-
-                    lines.forEach((line) => {
-                        line = line.trim();
-                        if (line.length === 0) return;
-
-                        if (line.match(/^<\/\w/)) {
-                            indent--;
-                        }
-
-                        formatted +=
-                            tab.repeat(Math.max(0, indent)) + line + "\n";
-
-                        if (
-                            line.match(/^<\w[^>]*[^\/]>.*<\/\w/) ||
-                            line.match(/^<\w[^>]*[^\/]>$/)
-                        ) {
-                            if (!line.match(/^<\w[^>]*\/>/)) {
-                                indent++;
-                            }
-                        }
-                    });
-
-                    return formatted.trim();
-                }
-
-                formatCss(css) {
-                    return css
-                        .replace(/\s*{\s*/g, " {\n  ")
-                        .replace(/;\s*/g, ";\n  ")
-                        .replace(/\s*}\s*/g, "\n}\n\n")
-                        .replace(/,\s*/g, ",\n")
-                        .trim();
-                }
-
-                formatJavaScript(js) {
-                    let formatted = "";
-                    let indent = 0;
-                    const tab = "  ";
-                    let inString = false;
-                    let stringChar = "";
-
-                    for (let i = 0; i < js.length; i++) {
-                        const char = js[i];
-                        const nextChar = js[i + 1];
-
-                        if (
-                            (char === '"' || char === "'") &&
-                            js[i - 1] !== "\\"
-                        ) {
-                            if (!inString) {
-                                inString = true;
-                                stringChar = char;
-                            } else if (char === stringChar) {
-                                inString = false;
-                            }
-                        }
-
-                        if (!inString) {
-                            if (char === "{") {
-                                formatted += char + "\n" + tab.repeat(++indent);
-                            } else if (char === "}") {
-                                formatted =
-                                    formatted.trim() +
-                                    "\n" +
-                                    tab.repeat(--indent) +
-                                    char;
-                                if (
-                                    nextChar &&
-                                    nextChar !== ";" &&
-                                    nextChar !== ","
-                                ) {
-                                    formatted += "\n" + tab.repeat(indent);
-                                }
-                            } else if (char === ";") {
-                                formatted += char;
-                                if (nextChar && nextChar !== "}") {
-                                    formatted += "\n" + tab.repeat(indent);
-                                }
-                            } else {
-                                formatted += char;
-                            }
-                        } else {
-                            formatted += char;
-                        }
-                    }
-
-                    return formatted.trim();
                 }
 
                 formatCSharp(code) {
@@ -1190,13 +1116,16 @@
                 }
             }
 
-            // Initialize the application
-            const notepad = new NotepadPlus();
-            loadTheme();
+            // Wait for Prettier to load
+            window.addEventListener("load", () => {
+                // Initialize the application after Prettier loads
+                window.notepad = new NotepadPlus();
+                loadTheme();
 
-            window.addEventListener("beforeunload", (e) => {
-                notepad.updateActiveTabContent();
-                notepad.saveToStorage();
+                window.addEventListener("beforeunload", (e) => {
+                    notepad.updateActiveTabContent();
+                    notepad.saveToStorage();
+                });
             });
         </script>
     </body>
