@@ -640,9 +640,58 @@
     </head>
     <body>
         <div class="container">
-            <div class="header">
-                <h1>🎵 My Spotify Stats</h1>
-                <p>
+            <div
+                class="header"
+                style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    margin-bottom: 40px;
+                "
+            >
+                <div
+                    style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                    "
+                >
+                    <h1
+                        style="
+                            font-size: 3rem;
+                            margin-bottom: 10px;
+                            color: #1db954;
+                            margin: 0 auto;
+                            text-align: center;
+                            flex: 1 1 auto;
+                        "
+                    >
+                        🎵 My Spotify Stats
+                    </h1>
+                    <a
+                        href="../index.html"
+                        style="
+                            font-size: 0.95rem;
+                            color: #b3b3b3;
+                            background: none;
+                            border: none;
+                            padding: 6px 12px;
+                            text-decoration: none;
+                            border-radius: 4px;
+                            transition: color 0.2s;
+                            margin-left: 24px;
+                            align-self: center;
+                            flex-shrink: 0;
+                        "
+                        onmouseover="this.style.color='#1db954';"
+                        onmouseout="this.style.color='#b3b3b3';"
+                    >
+                        My Other Sites
+                    </a>
+                </div>
+                <p style="width: 100%; text-align: center; margin-top: 18px">
                     Upload your Spotify Extended Streaming History to see
                     detailed analytics
                 </p>
