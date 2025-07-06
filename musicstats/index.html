@@ -22,7 +22,7 @@
             }
 
             .container {
-                max-width: 1200px;
+                max-width: 1400px;
                 margin: 0 auto;
             }
 
@@ -104,142 +104,328 @@
             }
 
             .back-button:hover {
-                background: rgba(29, 185, 84, 0.2);
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-1px);
             }
 
             .processing {
                 text-align: center;
-                font-size: 1.5rem;
-                margin: 50px 0;
+                padding: 40px;
+                display: none;
             }
 
             .processing-steps {
-                margin-top: 20px;
-                text-align: left;
-                max-width: 400px;
-                margin-left: auto;
-                margin-right: auto;
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                margin: 20px 0;
+                flex-wrap: wrap;
             }
 
             .processing-step {
-                padding: 10px;
-                margin: 5px 0;
-                border-radius: 5px;
-                transition: all 0.3s ease;
+                padding: 10px 20px;
+                border-radius: 25px;
+                background: rgba(255, 255, 255, 0.1);
+                opacity: 0.5;
             }
 
             .processing-step.active {
-                background: rgba(29, 185, 84, 0.2);
-                border-left: 3px solid #1db954;
+                background: #1db954;
+                opacity: 1;
             }
 
             .processing-step.completed {
-                background: rgba(29, 185, 84, 0.1);
-                color: #1db954;
+                background: #1ed760;
+                opacity: 1;
             }
 
             .loading {
-                text-align: center;
-                font-size: 1.5rem;
-                margin: 50px 0;
+                display: inline-block;
+                width: 40px;
+                height: 40px;
+                border: 4px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top-color: #1db954;
+                animation: spin 1s ease-in-out infinite;
             }
 
-            .stats-grid {
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .stats-overview {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
                 gap: 20px;
                 margin-bottom: 40px;
             }
 
             .stat-card {
-                background: rgba(25, 20, 20, 0.8);
-                border-radius: 10px;
-                padding: 20px;
-                border: 1px solid #1db954;
-                backdrop-filter: blur(10px);
+                background: rgba(25, 20, 20, 0.9);
+                border-radius: 15px;
+                padding: 25px;
+                text-align: center;
+                border: 1px solid rgba(29, 185, 84, 0.3);
             }
 
             .stat-card h3 {
                 color: #1db954;
                 margin-bottom: 15px;
-                font-size: 1.5rem;
+                font-size: 1.1rem;
             }
 
             .big-number {
                 font-size: 2.5rem;
                 font-weight: bold;
-                color: #1db954;
-                margin-bottom: 10px;
+                color: #1ed760;
+                margin-bottom: 5px;
             }
 
-            .chart-container {
-                position: relative;
-                height: 300px;
-                margin-top: 15px;
-            }
-
-            .top-list {
-                list-style: none;
-                max-height: 300px;
-                overflow-y: auto;
-            }
-
-            .top-list li {
-                padding: 10px;
-                margin: 5px 0;
-                background: rgba(29, 185, 84, 0.1);
-                border-radius: 5px;
-                border-left: 3px solid #1db954;
-            }
-
-            .rank {
-                color: #1db954;
-                font-weight: bold;
-                margin-right: 10px;
+            .sub-stat {
+                color: #ccc;
+                font-size: 0.9rem;
+                margin-top: 8px;
             }
 
             .time-period {
-                margin-bottom: 20px;
+                text-align: center;
+                margin-bottom: 30px;
             }
 
             .time-period select {
-                background: #191414;
+                background: rgba(25, 20, 20, 0.9);
                 color: white;
                 border: 1px solid #1db954;
-                padding: 10px;
-                border-radius: 5px;
+                padding: 10px 15px;
+                border-radius: 25px;
                 font-size: 1rem;
+                cursor: pointer;
             }
 
             .progress-bar {
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
+                width: 100%;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 4px;
                 overflow: hidden;
-                height: 20px;
-                margin-top: 5px;
+                margin-top: 10px;
             }
 
             .progress-fill {
-                background: #1db954;
                 height: 100%;
+                background: #1db954;
                 transition: width 0.3s ease;
             }
 
+            .content-tabs {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 30px;
+                flex-wrap: wrap;
+            }
+
+            .tab-button {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border: 1px solid #1db954;
+                padding: 10px 20px;
+                border-radius: 25px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .tab-button.active {
+                background: #1db954;
+                transform: translateY(-2px);
+            }
+
+            .tab-content {
+                display: none;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            .charts-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                gap: 30px;
+                margin-bottom: 40px;
+            }
+
+            .chart-container {
+                background: rgba(25, 20, 20, 0.9);
+                border-radius: 15px;
+                padding: 25px;
+                border: 1px solid rgba(29, 185, 84, 0.3);
+                position: relative;
+                min-height: 350px;
+            }
+
+            .chart-title {
+                color: #1db954;
+                margin-bottom: 20px;
+                text-align: center;
+                font-size: 1.2rem;
+            }
+
+            .chart-container canvas {
+                max-width: 100% !important;
+                max-height: 300px !important;
+                width: auto !important;
+                height: auto !important;
+            }
+
+            .top-lists-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 30px;
+                margin-bottom: 40px;
+            }
+
+            .top-list-container {
+                background: rgba(25, 20, 20, 0.9);
+                border-radius: 15px;
+                padding: 25px;
+                border: 1px solid rgba(29, 185, 84, 0.3);
+            }
+
+            .top-list-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .top-list-title {
+                color: #1db954;
+                font-size: 1.2rem;
+            }
+
+            .search-box {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(29, 185, 84, 0.5);
+                border-radius: 20px;
+                padding: 8px 15px;
+                color: white;
+                font-size: 0.9rem;
+                width: 150px;
+            }
+
+            .search-box::placeholder {
+                color: #ccc;
+            }
+
+            .top-list {
+                max-height: 400px;
+                overflow-y: auto;
+                list-style: none;
+            }
+
+            .top-list::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .top-list::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 3px;
+            }
+
+            .top-list::-webkit-scrollbar-thumb {
+                background: #1db954;
+                border-radius: 3px;
+            }
+
+            .top-list li {
+                padding: 12px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .rank {
+                background: #1db954;
+                color: white;
+                width: 25px;
+                height: 25px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
+                font-weight: bold;
+                flex-shrink: 0;
+            }
+
+            .list-item-content {
+                flex: 1;
+            }
+
+            .list-item-name {
+                font-weight: bold;
+                margin-bottom: 2px;
+            }
+
+            .list-item-stats {
+                color: #ccc;
+                font-size: 0.8rem;
+            }
+
+            .show-more-btn {
+                background: rgba(29, 185, 84, 0.2);
+                border: 1px solid #1db954;
+                color: #1db954;
+                padding: 8px 16px;
+                border-radius: 15px;
+                cursor: pointer;
+                margin-top: 15px;
+                font-size: 0.9rem;
+                width: 100%;
+            }
+
             .error {
-                background: rgba(255, 0, 0, 0.2);
-                border: 1px solid #ff4444;
-                border-radius: 5px;
+                background: rgba(255, 0, 0, 0.1);
+                border: 1px solid red;
+                border-radius: 10px;
                 padding: 20px;
                 margin: 20px 0;
+                text-align: center;
+                color: #ff6b6b;
+                display: none;
             }
 
             .file-info {
-                background: rgba(29, 185, 84, 0.1);
-                border: 1px solid #1db954;
-                border-radius: 5px;
-                padding: 15px;
-                margin: 15px 0;
+                background: rgba(25, 20, 20, 0.9);
+                border-radius: 10px;
+                padding: 20px;
+                margin: 20px 0;
+                border: 1px solid rgba(29, 185, 84, 0.3);
+                cursor: pointer;
+                display: none;
+                max-width: 100%;
+                word-wrap: break-word;
+            }
+
+            .file-info ol {
+                padding-left: 20px;
+                line-height: 1.6;
                 text-align: left;
+            }
+
+            .file-info li {
+                margin-bottom: 8px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                text-align: left;
+            }
+
+            .file-info a {
+                word-break: break-all;
             }
 
             .file-info h4 {
@@ -247,19 +433,109 @@
                 margin-bottom: 10px;
             }
 
+            .insights-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-bottom: 40px;
+            }
+
+            .insight-card {
+                background: rgba(25, 20, 20, 0.9);
+                border-radius: 15px;
+                padding: 20px;
+                border: 1px solid rgba(29, 185, 84, 0.3);
+            }
+
+            .tab-content {
+                background: rgba(25, 20, 20, 0.3);
+                border-radius: 15px;
+                padding: 20px;
+                margin-top: 20px;
+            }
+
+            .insight-title {
+                color: #1db954;
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+
+            .insight-value {
+                font-size: 1.8rem;
+                font-weight: bold;
+                color: #1ed760;
+                margin-bottom: 5px;
+            }
+
+            .insight-detail {
+                color: #ccc;
+                font-size: 0.9rem;
+            }
+
+            .heatmap {
+                display: grid;
+                grid-template-columns: repeat(24, 1fr);
+                gap: 2px;
+                margin: 15px 0;
+            }
+
+            .heatmap-cell {
+                aspect-ratio: 1;
+                border-radius: 2px;
+                transition: transform 0.2s ease;
+            }
+
+            .heatmap-cell:hover {
+                transform: scale(1.2);
+            }
+
+            .heatmap-legend {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 10px;
+                font-size: 0.8rem;
+                color: #ccc;
+            }
+
             @media (max-width: 768px) {
                 .header h1 {
                     font-size: 2rem;
                 }
 
-                .stats-grid {
-                    grid-template-columns: 1fr;
+                .stats-overview {
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 }
 
                 .upload-container {
                     padding: 20px;
                     margin: 20px auto;
                 }
+
+                .charts-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .top-lists-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .search-box {
+                    width: 120px;
+                }
+
+                .content-tabs {
+                    gap: 5px;
+                }
+
+                .tab-button {
+                    padding: 8px 15px;
+                    font-size: 0.9rem;
+                }
+            }
+
+            .hidden {
+                display: none !important;
             }
         </style>
     </head>
@@ -268,8 +544,8 @@
             <div class="header">
                 <h1>🎵 My Spotify Stats</h1>
                 <p>
-                    Upload your Spotify data to discover your music listening
-                    patterns
+                    Upload your Spotify Extended Streaming History to see
+                    detailed analytics
                 </p>
             </div>
 
@@ -334,38 +610,38 @@
             </div>
 
             <!-- Processing View -->
-            <div id="processingView" style="display: none">
-                <button class="back-button" onclick="showUploadView()">
-                    ← Back to Upload
-                </button>
-                <div class="processing">
-                    <div>Processing your Spotify data... 🎶</div>
-                    <div class="processing-steps">
-                        <div class="processing-step" id="step1">
-                            📁 Extracting ZIP file...
-                        </div>
-                        <div class="processing-step" id="step2">
-                            🔍 Finding data files...
-                        </div>
-                        <div class="processing-step" id="step3">
-                            📊 Processing listening history...
-                        </div>
-                        <div class="processing-step" id="step4">
-                            🎵 Generating statistics...
-                        </div>
+            <div id="processingView" class="processing">
+                <h2>Processing your Spotify data...</h2>
+                <div class="processing-steps">
+                    <div class="processing-step" id="step1">
+                        Reading ZIP file
+                    </div>
+                    <div class="processing-step" id="step2">
+                        Parsing JSON data
+                    </div>
+                    <div class="processing-step" id="step3">
+                        Analyzing patterns
+                    </div>
+                    <div class="processing-step" id="step4">
+                        Generating insights
                     </div>
                 </div>
+                <div class="loading"></div>
+                <p>This may take a few moments...</p>
             </div>
 
             <!-- Stats View -->
-            <div id="statsView" style="display: none">
+            <div id="statsView" class="hidden">
                 <button class="back-button" onclick="showUploadView()">
                     ← Upload New Data
                 </button>
 
                 <div class="time-period">
                     <label for="periodSelect">Time Period: </label>
-                    <select id="periodSelect">
+                    <select
+                        id="periodSelect"
+                        onchange="applyFilter(this.value)"
+                    >
                         <option value="all">All Time</option>
                         <option value="2024">2024</option>
                         <option value="2023">2023</option>
@@ -375,79 +651,283 @@
                     </select>
                 </div>
 
-                <div class="stats-grid">
+                <!-- Stats Overview -->
+                <div class="stats-overview">
                     <div class="stat-card">
                         <h3>Total Listening Time</h3>
                         <div class="big-number" id="totalTime">0h</div>
-                        <div id="totalTracks">0 tracks played</div>
+                        <div class="sub-stat" id="totalTracks">
+                            0 tracks played
+                        </div>
                     </div>
-
                     <div class="stat-card">
-                        <h3>Average Daily Listening</h3>
+                        <h3>Daily Average</h3>
                         <div class="big-number" id="avgDaily">0h</div>
-                        <div id="avgTracks">0 tracks per day</div>
+                        <div class="sub-stat" id="avgTracks">
+                            0 tracks per day
+                        </div>
                     </div>
-
                     <div class="stat-card">
                         <h3>Unique Artists</h3>
                         <div class="big-number" id="uniqueArtists">0</div>
-                        <div id="uniqueTracks">0 unique tracks</div>
+                        <div class="sub-stat" id="uniqueTracks">
+                            0 unique tracks
+                        </div>
                     </div>
-
                     <div class="stat-card">
-                        <h3>Top Platform</h3>
-                        <div class="big-number" id="topPlatform">-</div>
-                        <div id="platformStats">Platform breakdown</div>
+                        <h3>Completion Rate</h3>
+                        <div class="big-number" id="skipRate">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="completionBar"></div>
+                        </div>
+                        <div class="sub-stat">Songs played 30+ seconds</div>
                     </div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Top Artists</h3>
-                        <ul class="top-list" id="topArtists"></ul>
+                <!-- Content Tabs -->
+                <div class="content-tabs">
+                    <button
+                        class="tab-button active"
+                        onclick="showTab('overview')"
+                    >
+                        Overview
+                    </button>
+                    <button class="tab-button" onclick="showTab('insights')">
+                        Insights
+                    </button>
+                    <button class="tab-button" onclick="showTab('top-lists')">
+                        Top Lists
+                    </button>
+                    <button class="tab-button" onclick="showTab('charts')">
+                        Charts
+                    </button>
+                </div>
+
+                <!-- Overview Tab -->
+                <div id="overview-tab" class="tab-content active">
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-title">🌍 Top Country</div>
+                            <div class="insight-value" id="topCountry">--</div>
+                            <div class="insight-detail" id="countryDetail">
+                                -- listens
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">
+                                📱 Favorite Platform
+                            </div>
+                            <div class="insight-value" id="topPlatform">--</div>
+                            <div class="insight-detail" id="platformDetail">
+                                -- hours
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🔀 Shuffle Usage</div>
+                            <div class="insight-value" id="shuffleRate">0%</div>
+                            <div class="insight-detail">of your listening</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">
+                                📶 Offline Listening
+                            </div>
+                            <div class="insight-value" id="offlineRate">0%</div>
+                            <div class="insight-detail">of your time</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">⏭️ Skip Rate</div>
+                            <div class="insight-value" id="actualSkipRate">
+                                0%
+                            </div>
+                            <div class="insight-detail">tracks skipped</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🎯 Discovery Score</div>
+                            <div class="insight-value" id="discoveryScore">
+                                0
+                            </div>
+                            <div class="insight-detail">new tracks found</div>
+                        </div>
                     </div>
 
-                    <div class="stat-card">
-                        <h3>Top Tracks</h3>
-                        <ul class="top-list" id="topTracks"></ul>
+                    <!-- Listening Patterns Heatmap -->
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            ⏰ Listening Patterns by Hour
+                        </div>
+                        <div class="heatmap" id="hourlyHeatmap"></div>
+                        <div class="heatmap-legend">
+                            <span>12 AM</span>
+                            <span>6 AM</span>
+                            <span>12 PM</span>
+                            <span>6 PM</span>
+                            <span>12 AM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Tab -->
+                <div id="insights-tab" class="tab-content">
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-title">🏆 Longest Session</div>
+                            <div class="insight-value" id="longestSession">
+                                0h
+                            </div>
+                            <div class="insight-detail" id="sessionDetail">
+                                consecutive listening
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🔥 Listening Streak</div>
+                            <div class="insight-value" id="longestStreak">
+                                0
+                            </div>
+                            <div class="insight-detail">days in a row</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">📅 Most Active Day</div>
+                            <div class="insight-value" id="mostActiveDay">
+                                --
+                            </div>
+                            <div class="insight-detail" id="activeDetails">
+                                --
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🌙 Night Owl Score</div>
+                            <div class="insight-value" id="nightOwlScore">
+                                0%
+                            </div>
+                            <div class="insight-detail">
+                                listening after 10 PM
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🌅 Early Bird Score</div>
+                            <div class="insight-value" id="earlyBirdScore">
+                                0%
+                            </div>
+                            <div class="insight-detail">
+                                listening before 8 AM
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">📊 Variety Score</div>
+                            <div class="insight-value" id="varietyScore">0</div>
+                            <div class="insight-detail">
+                                different artists per week
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="stat-card">
-                        <h3>Top Albums</h3>
-                        <ul class="top-list" id="topAlbums"></ul>
+                    <!-- Weekly Pattern -->
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            📅 Weekly Listening Pattern
+                        </div>
+                        <canvas id="weeklyChart"></canvas>
                     </div>
+                </div>
 
-                    <div class="stat-card">
-                        <h3>Listening by Hour</h3>
+                <!-- Top Lists Tab -->
+                <div id="top-lists-tab" class="tab-content">
+                    <div class="top-lists-grid">
+                        <div class="top-list-container">
+                            <div class="top-list-header">
+                                <h3 class="top-list-title">🎤 Top Artists</h3>
+                                <input
+                                    type="text"
+                                    class="search-box"
+                                    placeholder="Search artists..."
+                                    oninput="filterList('artists', this.value)"
+                                />
+                            </div>
+                            <ul class="top-list" id="topArtists"></ul>
+                            <button
+                                class="show-more-btn"
+                                id="showMoreArtists"
+                                onclick="showMoreItems('artists')"
+                            >
+                                Show More Artists
+                            </button>
+                        </div>
+
+                        <div class="top-list-container">
+                            <div class="top-list-header">
+                                <h3 class="top-list-title">🎵 Top Tracks</h3>
+                                <input
+                                    type="text"
+                                    class="search-box"
+                                    placeholder="Search tracks..."
+                                    oninput="filterList('tracks', this.value)"
+                                />
+                            </div>
+                            <ul class="top-list" id="topTracks"></ul>
+                            <button
+                                class="show-more-btn"
+                                id="showMoreTracks"
+                                onclick="showMoreItems('tracks')"
+                            >
+                                Show More Tracks
+                            </button>
+                        </div>
+
+                        <div class="top-list-container">
+                            <div class="top-list-header">
+                                <h3 class="top-list-title">💿 Top Albums</h3>
+                                <input
+                                    type="text"
+                                    class="search-box"
+                                    placeholder="Search albums..."
+                                    oninput="filterList('albums', this.value)"
+                                />
+                            </div>
+                            <ul class="top-list" id="topAlbums"></ul>
+                            <button
+                                class="show-more-btn"
+                                id="showMoreAlbums"
+                                onclick="showMoreItems('albums')"
+                            >
+                                Show More Albums
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Tab -->
+                <div id="charts-tab" class="tab-content">
+                    <div class="charts-grid">
                         <div class="chart-container">
+                            <div class="chart-title">
+                                📈 Listening Over Time
+                            </div>
+                            <canvas id="timeChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">📱 Platform Usage</div>
+                            <canvas id="platformChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">
+                                🌍 Listening by Country
+                            </div>
+                            <canvas id="countryChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">
+                                ⏰ Hourly Distribution
+                            </div>
                             <canvas id="hourlyChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <h3>Monthly Listening</h3>
-                        <div class="chart-container">
-                            <canvas id="monthlyChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <h3>Skip Rate Analysis</h3>
-                        <div id="skipRate" class="big-number">0%</div>
-                        <div>Average completion rate</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="completionBar"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Error View -->
-            <div id="errorView" style="display: none" class="error">
-                <h3>Error Processing Data</h3>
-                <p id="errorMessage">
-                    There was an issue processing your Spotify data.
-                </p>
+            <div id="errorView" class="error">
+                <h3>Error Processing File</h3>
+                <p id="errorMessage"></p>
                 <button class="upload-button" onclick="showUploadView()">
                     Try Again
                 </button>
@@ -458,13 +938,18 @@
             let allData = [];
             let filteredData = [];
             let charts = {};
+            let topLists = {
+                artists: { data: [], displayed: 20, filtered: [] },
+                tracks: { data: [], displayed: 20, filtered: [] },
+                albums: { data: [], displayed: 20, filtered: [] },
+            };
 
             // View management
             function showUploadView() {
                 document.getElementById("uploadView").style.display = "block";
                 document.getElementById("processingView").style.display =
                     "none";
-                document.getElementById("statsView").style.display = "none";
+                document.getElementById("statsView").classList.add("hidden");
                 document.getElementById("errorView").style.display = "none";
 
                 // Clear previous data
@@ -480,7 +965,7 @@
                 document.getElementById("uploadView").style.display = "none";
                 document.getElementById("processingView").style.display =
                     "block";
-                document.getElementById("statsView").style.display = "none";
+                document.getElementById("statsView").classList.add("hidden");
                 document.getElementById("errorView").style.display = "none";
 
                 // Reset processing steps
@@ -494,7 +979,7 @@
                 document.getElementById("uploadView").style.display = "none";
                 document.getElementById("processingView").style.display =
                     "none";
-                document.getElementById("statsView").style.display = "block";
+                document.getElementById("statsView").classList.remove("hidden");
                 document.getElementById("errorView").style.display = "none";
             }
 
@@ -502,9 +987,25 @@
                 document.getElementById("uploadView").style.display = "none";
                 document.getElementById("processingView").style.display =
                     "none";
-                document.getElementById("statsView").style.display = "none";
+                document.getElementById("statsView").classList.add("hidden");
                 document.getElementById("errorView").style.display = "block";
                 document.getElementById("errorMessage").textContent = message;
+            }
+
+            function showTab(tabName) {
+                // Hide all tabs
+                document.querySelectorAll(".tab-content").forEach((tab) => {
+                    tab.classList.remove("active");
+                });
+                document.querySelectorAll(".tab-button").forEach((btn) => {
+                    btn.classList.remove("active");
+                });
+
+                // Show selected tab
+                document
+                    .getElementById(tabName + "-tab")
+                    .classList.add("active");
+                event.target.classList.add("active");
             }
 
             function toggleFileInfo() {
@@ -531,7 +1032,6 @@
                 currentStep.classList.add("active");
             }
 
-            // File handling
             async function processZipFile(file) {
                 try {
                     showProcessingView();
@@ -655,7 +1155,7 @@
                 }
             }
 
-            // Stats functions (same as before but adapted)
+            // Stats functions
             function applyFilter(period) {
                 const now = new Date();
                 let startDate = new Date(0);
@@ -703,6 +1203,13 @@
             }
 
             function updateStats() {
+                updateBasicStats();
+                updateInsights();
+                updateTopLists();
+                updateCharts();
+            }
+
+            function updateBasicStats() {
                 // Basic stats
                 const totalMs = filteredData.reduce(
                     (sum, item) => sum + item.ms_played,
@@ -712,25 +1219,13 @@
                 const totalTracks = filteredData.length;
 
                 document.getElementById("totalTime").textContent =
-                    `${totalHours}h`;
+                    `${totalHours.toLocaleString()}h`;
                 document.getElementById("totalTracks").textContent =
                     `${totalTracks.toLocaleString()} tracks played`;
 
                 // Average daily listening
-                const days = Math.max(
-                    1,
-                    Math.ceil(
-                        (new Date() -
-                            new Date(
-                                Math.min(
-                                    ...filteredData.map(
-                                        (item) => new Date(item.ts),
-                                    ),
-                                ),
-                            )) /
-                            (1000 * 60 * 60 * 24),
-                    ),
-                );
+                const dateRange = getDateRange(filteredData);
+                const days = Math.max(1, dateRange.days);
                 const avgDailyHours = Math.round((totalHours / days) * 10) / 10;
                 const avgDailyTracks = Math.round(totalTracks / days);
 
@@ -757,204 +1252,822 @@
                 document.getElementById("uniqueTracks").textContent =
                     `${uniqueTracks.toLocaleString()} unique tracks`;
 
-                // Platform stats
-                const platforms = {};
-                filteredData.forEach((item) => {
-                    platforms[item.platform] =
-                        (platforms[item.platform] || 0) + item.ms_played;
-                });
-
-                const topPlatform = Object.keys(platforms).reduce(
-                    (a, b) => (platforms[a] > platforms[b] ? a : b),
-                    "unknown",
-                );
-                document.getElementById("topPlatform").textContent =
-                    topPlatform;
-
-                // Skip rate
+                // Completion rate
                 const completedTracks = filteredData.filter(
                     (item) => item.ms_played > 30000,
-                ).length; // 30+ seconds
-                const completionRate = Math.round(
-                    (completedTracks / totalTracks) * 100,
-                );
+                ).length;
+                const completionRate =
+                    totalTracks > 0
+                        ? Math.round((completedTracks / totalTracks) * 100)
+                        : 0;
                 document.getElementById("skipRate").textContent =
                     `${completionRate}%`;
                 document.getElementById("completionBar").style.width =
                     `${completionRate}%`;
+            }
 
-                updateTopLists();
-                updateCharts();
+            function updateInsights() {
+                // Country analysis
+                const countries = {};
+                filteredData.forEach((item) => {
+                    if (item.conn_country) {
+                        countries[item.conn_country] =
+                            (countries[item.conn_country] || 0) + 1;
+                    }
+                });
+
+                const countryKeys = Object.keys(countries);
+                if (countryKeys.length > 0) {
+                    const topCountry = countryKeys.reduce((a, b) =>
+                        countries[a] > countries[b] ? a : b,
+                    );
+                    document.getElementById("topCountry").textContent =
+                        topCountry;
+                    document.getElementById("countryDetail").textContent =
+                        `${countries[topCountry]?.toLocaleString() || 0} listens`;
+                } else {
+                    document.getElementById("topCountry").textContent = "N/A";
+                    document.getElementById("countryDetail").textContent =
+                        "0 listens";
+                }
+
+                // Platform analysis
+                const platforms = {};
+                filteredData.forEach((item) => {
+                    if (item.platform) {
+                        platforms[item.platform] =
+                            (platforms[item.platform] || 0) + item.ms_played;
+                    }
+                });
+
+                const platformKeys = Object.keys(platforms);
+                if (platformKeys.length > 0) {
+                    const topPlatform = platformKeys.reduce((a, b) =>
+                        platforms[a] > platforms[b] ? a : b,
+                    );
+                    const platformHours = Math.round(
+                        platforms[topPlatform] / (1000 * 60 * 60),
+                    );
+                    document.getElementById("topPlatform").textContent =
+                        topPlatform;
+                    document.getElementById("platformDetail").textContent =
+                        `${platformHours} hours`;
+                } else {
+                    document.getElementById("topPlatform").textContent =
+                        "unknown";
+                    document.getElementById("platformDetail").textContent =
+                        "0 hours";
+                }
+
+                // Shuffle analysis
+                const shuffleTracks = filteredData.filter(
+                    (item) => item.shuffle,
+                ).length;
+                const shuffleRate =
+                    filteredData.length > 0
+                        ? Math.round(
+                              (shuffleTracks / filteredData.length) * 100,
+                          )
+                        : 0;
+                document.getElementById("shuffleRate").textContent =
+                    `${shuffleRate}%`;
+
+                // Offline analysis
+                const offlineTracks = filteredData.filter(
+                    (item) => item.offline,
+                ).length;
+                const offlineRate =
+                    filteredData.length > 0
+                        ? Math.round(
+                              (offlineTracks / filteredData.length) * 100,
+                          )
+                        : 0;
+                document.getElementById("offlineRate").textContent =
+                    `${offlineRate}%`;
+
+                // Skip analysis
+                const skippedTracks = filteredData.filter(
+                    (item) => item.skipped,
+                ).length;
+                const actualSkipRate =
+                    filteredData.length > 0
+                        ? Math.round(
+                              (skippedTracks / filteredData.length) * 100,
+                          )
+                        : 0;
+                document.getElementById("actualSkipRate").textContent =
+                    `${actualSkipRate}%`;
+
+                // Discovery score
+                const trackCounts = {};
+                filteredData.forEach((item) => {
+                    const trackKey = `${item.master_metadata_track_name}-${item.master_metadata_album_artist_name}`;
+                    trackCounts[trackKey] = (trackCounts[trackKey] || 0) + 1;
+                });
+                const newTracks = Object.values(trackCounts).filter(
+                    (count) => count === 1,
+                ).length;
+                document.getElementById("discoveryScore").textContent =
+                    newTracks;
+
+                // Time-based insights
+                updateTimeInsights();
+
+                // Create hourly heatmap
+                createHourlyHeatmap();
+            }
+
+            function updateTimeInsights() {
+                // Longest session analysis
+                const sessions = calculateSessions();
+                const longestSession = Math.max(
+                    ...sessions.map((s) => s.duration),
+                    0,
+                );
+                document.getElementById("longestSession").textContent =
+                    `${Math.round(longestSession / (1000 * 60 * 60))}h`;
+
+                // Listening streak
+                const streak = calculateListeningStreak();
+                document.getElementById("longestStreak").textContent = streak;
+
+                // Most active day
+                const dailyStats = calculateDailyStats();
+                const days = Object.keys(dailyStats);
+                if (days.length > 0) {
+                    const mostActiveDay = days.reduce((a, b) =>
+                        dailyStats[a].tracks > dailyStats[b].tracks ? a : b,
+                    );
+                    const dayData = dailyStats[mostActiveDay];
+                    document.getElementById("mostActiveDay").textContent =
+                        new Date(mostActiveDay).toLocaleDateString();
+                    document.getElementById("activeDetails").textContent =
+                        `${dayData.tracks} tracks, ${Math.round(dayData.time / (1000 * 60 * 60))}h`;
+                } else {
+                    document.getElementById("mostActiveDay").textContent =
+                        "N/A";
+                    document.getElementById("activeDetails").textContent =
+                        "No data available";
+                }
+
+                // Night owl / Early bird scores
+                const hourlyData = calculateHourlyDistribution();
+                const nightOwlHours = hourlyData
+                    .slice(22)
+                    .concat(hourlyData.slice(0, 6));
+                const earlyBirdHours = hourlyData.slice(5, 8);
+                const totalListens = hourlyData.reduce(
+                    (sum, hour) => sum + hour,
+                    0,
+                );
+
+                const nightOwlScore =
+                    totalListens > 0
+                        ? Math.round(
+                              (nightOwlHours.reduce(
+                                  (sum, hour) => sum + hour,
+                                  0,
+                              ) /
+                                  totalListens) *
+                                  100,
+                          )
+                        : 0;
+                const earlyBirdScore =
+                    totalListens > 0
+                        ? Math.round(
+                              (earlyBirdHours.reduce(
+                                  (sum, hour) => sum + hour,
+                                  0,
+                              ) /
+                                  totalListens) *
+                                  100,
+                          )
+                        : 0;
+
+                document.getElementById("nightOwlScore").textContent =
+                    `${nightOwlScore}%`;
+                document.getElementById("earlyBirdScore").textContent =
+                    `${earlyBirdScore}%`;
+
+                // Variety score
+                const varietyScore = calculateVarietyScore();
+                document.getElementById("varietyScore").textContent =
+                    varietyScore || 0;
+            }
+
+            function calculateSessions() {
+                const sessions = [];
+                let currentSession = null;
+
+                filteredData.forEach((item) => {
+                    const itemTime = new Date(item.ts).getTime();
+
+                    if (
+                        !currentSession ||
+                        itemTime - currentSession.lastActivity > 30 * 60 * 1000
+                    ) {
+                        // 30 min gap
+                        currentSession = {
+                            start: itemTime,
+                            lastActivity: itemTime,
+                            duration: item.ms_played,
+                            tracks: 1,
+                        };
+                        sessions.push(currentSession);
+                    } else {
+                        currentSession.lastActivity = itemTime;
+                        currentSession.duration += item.ms_played;
+                        currentSession.tracks++;
+                    }
+                });
+
+                return sessions;
+            }
+
+            function calculateListeningStreak() {
+                const dailyData = calculateDailyStats();
+                const sortedDays = Object.keys(dailyData).sort();
+
+                if (sortedDays.length === 0) return 0;
+
+                let currentStreak = 0;
+                let maxStreak = 0;
+                let lastDate = null;
+
+                sortedDays.forEach((dateStr) => {
+                    const date = new Date(dateStr);
+                    if (lastDate && date - lastDate === 24 * 60 * 60 * 1000) {
+                        currentStreak++;
+                    } else {
+                        currentStreak = 1;
+                    }
+                    maxStreak = Math.max(maxStreak, currentStreak);
+                    lastDate = date;
+                });
+
+                return maxStreak;
+            }
+
+            function calculateDailyStats() {
+                const dailyData = {};
+
+                filteredData.forEach((item) => {
+                    const date = new Date(item.ts).toDateString();
+                    if (!dailyData[date]) {
+                        dailyData[date] = { tracks: 0, time: 0 };
+                    }
+                    dailyData[date].tracks++;
+                    dailyData[date].time += item.ms_played;
+                });
+
+                return dailyData;
+            }
+
+            function calculateHourlyDistribution() {
+                const hourlyData = new Array(24).fill(0);
+
+                filteredData.forEach((item) => {
+                    const hour = new Date(item.ts).getHours();
+                    hourlyData[hour]++;
+                });
+
+                return hourlyData;
+            }
+
+            function calculateVarietyScore() {
+                if (filteredData.length === 0) return 0;
+
+                const weeklyData = {};
+
+                filteredData.forEach((item) => {
+                    if (item.ts && item.master_metadata_album_artist_name) {
+                        const date = new Date(item.ts);
+                        const weekKey = `${date.getFullYear()}-W${getWeekNumber(date)}`;
+
+                        if (!weeklyData[weekKey]) {
+                            weeklyData[weekKey] = new Set();
+                        }
+                        weeklyData[weekKey].add(
+                            item.master_metadata_album_artist_name,
+                        );
+                    }
+                });
+
+                const weeksWithData = Object.keys(weeklyData);
+                if (weeksWithData.length === 0) return 0;
+
+                const avgArtistsPerWeek =
+                    weeksWithData.reduce(
+                        (sum, week) => sum + weeklyData[week].size,
+                        0,
+                    ) / weeksWithData.length;
+
+                return Math.round(avgArtistsPerWeek);
+            }
+
+            function getWeekNumber(date) {
+                const d = new Date(
+                    Date.UTC(
+                        date.getFullYear(),
+                        date.getMonth(),
+                        date.getDate(),
+                    ),
+                );
+                const dayNum = d.getUTCDay() || 7;
+                d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+            }
+
+            function createHourlyHeatmap() {
+                const hourlyData = calculateHourlyDistribution();
+                const maxListens = Math.max(...hourlyData);
+                const heatmapContainer =
+                    document.getElementById("hourlyHeatmap");
+                heatmapContainer.innerHTML = "";
+
+                hourlyData.forEach((listens, hour) => {
+                    const cell = document.createElement("div");
+                    cell.className = "heatmap-cell";
+                    const intensity = maxListens > 0 ? listens / maxListens : 0;
+                    const opacity = 0.1 + intensity * 0.9;
+                    cell.style.backgroundColor = `rgba(29, 185, 84, ${opacity})`;
+                    cell.title = `${hour}:00 - ${listens} listens`;
+                    heatmapContainer.appendChild(cell);
+                });
             }
 
             function updateTopLists() {
                 // Top Artists
-                const artistPlays = {};
+                const artistStats = {};
                 filteredData.forEach((item) => {
                     const artist = item.master_metadata_album_artist_name;
-                    artistPlays[artist] =
-                        (artistPlays[artist] || 0) + item.ms_played;
+                    if (!artistStats[artist]) {
+                        artistStats[artist] = { time: 0, plays: 0 };
+                    }
+                    artistStats[artist].time += item.ms_played;
+                    artistStats[artist].plays++;
                 });
 
-                const topArtists = Object.entries(artistPlays)
-                    .sort(([, a], [, b]) => b - a)
-                    .slice(0, 10);
-
-                document.getElementById("topArtists").innerHTML = topArtists
-                    .map(
-                        ([artist, ms], index) =>
-                            `<li><span class="rank">${index + 1}.</span>${artist} <br><small>${Math.round(ms / (1000 * 60))} minutes</small></li>`,
-                    )
-                    .join("");
+                topLists.artists.data = Object.entries(artistStats)
+                    .map(([artist, stats]) => ({
+                        name: artist,
+                        time: stats.time,
+                        plays: stats.plays,
+                        timeText: `${Math.round(stats.time / (1000 * 60))} min`,
+                        playsText: `${stats.plays} plays`,
+                    }))
+                    .sort((a, b) => b.time - a.time);
 
                 // Top Tracks
-                const trackPlays = {};
+                const trackStats = {};
                 filteredData.forEach((item) => {
-                    const track = `${item.master_metadata_track_name} - ${item.master_metadata_album_artist_name}`;
-                    trackPlays[track] = (trackPlays[track] || 0) + 1;
+                    const track = `${item.master_metadata_track_name}`;
+                    const artist = item.master_metadata_album_artist_name;
+                    const key = `${track}|||${artist}`;
+
+                    if (!trackStats[key]) {
+                        trackStats[key] = { plays: 0, time: 0, track, artist };
+                    }
+                    trackStats[key].plays++;
+                    trackStats[key].time += item.ms_played;
                 });
 
-                const topTracks = Object.entries(trackPlays)
-                    .sort(([, a], [, b]) => b - a)
-                    .slice(0, 10);
-
-                document.getElementById("topTracks").innerHTML = topTracks
-                    .map(
-                        ([track, plays], index) =>
-                            `<li><span class="rank">${index + 1}.</span>${track} <br><small>${plays} plays</small></li>`,
-                    )
-                    .join("");
+                topLists.tracks.data = Object.values(trackStats)
+                    .map((stats) => ({
+                        name: `${stats.track} - ${stats.artist}`,
+                        plays: stats.plays,
+                        time: stats.time,
+                        timeText: `${Math.round(stats.time / (1000 * 60))} min`,
+                        playsText: `${stats.plays} plays`,
+                    }))
+                    .sort((a, b) => b.plays - a.plays);
 
                 // Top Albums
-                const albumPlays = {};
+                const albumStats = {};
                 filteredData.forEach((item) => {
                     if (item.master_metadata_album_album_name) {
-                        const album = `${item.master_metadata_album_album_name} - ${item.master_metadata_album_artist_name}`;
-                        albumPlays[album] =
-                            (albumPlays[album] || 0) + item.ms_played;
+                        const album = `${item.master_metadata_album_album_name}`;
+                        const artist = item.master_metadata_album_artist_name;
+                        const key = `${album}|||${artist}`;
+
+                        if (!albumStats[key]) {
+                            albumStats[key] = {
+                                time: 0,
+                                plays: 0,
+                                album,
+                                artist,
+                            };
+                        }
+                        albumStats[key].time += item.ms_played;
+                        albumStats[key].plays++;
                     }
                 });
 
-                const topAlbums = Object.entries(albumPlays)
-                    .sort(([, a], [, b]) => b - a)
-                    .slice(0, 10);
+                topLists.albums.data = Object.values(albumStats)
+                    .map((stats) => ({
+                        name: `${stats.album} - ${stats.artist}`,
+                        time: stats.time,
+                        plays: stats.plays,
+                        timeText: `${Math.round(stats.time / (1000 * 60))} min`,
+                        playsText: `${stats.plays} plays`,
+                    }))
+                    .sort((a, b) => b.time - a.time);
 
-                document.getElementById("topAlbums").innerHTML = topAlbums
-                    .map(
-                        ([album, ms], index) =>
-                            `<li><span class="rank">${index + 1}.</span>${album} <br><small>${Math.round(ms / (1000 * 60))} minutes</small></li>`,
-                    )
-                    .join("");
+                // Reset filters and display
+                ["artists", "tracks", "albums"].forEach((type) => {
+                    topLists[type].filtered = [...topLists[type].data];
+                    topLists[type].displayed = 20;
+                });
+
+                renderTopLists();
+            }
+
+            function renderTopLists() {
+                ["artists", "tracks", "albums"].forEach((type) => {
+                    const container = document.getElementById(
+                        `top${type.charAt(0).toUpperCase() + type.slice(1)}`,
+                    );
+                    const items = topLists[type].filtered.slice(
+                        0,
+                        topLists[type].displayed,
+                    );
+
+                    container.innerHTML = items
+                        .map(
+                            (item, index) => `
+                        <li>
+                            <div class="rank">${index + 1}</div>
+                            <div class="list-item-content">
+                                <div class="list-item-name">${item.name}</div>
+                                <div class="list-item-stats">${item.timeText} • ${item.playsText}</div>
+                            </div>
+                        </li>
+                    `,
+                        )
+                        .join("");
+
+                    // Update show more button
+                    const showMoreBtn = document.getElementById(
+                        `showMore${type.charAt(0).toUpperCase() + type.slice(1)}`,
+                    );
+                    const hasMore =
+                        topLists[type].filtered.length >
+                        topLists[type].displayed;
+                    showMoreBtn.textContent = hasMore
+                        ? `Show More (${topLists[type].filtered.length - topLists[type].displayed} remaining)`
+                        : "All items shown";
+                    showMoreBtn.style.display = hasMore ? "block" : "none";
+                });
+            }
+
+            function filterList(type, query) {
+                const lowerQuery = query.toLowerCase();
+                topLists[type].filtered = topLists[type].data.filter((item) =>
+                    item.name.toLowerCase().includes(lowerQuery),
+                );
+                topLists[type].displayed = 20;
+                renderTopLists();
+            }
+
+            function showMoreItems(type) {
+                topLists[type].displayed += 20;
+                renderTopLists();
             }
 
             function updateCharts() {
-                // Hourly listening pattern
-                const hourlyData = new Array(24).fill(0);
-                filteredData.forEach((item) => {
-                    const hour = new Date(item.ts).getHours();
-                    hourlyData[hour] += item.ms_played;
+                updateTimeChart();
+                updatePlatformChart();
+                updateCountryChart();
+                updateHourlyChart();
+                updateWeeklyChart();
+            }
+
+            function updateTimeChart() {
+                const ctx = document.getElementById("timeChart");
+                if (!ctx) return;
+
+                const dailyData = calculateDailyStats();
+                const sortedDays = Object.keys(dailyData).sort();
+
+                // Group by week or month for better visualization
+                const groupedData = {};
+                sortedDays.forEach((day) => {
+                    const date = new Date(day);
+                    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+                    if (!groupedData[key]) groupedData[key] = 0;
+                    groupedData[key] += dailyData[day].time / (1000 * 60 * 60); // Convert to hours
                 });
 
-                // Destroy existing chart if it exists
-                if (charts.hourly) {
-                    charts.hourly.destroy();
-                }
+                if (charts.timeChart) charts.timeChart.destroy();
 
-                const hourlyCtx = document
-                    .getElementById("hourlyChart")
-                    .getContext("2d");
-                charts.hourly = new Chart(hourlyCtx, {
+                charts.timeChart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: Object.keys(groupedData),
+                        datasets: [
+                            {
+                                label: "Hours Listened",
+                                data: Object.values(groupedData),
+                                borderColor: "#1db954",
+                                backgroundColor: "rgba(29, 185, 84, 0.1)",
+                                tension: 0.4,
+                                fill: true,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                top: 10,
+                                right: 10,
+                                bottom: 10,
+                                left: 10,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: "white" },
+                                display: true,
+                            },
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: "white",
+                                    maxTicksLimit: 8,
+                                },
+                                grid: { color: "rgba(255,255,255,0.1)" },
+                            },
+                            y: {
+                                ticks: {
+                                    color: "white",
+                                    beginAtZero: true,
+                                },
+                                grid: { color: "rgba(255,255,255,0.1)" },
+                            },
+                        },
+                    },
+                });
+            }
+
+            function updatePlatformChart() {
+                const ctx = document.getElementById("platformChart");
+                if (!ctx) return;
+
+                const platforms = {};
+                filteredData.forEach((item) => {
+                    if (item.platform && item.ms_played) {
+                        platforms[item.platform] =
+                            (platforms[item.platform] || 0) +
+                            item.ms_played / (1000 * 60 * 60);
+                    }
+                });
+
+                if (charts.platformChart) charts.platformChart.destroy();
+
+                charts.platformChart = new Chart(ctx, {
+                    type: "doughnut",
+                    data: {
+                        labels: Object.keys(platforms),
+                        datasets: [
+                            {
+                                data: Object.values(platforms),
+                                backgroundColor: [
+                                    "#1db954",
+                                    "#1ed760",
+                                    "#16a34a",
+                                    "#15803d",
+                                    "#166534",
+                                ],
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: 20,
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: "white" },
+                                position: "bottom",
+                            },
+                        },
+                    },
+                });
+            }
+
+            function updateCountryChart() {
+                const ctx = document.getElementById("countryChart");
+                if (!ctx) return;
+
+                const countries = {};
+                filteredData.forEach((item) => {
+                    if (item.conn_country) {
+                        countries[item.conn_country] =
+                            (countries[item.conn_country] || 0) + 1;
+                    }
+                });
+
+                // Get top 5 countries
+                const topCountries = Object.entries(countries)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 5);
+
+                if (charts.countryChart) charts.countryChart.destroy();
+
+                charts.countryChart = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: topCountries.map(([country]) => country),
+                        datasets: [
+                            {
+                                label: "Listens",
+                                data: topCountries.map(([, count]) => count),
+                                backgroundColor: "#1db954",
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                top: 10,
+                                right: 10,
+                                bottom: 10,
+                                left: 10,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: "white" },
+                                display: false,
+                            },
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: "white",
+                                    maxRotation: 45,
+                                },
+                                grid: { color: "rgba(255,255,255,0.1)" },
+                            },
+                            y: {
+                                ticks: {
+                                    color: "white",
+                                    beginAtZero: true,
+                                },
+                                grid: { color: "rgba(255,255,255,0.1)" },
+                            },
+                        },
+                    },
+                });
+            }
+
+            function updateHourlyChart() {
+                const ctx = document.getElementById("hourlyChart");
+                if (!ctx) return;
+
+                const hourlyData = calculateHourlyDistribution();
+
+                if (charts.hourlyChart) charts.hourlyChart.destroy();
+
+                charts.hourlyChart = new Chart(ctx, {
                     type: "bar",
                     data: {
                         labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
                         datasets: [
                             {
-                                label: "Minutes Listened",
-                                data: hourlyData.map((ms) =>
-                                    Math.round(ms / (1000 * 60)),
-                                ),
+                                label: "Listens",
+                                data: hourlyData,
                                 backgroundColor: "#1db954",
-                                borderColor: "#1ed760",
-                                borderWidth: 1,
                             },
                         ],
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                top: 10,
+                                right: 10,
+                                bottom: 10,
+                                left: 10,
+                            },
+                        },
                         plugins: {
-                            legend: { display: false },
+                            legend: {
+                                labels: { color: "white" },
+                                display: false,
+                            },
                         },
                         scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: "rgba(255, 255, 255, 0.1)" },
-                                ticks: { color: "#fff" },
-                            },
                             x: {
-                                grid: { color: "rgba(255, 255, 255, 0.1)" },
-                                ticks: { color: "#fff" },
+                                ticks: {
+                                    color: "white",
+                                    maxTicksLimit: 12,
+                                },
+                                grid: { color: "rgba(255,255,255,0.1)" },
+                            },
+                            y: {
+                                ticks: {
+                                    color: "white",
+                                    beginAtZero: true,
+                                },
+                                grid: { color: "rgba(255,255,255,0.1)" },
                             },
                         },
                     },
                 });
+            }
 
-                // Monthly listening pattern
-                const monthlyData = {};
+            function updateWeeklyChart() {
+                const ctx = document.getElementById("weeklyChart");
+                if (!ctx) return;
+
+                const weeklyData = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
                 filteredData.forEach((item) => {
-                    const date = new Date(item.ts);
-                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-                    monthlyData[monthKey] =
-                        (monthlyData[monthKey] || 0) + item.ms_played;
+                    if (item.ts && item.ms_played) {
+                        const day = new Date(item.ts).getDay();
+                        weeklyData[day] += item.ms_played / (1000 * 60 * 60);
+                    }
                 });
 
-                const sortedMonths = Object.keys(monthlyData).sort();
-                const monthlyValues = sortedMonths.map((month) =>
-                    Math.round(monthlyData[month] / (1000 * 60 * 60)),
-                );
+                const dayNames = [
+                    "Sunday",
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                ];
 
-                if (charts.monthly) {
-                    charts.monthly.destroy();
-                }
+                if (charts.weeklyChart) charts.weeklyChart.destroy();
 
-                const monthlyCtx = document
-                    .getElementById("monthlyChart")
-                    .getContext("2d");
-                charts.monthly = new Chart(monthlyCtx, {
-                    type: "line",
+                charts.weeklyChart = new Chart(ctx, {
+                    type: "radar",
                     data: {
-                        labels: sortedMonths,
+                        labels: dayNames,
                         datasets: [
                             {
                                 label: "Hours Listened",
-                                data: monthlyValues,
-                                backgroundColor: "rgba(29, 185, 84, 0.2)",
+                                data: weeklyData,
                                 borderColor: "#1db954",
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4,
+                                backgroundColor: "rgba(29, 185, 84, 0.2)",
+                                pointBackgroundColor: "#1db954",
                             },
                         ],
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: 20,
+                        },
                         plugins: {
-                            legend: { display: false },
+                            legend: {
+                                labels: { color: "white" },
+                                display: false,
+                            },
                         },
                         scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: "rgba(255, 255, 255, 0.1)" },
-                                ticks: { color: "#fff" },
-                            },
-                            x: {
-                                grid: { color: "rgba(255, 255, 255, 0.1)" },
-                                ticks: { color: "#fff", maxTicksLimit: 8 },
+                            r: {
+                                ticks: {
+                                    color: "white",
+                                    beginAtZero: true,
+                                },
+                                grid: { color: "rgba(255,255,255,0.1)" },
+                                pointLabels: {
+                                    color: "white",
+                                    font: {
+                                        size: 12,
+                                    },
+                                },
                             },
                         },
                     },
                 });
+            }
+
+            function getDateRange(data) {
+                if (data.length === 0)
+                    return { days: 1, start: new Date(), end: new Date() };
+
+                const dates = data.map((item) => new Date(item.ts));
+                const start = new Date(Math.min(...dates));
+                const end = new Date(Math.max(...dates));
+                const days = Math.max(
+                    1,
+                    Math.ceil((end - start) / (1000 * 60 * 60 * 24)),
+                );
+
+                return { days, start, end };
             }
 
             // Event listeners
