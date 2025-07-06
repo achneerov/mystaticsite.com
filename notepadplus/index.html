@@ -175,7 +175,7 @@
                 border-bottom: 1px solid var(--border-color);
                 display: flex;
                 align-items: center;
-                padding: 0 15px 0 0;
+                padding: 0 0 0 10px;
                 overflow-x: auto;
                 overflow-y: hidden;
                 white-space: nowrap;
@@ -308,7 +308,7 @@
                 padding: 8px 12px;
                 border-radius: 4px;
                 cursor: pointer;
-                margin-left: 10px;
+                margin-right: 10px;
                 font-size: 12px;
                 flex-shrink: 0;
                 transition: background 0.2s;
@@ -467,10 +467,10 @@
         </div>
 
         <div class="tab-container">
-            <div id="tabs"></div>
             <button class="add-tab-btn" onclick="createNewTab()">
                 + New Tab
             </button>
+            <div id="tabs"></div>
         </div>
 
         <div class="editor-container">
