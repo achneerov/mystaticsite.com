@@ -366,7 +366,6 @@
                     this.draggedTab = null;
                     this.draggedElement = null;
                     this.placeholderElement = null;
-                    this.untitledCounter = 1;
                     this.isDragging = false;
                     this.dragTimer = null;
 
@@ -484,10 +483,7 @@
 
                 createNewTab() {
                     this.hideEmptyState();
-                    const tab = this.createTab(
-                        `Untitled ${this.untitledCounter}`,
-                    );
-                    this.untitledCounter++;
+                    const tab = this.createTab("Untitled");
                     this.renderTabs();
                     this.switchToTab(tab.id);
                 }
@@ -775,7 +771,6 @@
                     const data = {
                         tabs: this.tabs,
                         activeTabId: this.activeTabId,
-                        untitledCounter: this.untitledCounter,
                     };
                     localStorage.setItem(
                         "notepadplus-data",
@@ -790,12 +785,10 @@
                             const data = JSON.parse(saved);
                             this.tabs = data.tabs || [];
                             this.activeTabId = data.activeTabId;
-                            this.untitledCounter = data.untitledCounter || 1;
                         } catch (e) {
                             console.error("Failed to load saved data:", e);
                             this.tabs = [];
                             this.activeTabId = null;
-                            this.untitledCounter = 1;
                         }
                     }
                 }
