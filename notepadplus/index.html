@@ -1,0 +1,1042 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Notepad Plus</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: #1e1e1e;
+                color: #ffffff;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+            }
+
+            .header {
+                background: #2d2d30;
+                border-bottom: 1px solid #3e3e42;
+                padding: 10px 15px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .header h1 {
+                color: #ffffff;
+                font-size: 20px;
+                margin-right: 20px;
+            }
+
+            .prettify-section {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .prettify-label {
+                color: #cccccc;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            .prettify-buttons {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .prettify-btn {
+                background: #0e639c;
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: background 0.2s;
+            }
+
+            .prettify-btn:hover {
+                background: #1177bb;
+            }
+
+            .prettify-btn:disabled {
+                background: #666;
+                cursor: not-allowed;
+            }
+
+            .tab-container {
+                background: #2d2d30;
+                border-bottom: 1px solid #3e3e42;
+                display: flex;
+                align-items: center;
+                padding: 0 15px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                white-space: nowrap;
+                min-height: 40px;
+            }
+
+            .tab-container::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .tab-container::-webkit-scrollbar-track {
+                background: #2d2d30;
+            }
+
+            .tab-container::-webkit-scrollbar-thumb {
+                background: #555;
+                border-radius: 3px;
+            }
+
+            .tab-container::-webkit-scrollbar-thumb:hover {
+                background: #777;
+            }
+
+            #tabs {
+                display: flex;
+                align-items: center;
+                flex-shrink: 0;
+                position: relative;
+            }
+
+            .tab {
+                background: #3e3e42;
+                border: none;
+                color: #cccccc;
+                padding: 8px 15px;
+                cursor: pointer;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                margin-right: 2px;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 120px;
+                max-width: 200px;
+                justify-content: space-between;
+                flex-shrink: 0;
+                position: relative;
+                user-select: none;
+                transition:
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+            }
+
+            .tab.active {
+                background: #1e1e1e;
+                color: #ffffff;
+            }
+
+            .tab:hover {
+                background: #4e4e52;
+            }
+
+            .tab.active:hover {
+                background: #1e1e1e;
+            }
+
+            .tab.dragging {
+                z-index: 1000;
+                transform: scale(1.05) rotate(2deg);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+                opacity: 0.9;
+                position: fixed;
+                pointer-events: none;
+            }
+
+            .tab.drag-placeholder {
+                opacity: 0.5;
+                background: transparent;
+                border: 2px dashed #007acc;
+                color: transparent;
+            }
+
+            .tab-name {
+                flex: 1;
+                cursor: pointer;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding: 2px 4px;
+                border-radius: 2px;
+            }
+
+            .tab-name.editing {
+                background: #3e3e42;
+                border: 1px solid #007acc;
+                outline: none;
+                cursor: text;
+            }
+
+            .tab-close {
+                background: none;
+                border: none;
+                color: #999;
+                cursor: pointer;
+                font-size: 14px;
+                padding: 2px;
+                border-radius: 2px;
+                flex-shrink: 0;
+            }
+
+            .tab-close:hover {
+                background: #666;
+                color: #fff;
+            }
+
+            .add-tab-btn {
+                background: #0e639c;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-left: 10px;
+                font-size: 12px;
+                flex-shrink: 0;
+            }
+
+            .add-tab-btn:hover {
+                background: #1177bb;
+            }
+
+            .editor-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .textarea-container {
+                flex: 1;
+                position: relative;
+            }
+
+            .editor-textarea {
+                width: 100%;
+                height: 100%;
+                background: #1e1e1e;
+                color: #ffffff;
+                border: none;
+                font-family: "Consolas", "Monaco", "Courier New", monospace;
+                font-size: 14px;
+                line-height: 1.5;
+                padding: 15px;
+                resize: none;
+                outline: none;
+            }
+
+            .empty-state {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                color: #666;
+                font-size: 18px;
+            }
+
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 16px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 1000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease-in-out;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+
+            .notification.show {
+                transform: translateX(0);
+            }
+
+            .notification.error {
+                background: #f44336;
+                color: white;
+            }
+
+            @media (max-width: 768px) {
+                .header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 10px;
+                }
+
+                .prettify-section {
+                    width: 100%;
+                    justify-content: flex-start;
+                }
+
+                .tab {
+                    min-width: 100px;
+                    font-size: 12px;
+                }
+
+                .notification {
+                    top: 10px;
+                    right: 10px;
+                    font-size: 13px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Notepad Plus</h1>
+            <div class="prettify-section">
+                <span class="prettify-label">Format Selected Text:</span>
+                <div class="prettify-buttons">
+                    <button
+                        class="prettify-btn"
+                        onclick="prettifySelection('html')"
+                    >
+                        HTML
+                    </button>
+                    <button
+                        class="prettify-btn"
+                        onclick="prettifySelection('css')"
+                    >
+                        CSS
+                    </button>
+                    <button
+                        class="prettify-btn"
+                        onclick="prettifySelection('javascript')"
+                    >
+                        JS/TS
+                    </button>
+                    <button
+                        class="prettify-btn"
+                        onclick="prettifySelection('json')"
+                    >
+                        JSON
+                    </button>
+                    <button
+                        class="prettify-btn"
+                        onclick="prettifySelection('csharp')"
+                    >
+                        C#
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-container">
+            <div id="tabs"></div>
+            <button class="add-tab-btn" onclick="createNewTab()">
+                + New Tab
+            </button>
+        </div>
+
+        <div class="editor-container">
+            <div class="textarea-container">
+                <textarea
+                    id="editor"
+                    class="editor-textarea"
+                    placeholder="Start typing your notes..."
+                ></textarea>
+                <div id="empty-state" class="empty-state" style="display: none">
+                    Click "+ New Tab" to create your first note
+                </div>
+            </div>
+        </div>
+
+        <script>
+            class NotepadPlus {
+                constructor() {
+                    this.tabs = [];
+                    this.activeTabId = null;
+                    this.editor = document.getElementById("editor");
+                    this.saveTimeout = null;
+                    this.draggedTab = null;
+                    this.draggedElement = null;
+                    this.placeholderElement = null;
+                    this.untitledCounter = 1;
+                    this.isDragging = false;
+                    this.dragTimer = null;
+
+                    this.init();
+                }
+
+                init() {
+                    this.loadFromStorage();
+                    this.setupEventListeners();
+
+                    if (this.tabs.length === 0) {
+                        this.showEmptyState();
+                    } else {
+                        this.renderTabs();
+                        this.switchToTab(this.activeTabId || this.tabs[0].id);
+                    }
+                }
+
+                showEmptyState() {
+                    document.getElementById("empty-state").style.display =
+                        "flex";
+                    this.editor.style.display = "none";
+                }
+
+                hideEmptyState() {
+                    document.getElementById("empty-state").style.display =
+                        "none";
+                    this.editor.style.display = "block";
+                }
+
+                setupEventListeners() {
+                    this.editor.addEventListener("input", () => {
+                        this.updateActiveTabContent();
+                        this.debouncedSave();
+                    });
+
+                    this.editor.addEventListener("keydown", (e) => {
+                        if (e.ctrlKey && e.key === "s") {
+                            e.preventDefault();
+                            this.saveToStorage();
+                        }
+                    });
+
+                    // Global mouse events for drag and drop
+                    document.addEventListener("mousemove", (e) => {
+                        if (this.isDragging && this.draggedElement) {
+                            this.draggedElement.style.left =
+                                e.clientX - 60 + "px";
+                            this.draggedElement.style.top =
+                                e.clientY - 20 + "px";
+                        }
+                    });
+
+                    document.addEventListener("mouseup", () => {
+                        if (this.dragTimer) {
+                            clearTimeout(this.dragTimer);
+                            this.dragTimer = null;
+                        }
+                        if (this.isDragging) {
+                            this.endDrag();
+                        }
+                    });
+                }
+
+                debouncedSave() {
+                    if (this.saveTimeout) {
+                        clearTimeout(this.saveTimeout);
+                    }
+
+                    this.saveTimeout = setTimeout(() => {
+                        this.saveToStorage();
+                    }, 500);
+                }
+
+                showNotification(message, type = "error") {
+                    const existingNotifications =
+                        document.querySelectorAll(".notification");
+                    existingNotifications.forEach((notification) => {
+                        document.body.removeChild(notification);
+                    });
+
+                    const notification = document.createElement("div");
+                    notification.className = `notification ${type}`;
+                    notification.textContent = message;
+
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.classList.add("show");
+                    }, 100);
+
+                    setTimeout(() => {
+                        notification.classList.remove("show");
+                        setTimeout(() => {
+                            if (document.body.contains(notification)) {
+                                document.body.removeChild(notification);
+                            }
+                        }, 300);
+                    }, 3000);
+                }
+
+                createTab(name, content = "") {
+                    const id = Date.now().toString();
+                    const tab = {
+                        id: id,
+                        name: name,
+                        content: content,
+                    };
+
+                    this.tabs.push(tab);
+                    this.activeTabId = id;
+                    this.saveToStorage();
+                    return tab;
+                }
+
+                createNewTab() {
+                    this.hideEmptyState();
+                    const tab = this.createTab(
+                        `Untitled ${this.untitledCounter}`,
+                    );
+                    this.untitledCounter++;
+                    this.renderTabs();
+                    this.switchToTab(tab.id);
+                }
+
+                startTabEdit(tabId) {
+                    const tab = this.tabs.find((t) => t.id === tabId);
+                    if (!tab) return;
+
+                    const tabElement = document.querySelector(
+                        `[data-tab-id="${tabId}"]`,
+                    );
+                    const nameElement = tabElement.querySelector(".tab-name");
+
+                    nameElement.contentEditable = true;
+                    nameElement.classList.add("editing");
+                    nameElement.focus();
+
+                    const range = document.createRange();
+                    range.selectNodeContents(nameElement);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+
+                    const finishEdit = () => {
+                        nameElement.contentEditable = false;
+                        nameElement.classList.remove("editing");
+                        const newName =
+                            nameElement.textContent.trim() || "Untitled";
+                        tab.name = newName;
+                        nameElement.textContent = newName;
+                        this.saveToStorage();
+                    };
+
+                    nameElement.addEventListener("blur", finishEdit, {
+                        once: true,
+                    });
+                    nameElement.addEventListener(
+                        "keydown",
+                        (e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                finishEdit();
+                            } else if (e.key === "Escape") {
+                                nameElement.textContent = tab.name;
+                                finishEdit();
+                            }
+                        },
+                        { once: true },
+                    );
+                }
+
+                closeTab(tabId) {
+                    const tabIndex = this.tabs.findIndex((t) => t.id === tabId);
+                    if (tabIndex === -1) return;
+
+                    this.tabs.splice(tabIndex, 1);
+
+                    if (this.tabs.length === 0) {
+                        this.activeTabId = null;
+                        this.editor.value = "";
+                        this.showEmptyState();
+                        this.saveToStorage();
+                        return;
+                    }
+
+                    if (this.activeTabId === tabId) {
+                        const newActiveIndex = Math.max(0, tabIndex - 1);
+                        this.activeTabId = this.tabs[newActiveIndex].id;
+                        this.switchToTab(this.activeTabId);
+                    }
+
+                    this.saveToStorage();
+                    this.renderTabs();
+                }
+
+                switchToTab(tabId) {
+                    this.updateActiveTabContent();
+
+                    const tab = this.tabs.find((t) => t.id === tabId);
+                    if (!tab) return;
+
+                    this.activeTabId = tabId;
+                    this.editor.value = tab.content;
+                    this.saveToStorage();
+                    this.renderTabs();
+                }
+
+                updateActiveTabContent() {
+                    const activeTab = this.tabs.find(
+                        (t) => t.id === this.activeTabId,
+                    );
+                    if (activeTab) {
+                        activeTab.content = this.editor.value;
+                    }
+                }
+
+                startDragHold(e, tabId) {
+                    if (e.button !== 0) return; // Only left mouse button
+
+                    this.draggedTab = tabId;
+
+                    // Set up a timer to start drag after 500ms
+                    this.dragTimer = setTimeout(() => {
+                        if (this.draggedTab === tabId) {
+                            this.initiateDrag(tabId);
+                        }
+                    }, 100);
+
+                    e.preventDefault();
+                }
+
+                initiateDrag(tabId) {
+                    this.isDragging = true;
+
+                    const tabElement = document.querySelector(
+                        `[data-tab-id="${tabId}"]`,
+                    );
+                    this.draggedElement = tabElement.cloneNode(true);
+
+                    // Style the dragged element
+                    this.draggedElement.classList.add("dragging");
+                    this.draggedElement.style.position = "fixed";
+                    this.draggedElement.style.zIndex = "1000";
+                    this.draggedElement.style.pointerEvents = "none";
+
+                    document.body.appendChild(this.draggedElement);
+
+                    // Create placeholder
+                    this.placeholderElement = tabElement.cloneNode(true);
+                    this.placeholderElement.classList.add("drag-placeholder");
+                    this.placeholderElement.style.pointerEvents = "none";
+
+                    tabElement.parentNode.insertBefore(
+                        this.placeholderElement,
+                        tabElement.nextSibling,
+                    );
+                    tabElement.style.display = "none";
+                }
+
+                endDrag() {
+                    if (!this.isDragging) return;
+
+                    this.isDragging = false;
+
+                    // Clean up dragged element
+                    if (
+                        this.draggedElement &&
+                        document.body.contains(this.draggedElement)
+                    ) {
+                        document.body.removeChild(this.draggedElement);
+                    }
+
+                    // Show original tab
+                    const originalTab = document.querySelector(
+                        `[data-tab-id="${this.draggedTab}"]`,
+                    );
+                    if (originalTab) {
+                        originalTab.style.display = "flex";
+                    }
+
+                    // Find final position based on placeholder
+                    if (this.placeholderElement) {
+                        const placeholderIndex = Array.from(
+                            this.placeholderElement.parentNode.children,
+                        ).indexOf(this.placeholderElement);
+                        const draggedIndex = this.tabs.findIndex(
+                            (t) => t.id === this.draggedTab,
+                        );
+
+                        if (draggedIndex !== -1) {
+                            const [draggedTab] = this.tabs.splice(
+                                draggedIndex,
+                                1,
+                            );
+                            let insertIndex = placeholderIndex;
+
+                            // Adjust for removed element
+                            if (draggedIndex < insertIndex) {
+                                insertIndex--;
+                            }
+
+                            this.tabs.splice(insertIndex, 0, draggedTab);
+                            this.saveToStorage();
+                        }
+
+                        this.placeholderElement.parentNode.removeChild(
+                            this.placeholderElement,
+                        );
+                    }
+
+                    // Clean up
+                    this.draggedTab = null;
+                    this.draggedElement = null;
+                    this.placeholderElement = null;
+
+                    this.renderTabs();
+                }
+
+                handleDragOver(e, targetElement) {
+                    if (!this.isDragging || !this.placeholderElement) return;
+
+                    const rect = targetElement.getBoundingClientRect();
+                    const midpoint = rect.left + rect.width / 2;
+                    const insertBefore = e.clientX < midpoint;
+
+                    // Remove placeholder from current position
+                    if (this.placeholderElement.parentNode) {
+                        this.placeholderElement.parentNode.removeChild(
+                            this.placeholderElement,
+                        );
+                    }
+
+                    // Insert placeholder in new position
+                    const tabsContainer = document.getElementById("tabs");
+                    if (insertBefore) {
+                        tabsContainer.insertBefore(
+                            this.placeholderElement,
+                            targetElement,
+                        );
+                    } else {
+                        if (targetElement.nextSibling) {
+                            tabsContainer.insertBefore(
+                                this.placeholderElement,
+                                targetElement.nextSibling,
+                            );
+                        } else {
+                            tabsContainer.appendChild(this.placeholderElement);
+                        }
+                    }
+                }
+
+                renderTabs() {
+                    const tabsContainer = document.getElementById("tabs");
+                    tabsContainer.innerHTML = "";
+
+                    this.tabs.forEach((tab) => {
+                        const tabElement = document.createElement("div");
+                        tabElement.className = `tab ${tab.id === this.activeTabId ? "active" : ""}`;
+                        tabElement.dataset.tabId = tab.id;
+
+                        tabElement.innerHTML = `
+                            <span class="tab-name">${tab.name}</span>
+                            <button class="tab-close" title="Close tab">×</button>
+                        `;
+
+                        const nameElement =
+                            tabElement.querySelector(".tab-name");
+                        const closeButton =
+                            tabElement.querySelector(".tab-close");
+
+                        // Click to switch tabs
+                        nameElement.addEventListener("click", () => {
+                            this.switchToTab(tab.id);
+                        });
+
+                        // Double-click to rename
+                        nameElement.addEventListener("dblclick", (e) => {
+                            e.stopPropagation();
+                            this.startTabEdit(tab.id);
+                        });
+
+                        // Close button
+                        closeButton.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            this.closeTab(tab.id);
+                        });
+
+                        // Hold to drag (only on the tab element, not close button)
+                        nameElement.addEventListener("mousedown", (e) => {
+                            this.startDragHold(e, tab.id);
+                        });
+
+                        // Drag over for reordering
+                        tabElement.addEventListener("mouseover", (e) => {
+                            if (this.isDragging && this.draggedTab !== tab.id) {
+                                this.handleDragOver(e, tabElement);
+                            }
+                        });
+
+                        tabsContainer.appendChild(tabElement);
+                    });
+                }
+
+                saveToStorage() {
+                    const data = {
+                        tabs: this.tabs,
+                        activeTabId: this.activeTabId,
+                        untitledCounter: this.untitledCounter,
+                    };
+                    localStorage.setItem(
+                        "notepadplus-data",
+                        JSON.stringify(data),
+                    );
+                }
+
+                loadFromStorage() {
+                    const saved = localStorage.getItem("notepadplus-data");
+                    if (saved) {
+                        try {
+                            const data = JSON.parse(saved);
+                            this.tabs = data.tabs || [];
+                            this.activeTabId = data.activeTabId;
+                            this.untitledCounter = data.untitledCounter || 1;
+                        } catch (e) {
+                            console.error("Failed to load saved data:", e);
+                            this.tabs = [];
+                            this.activeTabId = null;
+                            this.untitledCounter = 1;
+                        }
+                    }
+                }
+
+                getSelectedText() {
+                    const start = this.editor.selectionStart;
+                    const end = this.editor.selectionEnd;
+                    return {
+                        text: this.editor.value.substring(start, end),
+                        start: start,
+                        end: end,
+                    };
+                }
+
+                replaceSelectedText(newText) {
+                    const start = this.editor.selectionStart;
+                    const end = this.editor.selectionEnd;
+                    const value = this.editor.value;
+
+                    this.editor.value =
+                        value.substring(0, start) +
+                        newText +
+                        value.substring(end);
+                    this.editor.setSelectionRange(
+                        start,
+                        start + newText.length,
+                    );
+                    this.editor.focus();
+
+                    this.updateActiveTabContent();
+                    this.debouncedSave();
+                }
+
+                prettifyCode(code, language) {
+                    try {
+                        switch (language) {
+                            case "json":
+                                return JSON.stringify(
+                                    JSON.parse(code),
+                                    null,
+                                    2,
+                                );
+
+                            case "html":
+                                return this.formatHtml(code);
+
+                            case "css":
+                                return this.formatCss(code);
+
+                            case "javascript":
+                                return this.formatJavaScript(code);
+
+                            case "csharp":
+                                return this.formatCSharp(code);
+
+                            default:
+                                return code;
+                        }
+                    } catch (e) {
+                        throw new Error(
+                            `Failed to format ${language}: ${e.message}`,
+                        );
+                    }
+                }
+
+                formatHtml(html) {
+                    let formatted = "";
+                    let indent = 0;
+                    const tab = "  ";
+
+                    html = html.replace(/></g, ">\n<");
+                    const lines = html.split("\n");
+
+                    lines.forEach((line) => {
+                        line = line.trim();
+                        if (line.length === 0) return;
+
+                        if (line.match(/^<\/\w/)) {
+                            indent--;
+                        }
+
+                        formatted +=
+                            tab.repeat(Math.max(0, indent)) + line + "\n";
+
+                        if (
+                            line.match(/^<\w[^>]*[^\/]>.*<\/\w/) ||
+                            line.match(/^<\w[^>]*[^\/]>$/)
+                        ) {
+                            if (!line.match(/^<\w[^>]*\/>/)) {
+                                indent++;
+                            }
+                        }
+                    });
+
+                    return formatted.trim();
+                }
+
+                formatCss(css) {
+                    return css
+                        .replace(/\s*{\s*/g, " {\n  ")
+                        .replace(/;\s*/g, ";\n  ")
+                        .replace(/\s*}\s*/g, "\n}\n\n")
+                        .replace(/,\s*/g, ",\n")
+                        .trim();
+                }
+
+                formatJavaScript(js) {
+                    let formatted = "";
+                    let indent = 0;
+                    const tab = "  ";
+                    let inString = false;
+                    let stringChar = "";
+
+                    for (let i = 0; i < js.length; i++) {
+                        const char = js[i];
+                        const nextChar = js[i + 1];
+
+                        if (
+                            (char === '"' || char === "'") &&
+                            js[i - 1] !== "\\"
+                        ) {
+                            if (!inString) {
+                                inString = true;
+                                stringChar = char;
+                            } else if (char === stringChar) {
+                                inString = false;
+                            }
+                        }
+
+                        if (!inString) {
+                            if (char === "{") {
+                                formatted += char + "\n" + tab.repeat(++indent);
+                            } else if (char === "}") {
+                                formatted =
+                                    formatted.trim() +
+                                    "\n" +
+                                    tab.repeat(--indent) +
+                                    char;
+                                if (
+                                    nextChar &&
+                                    nextChar !== ";" &&
+                                    nextChar !== ","
+                                ) {
+                                    formatted += "\n" + tab.repeat(indent);
+                                }
+                            } else if (char === ";") {
+                                formatted += char;
+                                if (nextChar && nextChar !== "}") {
+                                    formatted += "\n" + tab.repeat(indent);
+                                }
+                            } else {
+                                formatted += char;
+                            }
+                        } else {
+                            formatted += char;
+                        }
+                    }
+
+                    return formatted.trim();
+                }
+
+                formatCSharp(code) {
+                    let formatted = "";
+                    let indent = 0;
+                    const tab = "    ";
+                    let inString = false;
+                    let inComment = false;
+
+                    for (let i = 0; i < code.length; i++) {
+                        const char = code[i];
+                        const nextChar = code[i + 1];
+                        const prevChar = code[i - 1];
+
+                        if (char === '"' && prevChar !== "\\" && !inComment) {
+                            inString = !inString;
+                        }
+
+                        if (char === "/" && nextChar === "/" && !inString) {
+                            inComment = true;
+                        }
+                        if (char === "\n") {
+                            inComment = false;
+                        }
+
+                        if (!inString && !inComment) {
+                            if (char === "{") {
+                                formatted += char + "\n" + tab.repeat(++indent);
+                            } else if (char === "}") {
+                                formatted =
+                                    formatted.trim() +
+                                    "\n" +
+                                    tab.repeat(--indent) +
+                                    char +
+                                    "\n" +
+                                    tab.repeat(indent);
+                            } else if (char === ";") {
+                                formatted += char + "\n" + tab.repeat(indent);
+                            } else {
+                                formatted += char;
+                            }
+                        } else {
+                            formatted += char;
+                        }
+                    }
+
+                    return formatted.trim();
+                }
+            }
+
+            function prettifySelection(language) {
+                const selection = notepad.getSelectedText();
+
+                if (!selection.text.trim()) {
+                    notepad.showNotification(
+                        "Please select text to format",
+                        "error",
+                    );
+                    return;
+                }
+
+                try {
+                    const prettified = notepad.prettifyCode(
+                        selection.text,
+                        language,
+                    );
+                    notepad.replaceSelectedText(prettified);
+                } catch (e) {
+                    notepad.showNotification(`Error: ${e.message}`, "error");
+                }
+            }
+
+            function createNewTab() {
+                notepad.createNewTab();
+            }
+
+            const notepad = new NotepadPlus();
+
+            window.addEventListener("beforeunload", (e) => {
+                notepad.updateActiveTabContent();
+                notepad.saveToStorage();
+            });
+        </script>
+    </body>
+</html>
