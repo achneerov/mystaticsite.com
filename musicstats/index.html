@@ -266,6 +266,16 @@
                 min-height: 350px;
             }
 
+            .chart-container.hourly-patterns {
+                min-height: 200px;
+                padding: 15px;
+            }
+
+            .chart-container.weekly-patterns {
+                min-height: 600px;
+                padding: 40px;
+            }
+
             .chart-title {
                 color: #1db954;
                 margin-bottom: 20px;
@@ -278,6 +288,11 @@
                 max-height: 300px !important;
                 width: auto !important;
                 height: auto !important;
+            }
+
+            .chart-container.weekly-patterns canvas {
+                max-height: 500px !important;
+                height: 500px !important;
             }
 
             .top-lists-grid {
@@ -498,18 +513,88 @@
                 color: #ccc;
             }
 
+            /* Custom tooltip styles */
+            .custom-tooltip {
+                position: absolute;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                pointer-events: none;
+                z-index: 1000;
+                border: 1px solid #1db954;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                opacity: 0;
+                transform: translateY(-5px);
+                transition:
+                    opacity 0.1s ease,
+                    transform 0.1s ease;
+            }
+
+            .custom-tooltip.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Platform usage list styles */
+            .platform-list {
+                height: 100%;
+                overflow-y: auto;
+                background: rgba(15, 15, 15, 0.5);
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            .platform-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(29, 185, 84, 0.1);
+                color: white;
+            }
+
+            .platform-item:last-child {
+                border-bottom: none;
+            }
+
+            .platform-name {
+                font-weight: 500;
+                color: #1db954;
+            }
+
+            .platform-hours {
+                color: #ccc;
+                font-size: 0.9rem;
+            }
+
+            .platform-list::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .platform-list::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 4px;
+            }
+
+            .platform-list::-webkit-scrollbar-thumb {
+                background: #1db954;
+                border-radius: 4px;
+            }
+
             @media (max-width: 768px) {
                 .header h1 {
                     font-size: 2rem;
                 }
 
                 .stats-overview {
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    grid-template-columns: 1fr;
                 }
 
                 .upload-container {
-                    padding: 20px;
-                    margin: 20px auto;
+                    padding: 30px 20px;
                 }
 
                 .charts-grid {
@@ -521,16 +606,30 @@
                 }
 
                 .search-box {
-                    width: 120px;
+                    font-size: 14px;
                 }
 
                 .content-tabs {
-                    gap: 5px;
+                    overflow-x: auto;
                 }
 
                 .tab-button {
-                    padding: 8px 15px;
-                    font-size: 0.9rem;
+                    min-width: 100px;
+                    white-space: nowrap;
+                }
+
+                .chart-container.weekly-patterns {
+                    min-height: 400px;
+                    padding: 20px;
+                }
+
+                .chart-container.weekly-patterns canvas {
+                    max-height: 300px !important;
+                    height: 300px !important;
+                }
+
+                .platform-list {
+                    height: 100px !important;
                 }
             }
 
@@ -751,7 +850,7 @@
                     </div>
 
                     <!-- Listening Patterns Heatmap -->
-                    <div class="chart-container">
+                    <div class="chart-container hourly-patterns">
                         <div class="chart-title">
                             ⏰ Listening Patterns by Hour
                         </div>
@@ -778,13 +877,7 @@
                                 consecutive listening
                             </div>
                         </div>
-                        <div class="insight-card">
-                            <div class="insight-title">🔥 Listening Streak</div>
-                            <div class="insight-value" id="longestStreak">
-                                0
-                            </div>
-                            <div class="insight-detail">days in a row</div>
-                        </div>
+
                         <div class="insight-card">
                             <div class="insight-title">📅 Most Active Day</div>
                             <div class="insight-value" id="mostActiveDay">
@@ -822,7 +915,7 @@
                     </div>
 
                     <!-- Weekly Pattern -->
-                    <div class="chart-container">
+                    <div class="chart-container weekly-patterns">
                         <div class="chart-title">
                             📅 Weekly Listening Pattern
                         </div>
@@ -906,7 +999,23 @@
                         </div>
                         <div class="chart-container">
                             <div class="chart-title">📱 Platform Usage</div>
-                            <canvas id="platformChart"></canvas>
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 15px;
+                                "
+                            >
+                                <div style="height: 250px">
+                                    <canvas id="platformChart"></canvas>
+                                </div>
+                                <div style="height: 120px">
+                                    <div
+                                        class="platform-list"
+                                        id="platformList"
+                                    ></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="chart-container">
                             <div class="chart-title">
@@ -1387,10 +1496,6 @@
                 document.getElementById("longestSession").textContent =
                     `${Math.round(longestSession / (1000 * 60 * 60))}h`;
 
-                // Listening streak
-                const streak = calculateListeningStreak();
-                document.getElementById("longestStreak").textContent = streak;
-
                 // Most active day
                 const dailyStats = calculateDailyStats();
                 const days = Object.keys(dailyStats);
@@ -1484,30 +1589,6 @@
                 return sessions;
             }
 
-            function calculateListeningStreak() {
-                const dailyData = calculateDailyStats();
-                const sortedDays = Object.keys(dailyData).sort();
-
-                if (sortedDays.length === 0) return 0;
-
-                let currentStreak = 0;
-                let maxStreak = 0;
-                let lastDate = null;
-
-                sortedDays.forEach((dateStr) => {
-                    const date = new Date(dateStr);
-                    if (lastDate && date - lastDate === 24 * 60 * 60 * 1000) {
-                        currentStreak++;
-                    } else {
-                        currentStreak = 1;
-                    }
-                    maxStreak = Math.max(maxStreak, currentStreak);
-                    lastDate = date;
-                });
-
-                return maxStreak;
-            }
-
             function calculateDailyStats() {
                 const dailyData = {};
 
@@ -1586,13 +1667,38 @@
                     document.getElementById("hourlyHeatmap");
                 heatmapContainer.innerHTML = "";
 
+                // Remove any existing tooltips
+                const existingTooltips =
+                    document.querySelectorAll(".custom-tooltip");
+                existingTooltips.forEach((tooltip) => tooltip.remove());
+
+                // Create tooltip element
+                const tooltip = document.createElement("div");
+                tooltip.className = "custom-tooltip";
+                document.body.appendChild(tooltip);
+
                 hourlyData.forEach((listens, hour) => {
                     const cell = document.createElement("div");
                     cell.className = "heatmap-cell";
                     const intensity = maxListens > 0 ? listens / maxListens : 0;
                     const opacity = 0.1 + intensity * 0.9;
                     cell.style.backgroundColor = `rgba(29, 185, 84, ${opacity})`;
-                    cell.title = `${hour}:00 - ${listens} listens`;
+
+                    // Add custom tooltip events
+                    cell.addEventListener("mouseenter", (e) => {
+                        tooltip.textContent = `${hour}:00 - ${listens} listens`;
+                        tooltip.classList.add("show");
+                    });
+
+                    cell.addEventListener("mousemove", (e) => {
+                        tooltip.style.left = e.pageX + 10 + "px";
+                        tooltip.style.top = e.pageY - 40 + "px";
+                    });
+
+                    cell.addEventListener("mouseleave", () => {
+                        tooltip.classList.remove("show");
+                    });
+
                     heatmapContainer.appendChild(cell);
                 });
             }
@@ -1815,7 +1921,8 @@
 
             function updatePlatformChart() {
                 const ctx = document.getElementById("platformChart");
-                if (!ctx) return;
+                const listContainer = document.getElementById("platformList");
+                if (!ctx || !listContainer) return;
 
                 const platforms = {};
                 filteredData.forEach((item) => {
@@ -1826,10 +1933,16 @@
                     }
                 });
 
+                // Sort platforms by hours listened (largest to smallest)
+                const sortedPlatforms = Object.entries(platforms).sort(
+                    ([, a], [, b]) => b - a,
+                );
+
+                // Create/update the doughnut chart
                 if (charts.platformChart) charts.platformChart.destroy();
 
                 charts.platformChart = new Chart(ctx, {
-                    type: "doughnut",
+                    type: "pie",
                     data: {
                         labels: Object.keys(platforms),
                         datasets: [
@@ -1837,11 +1950,16 @@
                                 data: Object.values(platforms),
                                 backgroundColor: [
                                     "#1db954",
-                                    "#1ed760",
-                                    "#16a34a",
-                                    "#15803d",
-                                    "#166534",
+                                    "#ff6b6b",
+                                    "#4ecdc4",
+                                    "#45b7d1",
+                                    "#f9ca24",
+                                    "#f0932b",
+                                    "#eb4d4b",
+                                    "#6c5ce7",
                                 ],
+                                borderWidth: 3,
+                                borderColor: "#000",
                             },
                         ],
                     },
@@ -1853,11 +1971,57 @@
                         },
                         plugins: {
                             legend: {
-                                labels: { color: "white" },
-                                position: "bottom",
+                                display: false,
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const label = context.label || "";
+                                        const value = context.parsed;
+                                        const total =
+                                            context.dataset.data.reduce(
+                                                (a, b) => a + b,
+                                                0,
+                                            );
+                                        const percentage = (
+                                            (value / total) *
+                                            100
+                                        ).toFixed(1);
+                                        return `${label}: ${value.toFixed(1)}h (${percentage}%)`;
+                                    },
+                                },
                             },
                         },
                     },
+                });
+
+                // Update the list
+                listContainer.innerHTML = "";
+
+                const totalHours = Object.values(platforms).reduce(
+                    (sum, hours) => sum + hours,
+                    0,
+                );
+
+                sortedPlatforms.forEach(([platform, hours]) => {
+                    const item = document.createElement("div");
+                    item.className = "platform-item";
+
+                    const name = document.createElement("span");
+                    name.className = "platform-name";
+                    name.textContent = platform;
+
+                    const percentage =
+                        totalHours > 0
+                            ? ((hours / totalHours) * 100).toFixed(1)
+                            : 0;
+                    const hoursSpan = document.createElement("span");
+                    hoursSpan.className = "platform-hours";
+                    hoursSpan.textContent = `${hours.toFixed(1)} hours (${percentage}%)`;
+
+                    item.appendChild(name);
+                    item.appendChild(hoursSpan);
+                    listContainer.appendChild(item);
                 });
             }
 
@@ -2028,7 +2192,7 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         layout: {
-                            padding: 20,
+                            padding: 60,
                         },
                         plugins: {
                             legend: {
@@ -2038,15 +2202,17 @@
                         },
                         scales: {
                             r: {
+                                min: 0,
                                 ticks: {
                                     color: "white",
                                     beginAtZero: true,
+                                    stepSize: undefined,
                                 },
                                 grid: { color: "rgba(255,255,255,0.1)" },
                                 pointLabels: {
                                     color: "white",
                                     font: {
-                                        size: 12,
+                                        size: 14,
                                     },
                                 },
                             },
