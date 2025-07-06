@@ -1,48 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Static Site</title>
-    <!-- Favicon links -->
-    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
-    <link rel="icon" type="image/x-icon" href="images/favicon/favicon.ico">
-    <link rel="manifest" href="images/favicon/site.webmanifest">
-    <link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="images/favicon/android-chrome-512x512.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100 min-h-screen flex flex-col">
-    <header class="bg-blue-500 shadow">
-      <nav class="container mx-auto flex justify-center py-4">
-        <a href="index.html" class="mx-4 text-white hover:text-gray-200">My Sites</a>
-        <a href="news.html" class="mx-4 text-white hover:text-gray-200">News</a>
-        <a href="about.html" class="mx-4 text-white hover:text-gray-200">About</a>
-      </nav>
-    </header>
-    <main class="flex-grow container mx-auto py-12 flex justify-center items-center">
-      <div class="bg-white shadow-md rounded-2xl p-6 max-w-lg w-full text-center">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">Welcome to the Directory</h1>
-        <p class="text-gray-600 mb-4">Navigate to one of the following pages:</p>
-        <div class="space-y-4">
-          <a href="followercheck/index.html" class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"> Follower Check </a>
-          <a href="notepad/index.html" class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"> Notepad with Font and Sizing </a>
-          <a href="apitester/index.html" class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"> API Request Tester </a>
-          <a href="kernelconvolution/index.html" class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"> Pass a Kernel through an image </a>
-          <a href="qrcodegenerator/index.html" class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"> Generate a Free Permanent QR Code </a>
-        </div>
-      </div>
-    </main>
-    <footer class="py-4 mt-auto">
-      <div class="text-center space-y-2">
-        <p class="text-gray-600">&copy; <span id="currentYear"></span>. All rights reserved. </p>
-        <p class="text-gray-600">Created by Alex with ❤️</p>
-      </div>
-    </footer>
-    <script>
-      document.getElementById('currentYear').textContent = new Date().getFullYear();
-    </script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My Static Site</title>
+        <!-- Favicon links -->
+        <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="images/favicon/apple-touch-icon.png"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="images/favicon/favicon-32x32.png"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="images/favicon/favicon-16x16.png"
+        />
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="images/favicon/favicon.ico"
+        />
+        <link rel="manifest" href="images/favicon/site.webmanifest" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="images/favicon/android-chrome-192x192.png"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="images/favicon/android-chrome-512x512.png"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 min-h-screen flex flex-col">
+        <header class="bg-blue-500 shadow">
+            <nav class="container mx-auto flex justify-center py-4">
+                <a href="index.html" class="mx-4 text-white hover:text-gray-200"
+                    >My Sites</a
+                >
+                <a href="news.html" class="mx-4 text-white hover:text-gray-200"
+                    >News</a
+                >
+                <a href="about.html" class="mx-4 text-white hover:text-gray-200"
+                    >About</a
+                >
+            </nav>
+        </header>
+        <main
+            class="flex-grow container mx-auto py-12 flex justify-center items-center"
+        >
+            <div
+                class="bg-white shadow-md rounded-2xl p-6 max-w-lg w-full text-center"
+            >
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">
+                    Welcome to the Directory
+                </h1>
+                <p class="text-gray-600 mb-4">
+                    Navigate to one of the following pages:
+                </p>
+                <div class="space-y-4">
+                    <a
+                        href="followercheck/index.html"
+                        class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"
+                    >
+                        Follower Check
+                    </a>
+                    <a
+                        href="notepad/index.html"
+                        class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"
+                    >
+                        Notepad with Font and Sizing
+                    </a>
+                    <a
+                        href="notepadplus/index.html"
+                        class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"
+                    >
+                        Notepad Plus (Multi-tab with Code Formatting)
+                    </a>
+                    <a
+                        href="apitester/index.html"
+                        class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"
+                    >
+                        API Request Tester
+                    </a>
+                    <a
+                        href="kernelconvolution/index.html"
+                        class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"
+                    >
+                        Pass a Kernel through an image
+                    </a>
+                    <a
+                        href="qrcodegenerator/index.html"
+                        class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg transition-all"
+                    >
+                        Generate a Free Permanent QR Code
+                    </a>
+                </div>
+            </div>
+        </main>
+        <footer class="py-4 mt-auto">
+            <div class="text-center space-y-2">
+                <p class="text-gray-600">
+                    &copy; <span id="currentYear"></span>. All rights reserved.
+                </p>
+                <p class="text-gray-600">Created by Alex with ❤️</p>
+            </div>
+        </footer>
+        <script>
+            document.getElementById("currentYear").textContent =
+                new Date().getFullYear();
+        </script>
+    </body>
 </html>
