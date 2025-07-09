@@ -1697,7 +1697,7 @@
                 const dailyData = {};
 
                 filteredData.forEach((item) => {
-                    const date = new Date(item.ts).toDateString();
+                    const date = new Date(item.ts).toISOString().slice(0, 10); // "YYYY-MM-DD"
                     if (!dailyData[date]) {
                         dailyData[date] = { tracks: 0, time: 0 };
                     }
@@ -1977,24 +1977,26 @@
                 } else {
                     // Group by month (YYYY-MM)
                     sortedDays.forEach((day) => {
-                        const date = new Date(day);
-                        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+                        const key = day.slice(0, 7); // "YYYY-MM"
                         if (!groupedData[key]) groupedData[key] = 0;
                         groupedData[key] +=
                             dailyData[day].time / (1000 * 60 * 60); // hours
                     });
                 }
 
+                // Always sort the keys for chronological order
+                const sortedKeys = Object.keys(groupedData).sort();
+
                 if (charts.timeChart) charts.timeChart.destroy();
 
                 charts.timeChart = new Chart(ctx, {
                     type: "line",
                     data: {
-                        labels: Object.keys(groupedData),
+                        labels: sortedKeys,
                         datasets: [
                             {
                                 label: "Hours Listened",
-                                data: Object.values(groupedData),
+                                data: sortedKeys.map((k) => groupedData[k]),
                                 borderColor: "#1db954",
                                 backgroundColor: "rgba(29, 185, 84, 0.1)",
                                 tension: 0.4,
