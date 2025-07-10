@@ -707,7 +707,12 @@
                     selection.removeAllRanges();
                     selection.addRange(range);
 
+                    let isFinished = false;
+
                     const finishEdit = () => {
+                        if (isFinished) return;
+                        isFinished = true;
+
                         nameElement.contentEditable = false;
                         nameElement.classList.remove("editing");
                         const newName =
@@ -715,24 +720,27 @@
                         tab.name = newName;
                         nameElement.textContent = newName;
                         this.saveToStorage();
+
+                        // Clean up event listeners
+                        nameElement.removeEventListener("blur", finishEdit);
+                        nameElement.removeEventListener(
+                            "keydown",
+                            keydownHandler,
+                        );
                     };
 
-                    nameElement.addEventListener("blur", finishEdit, {
-                        once: true,
-                    });
-                    nameElement.addEventListener(
-                        "keydown",
-                        (e) => {
-                            if (e.key === "Enter") {
-                                e.preventDefault();
-                                finishEdit();
-                            } else if (e.key === "Escape") {
-                                nameElement.textContent = tab.name;
-                                finishEdit();
-                            }
-                        },
-                        { once: true },
-                    );
+                    const keydownHandler = (e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            finishEdit();
+                        } else if (e.key === "Escape") {
+                            nameElement.textContent = tab.name;
+                            finishEdit();
+                        }
+                    };
+
+                    nameElement.addEventListener("blur", finishEdit);
+                    nameElement.addEventListener("keydown", keydownHandler);
                 }
 
                 closeTab(tabId) {
