@@ -955,8 +955,42 @@
 
                     <!-- Listening Patterns Heatmap -->
                     <div class="chart-container hourly-patterns">
-                        <div class="chart-title">
+                        <div
+                            class="chart-title"
+                            style="
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                gap: 16px;
+                            "
+                        >
                             ⏰ Listening Patterns by Hour
+                            <div>
+                                <button
+                                    id="toggleHourlyHeatmap"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                        margin: 0 0 0 12px;
+                                    "
+                                    onclick="toggleMode('hourlyHeatmapMode')"
+                                >
+                                    By Time
+                                </button>
+                                <button
+                                    id="toggleHourlyHeatmapListens"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                        margin: 0;
+                                    "
+                                    onclick="toggleMode('hourlyHeatmapMode', true)"
+                                >
+                                    By Listens
+                                </button>
+                            </div>
                         </div>
                         <div class="heatmap" id="hourlyHeatmap"></div>
                         <div class="heatmap-legend">
@@ -1020,8 +1054,42 @@
 
                     <!-- Weekly Pattern -->
                     <div class="chart-container weekly-patterns">
-                        <div class="chart-title">
+                        <div
+                            class="chart-title"
+                            style="
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                gap: 16px;
+                            "
+                        >
                             📅 Weekly Listening Pattern
+                            <div>
+                                <button
+                                    id="toggleWeeklyChart"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                        margin: 0 0 0 12px;
+                                    "
+                                    onclick="toggleMode('weeklyChartMode')"
+                                >
+                                    By Time
+                                </button>
+                                <button
+                                    id="toggleWeeklyChartListens"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                        margin: 0;
+                                    "
+                                    onclick="toggleMode('weeklyChartMode', true)"
+                                >
+                                    By Listens
+                                </button>
+                            </div>
                         </div>
                         <canvas id="weeklyChart"></canvas>
                     </div>
@@ -1029,6 +1097,39 @@
 
                 <!-- Top Lists Tab -->
                 <div id="top-lists-tab" class="tab-content">
+                    <div
+                        style="
+                            display: flex;
+                            justify-content: flex-end;
+                            margin-bottom: 10px;
+                            gap: 10px;
+                        "
+                    >
+                        <span
+                            style="
+                                align-self: center;
+                                color: #1db954;
+                                font-weight: bold;
+                            "
+                            >Sort/Show By:</span
+                        >
+                        <button
+                            id="toggleTopListsTime"
+                            class="upload-button"
+                            style="padding: 4px 16px; font-size: 0.95rem"
+                            onclick="toggleMode('topListsMode')"
+                        >
+                            By Time
+                        </button>
+                        <button
+                            id="toggleTopListsListens"
+                            class="upload-button"
+                            style="padding: 4px 16px; font-size: 0.95rem"
+                            onclick="toggleMode('topListsMode', true)"
+                        >
+                            By Listens
+                        </button>
+                    </div>
                     <div class="top-lists-grid">
                         <div class="top-list-container">
                             <div class="top-list-header">
@@ -1094,6 +1195,39 @@
 
                 <!-- Charts Tab -->
                 <div id="charts-tab" class="tab-content">
+                    <div
+                        style="
+                            display: flex;
+                            justify-content: flex-end;
+                            margin-bottom: 10px;
+                            gap: 10px;
+                        "
+                    >
+                        <span
+                            style="
+                                align-self: center;
+                                color: #1db954;
+                                font-weight: bold;
+                            "
+                            >Show By:</span
+                        >
+                        <button
+                            id="toggleChartsTime"
+                            class="upload-button"
+                            style="padding: 4px 16px; font-size: 0.95rem"
+                            onclick="toggleMode('chartsMode')"
+                        >
+                            By Time
+                        </button>
+                        <button
+                            id="toggleChartsListens"
+                            class="upload-button"
+                            style="padding: 4px 16px; font-size: 0.95rem"
+                            onclick="toggleMode('chartsMode', true)"
+                        >
+                            By Listens
+                        </button>
+                    </div>
                     <div class="charts-grid">
                         <div class="chart-container">
                             <div class="chart-title">
@@ -1156,6 +1290,69 @@
                 tracks: { data: [], displayed: 20, filtered: [] },
                 albums: { data: [], displayed: 20, filtered: [] },
             };
+
+            // Toggle state for each section
+            let hourlyHeatmapMode = "time"; // "time" or "listens"
+            let weeklyChartMode = "time";
+            let topListsMode = "time";
+            let chartsMode = "time";
+
+            // Toggle UI logic
+            function toggleMode(section, toListens) {
+                if (section === "hourlyHeatmapMode") {
+                    hourlyHeatmapMode = toListens ? "listens" : "time";
+                    updateInsights();
+                    updateToggleButtons("hourlyHeatmapMode", hourlyHeatmapMode);
+                } else if (section === "weeklyChartMode") {
+                    weeklyChartMode = toListens ? "listens" : "time";
+                    updateWeeklyChart();
+                    updateToggleButtons("weeklyChartMode", weeklyChartMode);
+                } else if (section === "topListsMode") {
+                    topListsMode = toListens ? "listens" : "time";
+                    updateTopLists();
+                    updateToggleButtons("topListsMode", topListsMode);
+                } else if (section === "chartsMode") {
+                    chartsMode = toListens ? "listens" : "time";
+                    updateCharts();
+                    updateToggleButtons("chartsMode", chartsMode);
+                }
+            }
+
+            function updateToggleButtons(section, mode) {
+                if (section === "hourlyHeatmapMode") {
+                    document.getElementById(
+                        "toggleHourlyHeatmap",
+                    ).style.background = mode === "time" ? "#1db954" : "#222";
+                    document.getElementById(
+                        "toggleHourlyHeatmapListens",
+                    ).style.background =
+                        mode === "listens" ? "#1db954" : "#222";
+                } else if (section === "weeklyChartMode") {
+                    document.getElementById(
+                        "toggleWeeklyChart",
+                    ).style.background = mode === "time" ? "#1db954" : "#222";
+                    document.getElementById(
+                        "toggleWeeklyChartListens",
+                    ).style.background =
+                        mode === "listens" ? "#1db954" : "#222";
+                } else if (section === "topListsMode") {
+                    document.getElementById(
+                        "toggleTopListsTime",
+                    ).style.background = mode === "time" ? "#1db954" : "#222";
+                    document.getElementById(
+                        "toggleTopListsListens",
+                    ).style.background =
+                        mode === "listens" ? "#1db954" : "#222";
+                } else if (section === "chartsMode") {
+                    document.getElementById(
+                        "toggleChartsTime",
+                    ).style.background = mode === "time" ? "#1db954" : "#222";
+                    document.getElementById(
+                        "toggleChartsListens",
+                    ).style.background =
+                        mode === "listens" ? "#1db954" : "#222";
+                }
+            }
 
             // View management
             function showUploadView() {
@@ -1588,6 +1785,7 @@
 
                 // Create hourly heatmap
                 createHourlyHeatmap();
+                updateToggleButtons("hourlyHeatmapMode", hourlyHeatmapMode);
             }
 
             function updateTimeInsights() {
@@ -1765,8 +1963,20 @@
             }
 
             function createHourlyHeatmap() {
-                const hourlyData = calculateHourlyDistribution();
-                const maxListens = Math.max(...hourlyData);
+                let hourlyData, maxVal, label;
+                if (hourlyHeatmapMode === "time") {
+                    hourlyData = new Array(24).fill(0);
+                    filteredData.forEach((item) => {
+                        const hour = new Date(item.ts).getHours();
+                        hourlyData[hour] += item.ms_played / (1000 * 60); // minutes
+                    });
+                    maxVal = Math.max(...hourlyData);
+                    label = "min";
+                } else {
+                    hourlyData = calculateHourlyDistribution();
+                    maxVal = Math.max(...hourlyData);
+                    label = "listens";
+                }
                 const heatmapContainer =
                     document.getElementById("hourlyHeatmap");
                 heatmapContainer.innerHTML = "";
@@ -1781,16 +1991,16 @@
                 tooltip.className = "custom-tooltip";
                 document.body.appendChild(tooltip);
 
-                hourlyData.forEach((listens, hour) => {
+                hourlyData.forEach((val, hour) => {
                     const cell = document.createElement("div");
                     cell.className = "heatmap-cell";
-                    const intensity = maxListens > 0 ? listens / maxListens : 0;
+                    const intensity = maxVal > 0 ? val / maxVal : 0;
                     const opacity = 0.1 + intensity * 0.9;
                     cell.style.backgroundColor = `rgba(29, 185, 84, ${opacity})`;
 
                     // Add custom tooltip events
                     cell.addEventListener("mouseenter", (e) => {
-                        tooltip.textContent = `${hour}:00 - ${listens} listens`;
+                        tooltip.textContent = `${hour}:00 - ${Math.round(val)} ${label}`;
                         tooltip.classList.add("show");
                     });
 
@@ -1819,6 +2029,12 @@
                     artistStats[artist].plays++;
                 });
 
+                let sortKey = topListsMode === "time" ? "time" : "plays";
+                let valueText =
+                    topListsMode === "time"
+                        ? (v) => `${Math.round(v.time / (1000 * 60))} min`
+                        : (v) => `${v.plays} plays`;
+
                 topLists.artists.data = Object.entries(artistStats)
                     .map(([artist, stats]) => ({
                         name: artist,
@@ -1827,7 +2043,7 @@
                         timeText: `${Math.round(stats.time / (1000 * 60))} min`,
                         playsText: `${stats.plays} plays`,
                     }))
-                    .sort((a, b) => b.time - a.time);
+                    .sort((a, b) => b[sortKey] - a[sortKey]);
 
                 // Top Tracks
                 const trackStats = {};
@@ -1851,7 +2067,7 @@
                         timeText: `${Math.round(stats.time / (1000 * 60))} min`,
                         playsText: `${stats.plays} plays`,
                     }))
-                    .sort((a, b) => b.time - a.time);
+                    .sort((a, b) => b[sortKey] - a[sortKey]);
 
                 // Top Albums
                 const albumStats = {};
@@ -1882,7 +2098,7 @@
                         timeText: `${Math.round(stats.time / (1000 * 60))} min`,
                         playsText: `${stats.plays} plays`,
                     }))
-                    .sort((a, b) => b.time - a.time);
+                    .sort((a, b) => b[sortKey] - a[sortKey]);
 
                 // Reset filters and display
                 ["artists", "tracks", "albums"].forEach((type) => {
@@ -1891,6 +2107,7 @@
                 });
 
                 renderTopLists();
+                updateToggleButtons("topListsMode", topListsMode);
             }
 
             function renderTopLists() {
@@ -1904,17 +2121,25 @@
                     );
 
                     container.innerHTML = items
-                        .map(
-                            (item, index) => `
+                        .map((item, index) => {
+                            let statText =
+                                topListsMode === "time"
+                                    ? item.timeText
+                                    : item.playsText;
+                            let statOther =
+                                topListsMode === "time"
+                                    ? item.playsText
+                                    : item.timeText;
+                            return `
                         <li>
                             <div class="rank">${index + 1}</div>
                             <div class="list-item-content">
                                 <div class="list-item-name">${item.name}</div>
-                                <div class="list-item-stats">${item.timeText} • ${item.playsText}</div>
+                                <div class="list-item-stats">${statText} • ${statOther}</div>
                             </div>
                         </li>
-                    `,
-                        )
+                    `;
+                        })
                         .join("");
 
                     // Update show more button
@@ -1951,6 +2176,7 @@
                 updateCountryChart();
                 updateHourlyChart();
                 updateWeeklyChart();
+                updateToggleButtons("chartsMode", chartsMode);
             }
 
             function updateTimeChart() {
@@ -1966,13 +2192,17 @@
 
                 let groupedData = {};
                 let labelFormat = "month"; // default
+                let yLabel =
+                    chartsMode === "time" ? "Hours Listened" : "Listens";
 
                 if (period === "last7" || period === "last30") {
                     // Group by day (YYYY-MM-DD)
                     labelFormat = "day";
                     sortedDays.forEach((day) => {
                         groupedData[day] =
-                            dailyData[day].time / (1000 * 60 * 60); // hours
+                            chartsMode === "time"
+                                ? dailyData[day].time / (1000 * 60 * 60)
+                                : dailyData[day].tracks;
                     });
                 } else {
                     // Group by month (YYYY-MM)
@@ -1980,7 +2210,9 @@
                         const key = day.slice(0, 7); // "YYYY-MM"
                         if (!groupedData[key]) groupedData[key] = 0;
                         groupedData[key] +=
-                            dailyData[day].time / (1000 * 60 * 60); // hours
+                            chartsMode === "time"
+                                ? dailyData[day].time / (1000 * 60 * 60)
+                                : dailyData[day].tracks;
                     });
                 }
 
@@ -1995,7 +2227,7 @@
                         labels: sortedKeys,
                         datasets: [
                             {
-                                label: "Hours Listened",
+                                label: yLabel,
                                 data: sortedKeys.map((k) => groupedData[k]),
                                 borderColor: "#1db954",
                                 backgroundColor: "rgba(29, 185, 84, 0.1)",
@@ -2063,13 +2295,18 @@
                 const platforms = {};
                 filteredData.forEach((item) => {
                     if (item.platform && item.ms_played) {
-                        platforms[item.platform] =
-                            (platforms[item.platform] || 0) +
-                            item.ms_played / (1000 * 60 * 60);
+                        if (chartsMode === "time") {
+                            platforms[item.platform] =
+                                (platforms[item.platform] || 0) +
+                                item.ms_played / (1000 * 60 * 60);
+                        } else {
+                            platforms[item.platform] =
+                                (platforms[item.platform] || 0) + 1;
+                        }
                     }
                 });
 
-                // Sort platforms by hours listened (largest to smallest)
+                // Sort platforms by value (largest to smallest)
                 const sortedPlatforms = Object.entries(platforms).sort(
                     ([, a], [, b]) => b - a,
                 );
@@ -2123,7 +2360,9 @@
                                             (value / total) *
                                             100
                                         ).toFixed(1);
-                                        return `${label}: ${value.toFixed(1)}h (${percentage}%)`;
+                                        return chartsMode === "time"
+                                            ? `${label}: ${value.toFixed(1)}h (${percentage}%)`
+                                            : `${label}: ${value} listens (${percentage}%)`;
                                     },
                                 },
                             },
@@ -2134,12 +2373,12 @@
                 // Update the list
                 listContainer.innerHTML = "";
 
-                const totalHours = Object.values(platforms).reduce(
-                    (sum, hours) => sum + hours,
+                const totalVal = Object.values(platforms).reduce(
+                    (sum, val) => sum + val,
                     0,
                 );
 
-                sortedPlatforms.forEach(([platform, hours]) => {
+                sortedPlatforms.forEach(([platform, val]) => {
                     const item = document.createElement("div");
                     item.className = "platform-item";
 
@@ -2148,15 +2387,16 @@
                     name.textContent = platform;
 
                     const percentage =
-                        totalHours > 0
-                            ? ((hours / totalHours) * 100).toFixed(1)
-                            : 0;
-                    const hoursSpan = document.createElement("span");
-                    hoursSpan.className = "platform-hours";
-                    hoursSpan.textContent = `${hours.toFixed(1)} hours (${percentage}%)`;
+                        totalVal > 0 ? ((val / totalVal) * 100).toFixed(1) : 0;
+                    const valSpan = document.createElement("span");
+                    valSpan.className = "platform-hours";
+                    valSpan.textContent =
+                        chartsMode === "time"
+                            ? `${val.toFixed(1)} hours (${percentage}%)`
+                            : `${val} listens (${percentage}%)`;
 
                     item.appendChild(name);
-                    item.appendChild(hoursSpan);
+                    item.appendChild(valSpan);
                     listContainer.appendChild(item);
                 });
             }
@@ -2168,8 +2408,14 @@
                 const countries = {};
                 filteredData.forEach((item) => {
                     if (item.conn_country) {
-                        countries[item.conn_country] =
-                            (countries[item.conn_country] || 0) + 1;
+                        if (chartsMode === "time") {
+                            countries[item.conn_country] =
+                                (countries[item.conn_country] || 0) +
+                                item.ms_played / (1000 * 60 * 60);
+                        } else {
+                            countries[item.conn_country] =
+                                (countries[item.conn_country] || 0) + 1;
+                        }
                     }
                 });
 
@@ -2186,7 +2432,10 @@
                         labels: topCountries.map(([country]) => country),
                         datasets: [
                             {
-                                label: "Listens",
+                                label:
+                                    chartsMode === "time"
+                                        ? "Hours Listened"
+                                        : "Listens",
                                 data: topCountries.map(([, count]) => count),
                                 backgroundColor: "#1db954",
                             },
@@ -2233,7 +2482,18 @@
                 const ctx = document.getElementById("hourlyChart");
                 if (!ctx) return;
 
-                const hourlyData = calculateHourlyDistribution();
+                let hourlyData, yLabel;
+                if (chartsMode === "time") {
+                    hourlyData = new Array(24).fill(0);
+                    filteredData.forEach((item) => {
+                        const hour = new Date(item.ts).getHours();
+                        hourlyData[hour] += item.ms_played / (1000 * 60); // minutes
+                    });
+                    yLabel = "Minutes Listened";
+                } else {
+                    hourlyData = calculateHourlyDistribution();
+                    yLabel = "Listens";
+                }
 
                 if (charts.hourlyChart) charts.hourlyChart.destroy();
 
@@ -2243,7 +2503,7 @@
                         labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
                         datasets: [
                             {
-                                label: "Listens",
+                                label: yLabel,
                                 data: hourlyData,
                                 backgroundColor: "#1db954",
                             },
@@ -2290,13 +2550,23 @@
                 const ctx = document.getElementById("weeklyChart");
                 if (!ctx) return;
 
-                const weeklyData = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
-                filteredData.forEach((item) => {
-                    if (item.ts && item.ms_played) {
-                        const day = new Date(item.ts).getDay();
-                        weeklyData[day] += item.ms_played / (1000 * 60 * 60);
-                    }
-                });
+                let weeklyData = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
+                if (weeklyChartMode === "time") {
+                    filteredData.forEach((item) => {
+                        if (item.ts && item.ms_played) {
+                            const day = new Date(item.ts).getDay();
+                            weeklyData[day] +=
+                                item.ms_played / (1000 * 60 * 60);
+                        }
+                    });
+                } else {
+                    filteredData.forEach((item) => {
+                        if (item.ts) {
+                            const day = new Date(item.ts).getDay();
+                            weeklyData[day] += 1;
+                        }
+                    });
+                }
 
                 const dayNames = [
                     "Sunday",
@@ -2316,7 +2586,10 @@
                         labels: dayNames,
                         datasets: [
                             {
-                                label: "Hours Listened",
+                                label:
+                                    weeklyChartMode === "time"
+                                        ? "Hours Listened"
+                                        : "Listens",
                                 data: weeklyData,
                                 borderColor: "#1db954",
                                 backgroundColor: "rgba(29, 185, 84, 0.2)",
@@ -2355,6 +2628,7 @@
                         },
                     },
                 });
+                updateToggleButtons("weeklyChartMode", weeklyChartMode);
             }
 
             function getDateRange(data) {
@@ -2424,6 +2698,14 @@
 
             // Initialize with upload view
             showUploadView();
+
+            // Set initial toggle button states after DOM loads
+            window.addEventListener("DOMContentLoaded", () => {
+                updateToggleButtons("hourlyHeatmapMode", hourlyHeatmapMode);
+                updateToggleButtons("weeklyChartMode", weeklyChartMode);
+                updateToggleButtons("topListsMode", topListsMode);
+                updateToggleButtons("chartsMode", chartsMode);
+            });
         </script>
     </body>
 </html>
