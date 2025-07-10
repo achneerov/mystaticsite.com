@@ -1851,7 +1851,7 @@
                         timeText: `${Math.round(stats.time / (1000 * 60))} min`,
                         playsText: `${stats.plays} plays`,
                     }))
-                    .sort((a, b) => b.plays - a.plays);
+                    .sort((a, b) => b.time - a.time);
 
                 // Top Albums
                 const albumStats = {};
