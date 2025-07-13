@@ -1297,44 +1297,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <div
-                            style="display: flex; align-items: center; gap: 8px"
-                        >
-                            <label
-                                for="hourlyMode"
-                                style="
-                                    color: #1db954;
-                                    font-weight: bold;
-                                    min-width: 100px;
-                                "
-                                >Hourly Pattern:</label
-                            >
-                            <div class="toggle-buttons">
-                                <button
-                                    id="toggleHourlyHeatmap"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('hourlyHeatmapMode')"
-                                >
-                                    By Time
-                                </button>
-                                <button
-                                    id="toggleHourlyHeatmapListens"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('hourlyHeatmapMode', true)"
-                                >
-                                    By Listens
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </details>
 
@@ -1502,6 +1464,12 @@
                             </div>
                             <canvas id="countryChart"></canvas>
                         </div>
+                        <div class="chart-container weekly-patterns">
+                            <div class="chart-title">
+                                📅 Weekly Listening Pattern
+                            </div>
+                            <canvas id="weeklyChart"></canvas>
+                        </div>
                         <div class="chart-container">
                             <div class="chart-title">
                                 ⏰ Hourly Distribution
@@ -1615,27 +1583,7 @@
                         </div>
                     </div>
 
-                    <!-- Weekly Pattern -->
-                    <div class="chart-container weekly-patterns">
-                        <div class="chart-title">
-                            📅 Weekly Listening Pattern
-                        </div>
-                        <canvas id="weeklyChart"></canvas>
-                    </div>
                     <!-- Listening Patterns Heatmap -->
-                    <div class="chart-container hourly-patterns">
-                        <div class="chart-title">
-                            ⏰ Listening Patterns by Hour
-                        </div>
-                        <div class="heatmap" id="hourlyHeatmap"></div>
-                        <div class="heatmap-legend">
-                            <span>12 AM</span>
-                            <span>6 AM</span>
-                            <span>12 PM</span>
-                            <span>6 PM</span>
-                            <span>12 AM</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -1660,7 +1608,6 @@
             };
 
             // Toggle state for each section
-            let hourlyHeatmapMode = "time"; // "time" or "listens"
             let weeklyChartMode = "time";
             let topListsMode = "time";
             let chartsMode = "time";
@@ -1718,11 +1665,7 @@
 
             // Toggle UI logic
             function toggleMode(section, toListens) {
-                if (section === "hourlyHeatmapMode") {
-                    hourlyHeatmapMode = toListens ? "listens" : "time";
-                    updateInsights();
-                    updateToggleButtons("hourlyHeatmapMode", hourlyHeatmapMode);
-                } else if (section === "weeklyChartMode") {
+                if (section === "weeklyChartMode") {
                     weeklyChartMode = toListens ? "listens" : "time";
                     updateWeeklyChart();
                     updateToggleButtons("weeklyChartMode", weeklyChartMode);
@@ -1738,15 +1681,7 @@
             }
 
             function updateToggleButtons(section, mode) {
-                if (section === "hourlyHeatmapMode") {
-                    document.getElementById(
-                        "toggleHourlyHeatmap",
-                    ).style.background = mode === "time" ? "#1db954" : "#222";
-                    document.getElementById(
-                        "toggleHourlyHeatmapListens",
-                    ).style.background =
-                        mode === "listens" ? "#1db954" : "#222";
-                } else if (section === "weeklyChartMode") {
+                if (section === "weeklyChartMode") {
                     document.getElementById(
                         "toggleWeeklyChart",
                     ).style.background = mode === "time" ? "#1db954" : "#222";
@@ -2279,10 +2214,6 @@
 
                 // Time-based insights
                 updateTimeInsights();
-
-                // Create hourly heatmap
-                createHourlyHeatmap();
-                updateToggleButtons("hourlyHeatmapMode", hourlyHeatmapMode);
             }
 
             function updateTimeInsights() {
@@ -2459,76 +2390,6 @@
                 d.setUTCDate(d.getUTCDate() + 4 - dayNum);
                 const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
                 return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-            }
-
-            function createHourlyHeatmap() {
-                let hourlyData, maxVal, label;
-                if (hourlyHeatmapMode === "time") {
-                    hourlyData = new Array(24).fill(0);
-                    filteredData.forEach((item) => {
-                        const hour = new Date(item.ts).getHours();
-                        hourlyData[hour] += formatTimeValue(item.ms_played);
-                    });
-                    maxVal = 0;
-                    for (const val of hourlyData) {
-                        if (val > maxVal) maxVal = val;
-                    }
-                    label = timeFormat === "hours" ? "h" : "min";
-                } else {
-                    hourlyData = calculateHourlyDistribution();
-                    maxVal = 0;
-                    for (const val of hourlyData) {
-                        if (val > maxVal) maxVal = val;
-                    }
-                    label = "listens";
-                }
-                const heatmapContainer =
-                    document.getElementById("hourlyHeatmap");
-                heatmapContainer.innerHTML = "";
-
-                // Remove any existing tooltips
-                const existingTooltips =
-                    document.querySelectorAll(".custom-tooltip");
-                existingTooltips.forEach((tooltip) => tooltip.remove());
-
-                // Create tooltip element
-                const tooltip = document.createElement("div");
-                tooltip.className = "custom-tooltip";
-                document.body.appendChild(tooltip);
-
-                hourlyData.forEach((val, hour) => {
-                    const cell = document.createElement("div");
-                    cell.className = "heatmap-cell";
-                    const intensity = maxVal > 0 ? val / maxVal : 0;
-                    const opacity = 0.1 + intensity * 0.9;
-                    cell.style.backgroundColor = `rgba(29, 185, 84, ${opacity})`;
-
-                    // Add custom tooltip events
-                    cell.addEventListener("mouseenter", (e) => {
-                        const displayValue =
-                            hourlyHeatmapMode === "time"
-                                ? formatTime(
-                                      val *
-                                          (timeFormat === "hours"
-                                              ? 1000 * 60 * 60
-                                              : 1000 * 60),
-                                  )
-                                : `${Math.round(val)} ${label}`;
-                        tooltip.textContent = `${hour}:00 - ${displayValue}`;
-                        tooltip.classList.add("show");
-                    });
-
-                    cell.addEventListener("mousemove", (e) => {
-                        tooltip.style.left = e.pageX + 10 + "px";
-                        tooltip.style.top = e.pageY - 40 + "px";
-                    });
-
-                    cell.addEventListener("mouseleave", () => {
-                        tooltip.classList.remove("show");
-                    });
-
-                    heatmapContainer.appendChild(cell);
-                });
             }
 
             function updateTopLists() {
@@ -3231,7 +3092,6 @@
 
             // Set initial toggle button states after DOM loads
             window.addEventListener("DOMContentLoaded", () => {
-                updateToggleButtons("hourlyHeatmapMode", hourlyHeatmapMode);
                 updateToggleButtons("weeklyChartMode", weeklyChartMode);
                 updateToggleButtons("topListsMode", topListsMode);
                 updateToggleButtons("chartsMode", chartsMode);
