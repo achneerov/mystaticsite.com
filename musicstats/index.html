@@ -595,6 +595,11 @@
 
                 .stats-overview {
                     grid-template-columns: 1fr;
+                    gap: 15px;
+                }
+
+                .stat-card {
+                    padding: 15px;
                 }
 
                 .upload-container {
@@ -603,56 +608,220 @@
 
                 .charts-grid {
                     grid-template-columns: 1fr;
+                    gap: 20px;
+                }
+
+                .chart-container {
+                    padding: 15px;
+                    min-height: 250px;
+                    overflow: hidden;
+                }
+
+                .chart-container canvas {
+                    max-width: 100% !important;
+                    max-height: 250px !important;
+                    width: 100% !important;
+                    height: auto !important;
+                }
+
+                .chart-container.weekly-patterns {
+                    min-height: 300px;
+                    padding: 15px;
+                }
+
+                .chart-container.weekly-patterns canvas {
+                    max-height: 250px !important;
+                    height: auto !important;
+                }
+
+                .chart-container.hourly-patterns {
+                    min-height: 200px;
+                    padding: 10px;
+                }
+
+                .chart-title {
+                    font-size: 1rem;
+                    margin-bottom: 15px;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .chart-title > div {
+                    display: flex;
+                    gap: 5px;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                }
+
+                .chart-title button {
+                    padding: 3px 12px !important;
+                    font-size: 0.8rem !important;
+                    margin: 0 !important;
                 }
 
                 .top-lists-grid {
                     grid-template-columns: 1fr;
+                    gap: 20px;
+                }
+
+                .top-list-container {
+                    padding: 15px;
+                }
+
+                .top-list-header {
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: stretch;
+                }
+
+                .top-list-title {
+                    text-align: center;
+                    margin-bottom: 0;
                 }
 
                 .search-box {
-                    margin-bottom: 10px;
-                }
-
-                .chart-container.weekly-patterns {
-                    min-height: 400px;
-                    padding: 20px;
-                }
-
-                .chart-container.weekly-patterns canvas {
-                    max-height: 300px;
+                    margin-bottom: 0;
+                    width: 100%;
                 }
 
                 .platform-list {
                     height: 80px;
                 }
 
+                /* Platform chart mobile layout */
+                .chart-container .platform-chart-container {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .chart-container .platform-chart-container > div:first-child {
+                    height: 200px !important;
+                }
+
+                .chart-container .platform-chart-container > div:last-child {
+                    height: 100px !important;
+                }
+
+                .insights-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                    gap: 15px;
+                }
+
+                .insight-card {
+                    padding: 15px;
+                }
+
+                .insight-title {
+                    font-size: 0.9rem;
+                }
+
+                .insight-value {
+                    font-size: 1.3rem;
+                }
+
+                .heatmap {
+                    padding: 10px;
+                    overflow-x: auto;
+                    grid-template-columns: repeat(24, minmax(12px, 1fr));
+                    gap: 1px;
+                    min-width: 300px;
+                }
+
+                .heatmap-cell {
+                    min-width: 12px;
+                    min-height: 12px;
+                }
+
+                .heatmap-legend {
+                    font-size: 0.8rem;
+                    padding: 0 10px;
+                }
+
                 .time-period {
                     gap: 15px;
+                    flex-direction: column;
+                    align-items: stretch;
+                    padding: 15px;
+                    background: rgba(25, 20, 20, 0.5);
+                    border-radius: 10px;
+                    margin-bottom: 20px;
                 }
 
                 .time-period > div {
                     display: flex;
                     align-items: center;
-                    gap: 5px;
+                    gap: 8px;
                     flex-wrap: nowrap;
-                    justify-content: center;
+                    justify-content: space-between;
                 }
 
                 .time-period label {
                     margin-left: 0 !important;
-                    margin-right: 5px !important;
+                    margin-right: 8px !important;
                     white-space: nowrap;
                     font-size: 0.9rem;
+                    min-width: 80px;
+                    color: #1db954;
+                    font-weight: bold;
                 }
 
                 .time-period select {
-                    padding: 5px 8px;
+                    padding: 8px 12px;
                     font-size: 0.9rem;
+                    flex: 1;
+                    min-width: 120px;
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid #1db954;
+                    border-radius: 5px;
+                    color: white;
                 }
 
                 .decimal-precision-btn {
                     padding: 4px 10px;
                     font-size: 1rem;
+                }
+
+                .content-section h2 {
+                    font-size: 1.5rem;
+                    margin-bottom: 20px;
+                }
+
+                .content-section {
+                    margin-bottom: 60px;
+                    padding-top: 10px;
+                }
+
+                .show-more-btn {
+                    font-size: 0.9rem;
+                    padding: 8px 16px;
+                }
+
+                /* Toggle button sections mobile */
+                .toggle-section {
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: stretch;
+                    margin-bottom: 15px;
+                }
+
+                .toggle-section span {
+                    text-align: center;
+                    margin-bottom: 5px;
+                }
+
+                .toggle-buttons {
+                    display: flex;
+                    gap: 8px;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                }
+
+                .toggle-buttons button {
+                    flex: 1;
+                    min-width: 100px;
+                    padding: 8px 12px !important;
+                    font-size: 0.85rem !important;
+                    margin: 0 !important;
                 }
             }
 
@@ -945,6 +1114,7 @@
                         🎵 Top Lists
                     </h2>
                     <div
+                        class="toggle-section"
                         style="
                             display: flex;
                             justify-content: flex-end;
@@ -960,22 +1130,24 @@
                             "
                             >Sort/Show By:</span
                         >
-                        <button
-                            id="toggleTopListsTime"
-                            class="upload-button"
-                            style="padding: 4px 16px; font-size: 0.95rem"
-                            onclick="toggleMode('topListsMode')"
-                        >
-                            By Time
-                        </button>
-                        <button
-                            id="toggleTopListsListens"
-                            class="upload-button"
-                            style="padding: 4px 16px; font-size: 0.95rem"
-                            onclick="toggleMode('topListsMode', true)"
-                        >
-                            By Listens
-                        </button>
+                        <div class="toggle-buttons">
+                            <button
+                                id="toggleTopListsTime"
+                                class="upload-button"
+                                style="padding: 4px 16px; font-size: 0.95rem"
+                                onclick="toggleMode('topListsMode')"
+                            >
+                                By Time
+                            </button>
+                            <button
+                                id="toggleTopListsListens"
+                                class="upload-button"
+                                style="padding: 4px 16px; font-size: 0.95rem"
+                                onclick="toggleMode('topListsMode', true)"
+                            >
+                                By Listens
+                            </button>
+                        </div>
                     </div>
                     <div class="top-lists-grid">
                         <div class="top-list-container">
@@ -1053,6 +1225,7 @@
                         📊 Charts
                     </h2>
                     <div
+                        class="toggle-section"
                         style="
                             display: flex;
                             justify-content: flex-end;
@@ -1068,22 +1241,24 @@
                             "
                             >Show By:</span
                         >
-                        <button
-                            id="toggleChartsTime"
-                            class="upload-button"
-                            style="padding: 4px 16px; font-size: 0.95rem"
-                            onclick="toggleMode('chartsMode')"
-                        >
-                            By Time
-                        </button>
-                        <button
-                            id="toggleChartsListens"
-                            class="upload-button"
-                            style="padding: 4px 16px; font-size: 0.95rem"
-                            onclick="toggleMode('chartsMode', true)"
-                        >
-                            By Listens
-                        </button>
+                        <div class="toggle-buttons">
+                            <button
+                                id="toggleChartsTime"
+                                class="upload-button"
+                                style="padding: 4px 16px; font-size: 0.95rem"
+                                onclick="toggleMode('chartsMode')"
+                            >
+                                By Time
+                            </button>
+                            <button
+                                id="toggleChartsListens"
+                                class="upload-button"
+                                style="padding: 4px 16px; font-size: 0.95rem"
+                                onclick="toggleMode('chartsMode', true)"
+                            >
+                                By Listens
+                            </button>
+                        </div>
                     </div>
                     <div class="charts-grid">
                         <div class="chart-container">
@@ -1095,6 +1270,7 @@
                         <div class="chart-container">
                             <div class="chart-title">📱 Platform Usage</div>
                             <div
+                                class="platform-chart-container"
                                 style="
                                     display: flex;
                                     flex-direction: column;
@@ -1198,7 +1374,7 @@
                             "
                         >
                             📅 Weekly Listening Pattern
-                            <div>
+                            <div class="toggle-buttons">
                                 <button
                                     id="toggleWeeklyChart"
                                     class="upload-button"
@@ -1298,7 +1474,7 @@
                             "
                         >
                             ⏰ Listening Patterns by Hour
-                            <div>
+                            <div class="toggle-buttons">
                                 <button
                                     id="toggleHourlyHeatmap"
                                     class="upload-button"
