@@ -865,10 +865,6 @@
 
             <!-- Stats View -->
             <div id="statsView" class="hidden">
-                <button class="back-button" onclick="showUploadView()">
-                    ← Upload New Data
-                </button>
-
                 <div class="time-period">
                     <div style="display: flex; align-items: center; gap: 8px">
                         <label for="periodSelect">Time Period:</label>
@@ -1407,7 +1403,7 @@
 
             function changeDecimalPrecision(change) {
                 const newPrecision = decimalPrecision + change;
-                if (newPrecision >= 0) {
+                if (newPrecision >= 0 && newPrecision <= 3) {
                     decimalPrecision = newPrecision;
                     document.getElementById(
                         "decimalPrecisionValue",
