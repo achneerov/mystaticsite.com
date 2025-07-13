@@ -245,35 +245,13 @@
                 transition: width 0.3s ease;
             }
 
-            .content-tabs {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-                margin-bottom: 30px;
-                flex-wrap: wrap;
+            .content-section {
+                margin-bottom: 80px;
+                padding-top: 20px;
             }
 
-            .tab-button {
-                background: rgba(255, 255, 255, 0.1);
-                color: white;
-                border: 1px solid #1db954;
-                padding: 10px 20px;
-                border-radius: 25px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-
-            .tab-button.active {
-                background: #1db954;
-                transform: translateY(-2px);
-            }
-
-            .tab-content {
-                display: none;
-            }
-
-            .tab-content.active {
-                display: block;
+            .content-section:last-child {
+                margin-bottom: 40px;
             }
 
             .charts-grid {
@@ -488,7 +466,7 @@
                 border: 1px solid rgba(29, 185, 84, 0.3);
             }
 
-            .tab-content {
+            .insight-content {
                 background: rgba(25, 20, 20, 0.3);
                 border-radius: 15px;
                 padding: 20px;
@@ -633,15 +611,6 @@
 
                 .search-box {
                     margin-bottom: 10px;
-                }
-
-                .content-tabs {
-                    flex-wrap: wrap;
-                }
-
-                .tab-button {
-                    min-width: 100px;
-                    white-space: nowrap;
                 }
 
                 .chart-container.weekly-patterns {
@@ -961,216 +930,20 @@
                     </div>
                 </div>
 
-                <!-- Content Tabs -->
-                <div class="content-tabs">
-                    <button
-                        class="tab-button active"
-                        onclick="showTab('overview')"
+                <!-- Content sections arranged for scrolling -->
+
+                <!-- Top Lists Section -->
+                <div id="top-lists-section" class="content-section">
+                    <h2
+                        style="
+                            color: #1db954;
+                            text-align: center;
+                            margin-bottom: 30px;
+                            font-size: 2rem;
+                        "
                     >
-                        Overview
-                    </button>
-                    <button class="tab-button" onclick="showTab('insights')">
-                        Insights
-                    </button>
-                    <button class="tab-button" onclick="showTab('top-lists')">
-                        Top Lists
-                    </button>
-                    <button class="tab-button" onclick="showTab('charts')">
-                        Charts
-                    </button>
-                </div>
-
-                <!-- Overview Tab -->
-                <div id="overview-tab" class="tab-content active">
-                    <div class="insights-grid">
-                        <div class="insight-card">
-                            <div class="insight-title">🌍 Top Country</div>
-                            <div class="insight-value" id="topCountry">--</div>
-                            <div class="insight-detail" id="countryDetail">
-                                -- listens
-                            </div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-title">
-                                📱 Favorite Platform
-                            </div>
-                            <div class="insight-value" id="topPlatform">--</div>
-                            <div class="insight-detail" id="platformDetail">
-                                -- hours
-                            </div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-title">🔀 Shuffle Usage</div>
-                            <div class="insight-value" id="shuffleRate">0%</div>
-                            <div class="insight-detail">of your listening</div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-title">
-                                📶 Offline Listening
-                            </div>
-                            <div class="insight-value" id="offlineRate">0%</div>
-                            <div class="insight-detail">of your time</div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-title">⏭️ Skip Rate</div>
-                            <div class="insight-value" id="actualSkipRate">
-                                0%
-                            </div>
-                            <div class="insight-detail">tracks skipped</div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-title">🎯 Discovery Score</div>
-                            <div class="insight-value" id="discoveryScore">
-                                0
-                            </div>
-                            <div class="insight-detail">new tracks found</div>
-                        </div>
-                    </div>
-
-                    <!-- Listening Patterns Heatmap -->
-                    <div class="chart-container hourly-patterns">
-                        <div
-                            class="chart-title"
-                            style="
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                gap: 16px;
-                            "
-                        >
-                            ⏰ Listening Patterns by Hour
-                            <div>
-                                <button
-                                    id="toggleHourlyHeatmap"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                        margin: 0 0 0 12px;
-                                    "
-                                    onclick="toggleMode('hourlyHeatmapMode')"
-                                >
-                                    By Time
-                                </button>
-                                <button
-                                    id="toggleHourlyHeatmapListens"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                        margin: 0;
-                                    "
-                                    onclick="toggleMode('hourlyHeatmapMode', true)"
-                                >
-                                    By Listens
-                                </button>
-                            </div>
-                        </div>
-                        <div class="heatmap" id="hourlyHeatmap"></div>
-                        <div class="heatmap-legend">
-                            <span>12 AM</span>
-                            <span>6 AM</span>
-                            <span>12 PM</span>
-                            <span>6 PM</span>
-                            <span>12 AM</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Insights Tab -->
-                <div id="insights-tab" class="tab-content">
-                    <div class="insights-grid">
-                        <div class="insight-card">
-                            <div class="insight-title">🏆 Longest Session</div>
-                            <div class="insight-value" id="longestSession">
-                                0h
-                            </div>
-                            <div class="insight-detail" id="sessionDetail">
-                                consecutive listening
-                            </div>
-                        </div>
-
-                        <div class="insight-card">
-                            <div class="insight-title">📅 Most Active Day</div>
-                            <div class="insight-value" id="mostActiveDay">
-                                --
-                            </div>
-                            <div class="insight-detail" id="activeDetails">
-                                --
-                            </div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-title">🌙 Night Owl Score</div>
-                            <div class="insight-value" id="nightOwlScore">
-                                0%
-                            </div>
-                            <div class="insight-detail">
-                                listening after 10 PM
-                            </div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-title">🌅 Early Bird Score</div>
-                            <div class="insight-value" id="earlyBirdScore">
-                                0%
-                            </div>
-                            <div class="insight-detail">
-                                listening before 8 AM
-                            </div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-title">📊 Variety Score</div>
-                            <div class="insight-value" id="varietyScore">0</div>
-                            <div class="insight-detail">
-                                different artists per week
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Weekly Pattern -->
-                    <div class="chart-container weekly-patterns">
-                        <div
-                            class="chart-title"
-                            style="
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                gap: 16px;
-                            "
-                        >
-                            📅 Weekly Listening Pattern
-                            <div>
-                                <button
-                                    id="toggleWeeklyChart"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                        margin: 0 0 0 12px;
-                                    "
-                                    onclick="toggleMode('weeklyChartMode')"
-                                >
-                                    By Time
-                                </button>
-                                <button
-                                    id="toggleWeeklyChartListens"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                        margin: 0;
-                                    "
-                                    onclick="toggleMode('weeklyChartMode', true)"
-                                >
-                                    By Listens
-                                </button>
-                            </div>
-                        </div>
-                        <canvas id="weeklyChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Top Lists Tab -->
-                <div id="top-lists-tab" class="tab-content">
+                        🎵 Top Lists
+                    </h2>
                     <div
                         style="
                             display: flex;
@@ -1267,8 +1040,18 @@
                     </div>
                 </div>
 
-                <!-- Charts Tab -->
-                <div id="charts-tab" class="tab-content">
+                <!-- Charts Section -->
+                <div id="charts-section" class="content-section">
+                    <h2
+                        style="
+                            color: #1db954;
+                            text-align: center;
+                            margin-bottom: 30px;
+                            font-size: 2rem;
+                        "
+                    >
+                        📊 Charts
+                    </h2>
                     <div
                         style="
                             display: flex;
@@ -1340,6 +1123,215 @@
                                 ⏰ Hourly Distribution
                             </div>
                             <canvas id="hourlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Section -->
+                <div id="insights-section" class="content-section">
+                    <h2
+                        style="
+                            color: #1db954;
+                            text-align: center;
+                            margin-bottom: 30px;
+                            font-size: 2rem;
+                        "
+                    >
+                        💡 Insights
+                    </h2>
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-title">🏆 Longest Session</div>
+                            <div class="insight-value" id="longestSession">
+                                0h
+                            </div>
+                            <div class="insight-detail" id="sessionDetail">
+                                consecutive listening
+                            </div>
+                        </div>
+
+                        <div class="insight-card">
+                            <div class="insight-title">📅 Most Active Day</div>
+                            <div class="insight-value" id="mostActiveDay">
+                                --
+                            </div>
+                            <div class="insight-detail" id="activeDetails">
+                                --
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🌙 Night Owl Score</div>
+                            <div class="insight-value" id="nightOwlScore">
+                                0%
+                            </div>
+                            <div class="insight-detail">
+                                listening after 10 PM
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🌅 Early Bird Score</div>
+                            <div class="insight-value" id="earlyBirdScore">
+                                0%
+                            </div>
+                            <div class="insight-detail">
+                                listening before 8 AM
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">📊 Variety Score</div>
+                            <div class="insight-value" id="varietyScore">0</div>
+                            <div class="insight-detail">
+                                different artists per week
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Pattern -->
+                    <div class="chart-container weekly-patterns">
+                        <div
+                            class="chart-title"
+                            style="
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                gap: 16px;
+                            "
+                        >
+                            📅 Weekly Listening Pattern
+                            <div>
+                                <button
+                                    id="toggleWeeklyChart"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                        margin: 0 0 0 12px;
+                                    "
+                                    onclick="toggleMode('weeklyChartMode')"
+                                >
+                                    By Time
+                                </button>
+                                <button
+                                    id="toggleWeeklyChartListens"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                        margin: 0;
+                                    "
+                                    onclick="toggleMode('weeklyChartMode', true)"
+                                >
+                                    By Listens
+                                </button>
+                            </div>
+                        </div>
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Overview Section -->
+                <div id="overview-section" class="content-section">
+                    <h2
+                        style="
+                            color: #1db954;
+                            text-align: center;
+                            margin-bottom: 30px;
+                            font-size: 2rem;
+                        "
+                    >
+                        📋 Overview
+                    </h2>
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-title">🌍 Top Country</div>
+                            <div class="insight-value" id="topCountry">--</div>
+                            <div class="insight-detail" id="countryDetail">
+                                -- listens
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">
+                                📱 Favorite Platform
+                            </div>
+                            <div class="insight-value" id="topPlatform">--</div>
+                            <div class="insight-detail" id="platformDetail">
+                                -- hours
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🔀 Shuffle Usage</div>
+                            <div class="insight-value" id="shuffleRate">0%</div>
+                            <div class="insight-detail">of your listening</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">
+                                📶 Offline Listening
+                            </div>
+                            <div class="insight-value" id="offlineRate">0%</div>
+                            <div class="insight-detail">of your time</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">⏭️ Skip Rate</div>
+                            <div class="insight-value" id="actualSkipRate">
+                                0%
+                            </div>
+                            <div class="insight-detail">tracks skipped</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🎯 Discovery Score</div>
+                            <div class="insight-value" id="discoveryScore">
+                                0
+                            </div>
+                            <div class="insight-detail">new tracks found</div>
+                        </div>
+                    </div>
+
+                    <!-- Listening Patterns Heatmap -->
+                    <div class="chart-container hourly-patterns">
+                        <div
+                            class="chart-title"
+                            style="
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                gap: 16px;
+                            "
+                        >
+                            ⏰ Listening Patterns by Hour
+                            <div>
+                                <button
+                                    id="toggleHourlyHeatmap"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                        margin: 0 0 0 12px;
+                                    "
+                                    onclick="toggleMode('hourlyHeatmapMode')"
+                                >
+                                    By Time
+                                </button>
+                                <button
+                                    id="toggleHourlyHeatmapListens"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                        margin: 0;
+                                    "
+                                    onclick="toggleMode('hourlyHeatmapMode', true)"
+                                >
+                                    By Listens
+                                </button>
+                            </div>
+                        </div>
+                        <div class="heatmap" id="hourlyHeatmap"></div>
+                        <div class="heatmap-legend">
+                            <span>12 AM</span>
+                            <span>6 AM</span>
+                            <span>12 PM</span>
+                            <span>6 PM</span>
+                            <span>12 AM</span>
                         </div>
                     </div>
                 </div>
@@ -1525,22 +1517,6 @@
                 document.getElementById("statsView").classList.add("hidden");
                 document.getElementById("errorView").style.display = "block";
                 document.getElementById("errorMessage").textContent = message;
-            }
-
-            function showTab(tabName) {
-                // Hide all tabs
-                document.querySelectorAll(".tab-content").forEach((tab) => {
-                    tab.classList.remove("active");
-                });
-                document.querySelectorAll(".tab-button").forEach((btn) => {
-                    btn.classList.remove("active");
-                });
-
-                // Show selected tab
-                document
-                    .getElementById(tabName + "-tab")
-                    .classList.add("active");
-                event.target.classList.add("active");
             }
 
             function toggleFileInfo() {
