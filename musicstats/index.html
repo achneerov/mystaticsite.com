@@ -1188,76 +1188,31 @@
                             style="display: flex; align-items: center; gap: 8px"
                         >
                             <label
-                                for="topListsMode"
+                                for="topListsChartsMode"
                                 style="
                                     color: #1db954;
                                     font-weight: bold;
-                                    min-width: 100px;
+                                    min-width: 140px;
                                 "
-                                >Top Lists:</label
+                            >Top Lists &amp; Charts:</label>
+                            <select
+                                id="topListsChartsMode"
+                                onchange="setTopListsChartsMode(this.value)"
+                                style="
+                                    background: rgba(255, 255, 255, 0.1);
+                                    border: 1px solid rgba(29, 185, 84, 0.5);
+                                    border-radius: 8px;
+                                    padding: 8px 12px;
+                                    color: white;
+                                    font-size: 1rem;
+                                    min-width: 140px;
+                                    margin-left: 10px;
+                                "
                             >
-                            <div class="toggle-buttons">
-                                <button
-                                    id="toggleTopListsTime"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('topListsMode')"
-                                >
-                                    By Time
-                                </button>
-                                <button
-                                    id="toggleTopListsListens"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('topListsMode', true)"
-                                >
-                                    By Listens
-                                </button>
-                            </div>
+                                <option value="time" selected>By Time</option>
+                                <option value="listens">By Listens</option>
+                            </select>
                         </div>
-
-                        <div
-                            style="display: flex; align-items: center; gap: 8px"
-                        >
-                            <label
-                                for="chartsMode"
-                                style="
-                                    color: #1db954;
-                                    font-weight: bold;
-                                    min-width: 100px;
-                                "
-                                >Charts:</label
-                            >
-                            <div class="toggle-buttons">
-                                <button
-                                    id="toggleChartsTime"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('chartsMode')"
-                                >
-                                    By Time
-                                </button>
-                                <button
-                                    id="toggleChartsListens"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('chartsMode', true)"
-                                >
-                                    By Listens
-                                </button>
-                            </div>
                         </div>
 
                         <div
@@ -1309,7 +1264,7 @@
 
                 <!-- Content sections arranged for scrolling -->
 
-                <!-- Top Lists Section -->
+                <!-- Top Lists & Charts Section -->
                 <div id="top-lists-section" class="content-section">
                     <h2
                         style="
@@ -1322,7 +1277,7 @@
                             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
                         "
                     >
-                        🎵 Top Lists
+                        🎵 Top Lists &amp; Charts
                     </h2>
 
                     <div class="top-lists-grid">
@@ -1587,6 +1542,14 @@
             let timeFormat = "minutes"; // "minutes" or "hours"
             let decimalPrecision = 1; // number of decimal places
 
+            // Unified mode setter for Top Lists & Charts
+            function setTopListsChartsMode(mode) {
+                topListsMode = mode;
+                chartsMode = mode;
+                updateTopLists();
+                updateCharts();
+            }
+
             // Time format utility functions
             function formatTime(milliseconds, format = timeFormat) {
                 if (format === "hours") {
@@ -1636,38 +1599,13 @@
                 }
             }
 
-            // Toggle UI logic
+            // Toggle UI logic (legacy, now unused)
             function toggleMode(section, toListens) {
-                if (section === "topListsMode") {
-                    topListsMode = toListens ? "listens" : "time";
-                    updateTopLists();
-                    updateToggleButtons("topListsMode", topListsMode);
-                } else if (section === "chartsMode") {
-                    chartsMode = toListens ? "listens" : "time";
-                    updateCharts();
-                    updateToggleButtons("chartsMode", chartsMode);
-                }
+                // This function is now deprecated due to unified dropdown.
             }
 
-            function updateToggleButtons(section, mode) {
-                if (section === "topListsMode") {
-                    document.getElementById(
-                        "toggleTopListsTime",
-                    ).style.background = mode === "time" ? "#1db954" : "#222";
-                    document.getElementById(
-                        "toggleTopListsListens",
-                    ).style.background =
-                        mode === "listens" ? "#1db954" : "#222";
-                } else if (section === "chartsMode") {
-                    document.getElementById(
-                        "toggleChartsTime",
-                    ).style.background = mode === "time" ? "#1db954" : "#222";
-                    document.getElementById(
-                        "toggleChartsListens",
-                    ).style.background =
-                        mode === "listens" ? "#1db954" : "#222";
-                }
-            }
+            // updateToggleButtons is now obsolete and can be removed or left empty
+            function updateToggleButtons(section, mode) {}
 
             // View management
             function showUploadView() {
