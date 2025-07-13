@@ -1633,14 +1633,32 @@
 
                     setProcessingStep(3);
 
-                    // Process each file
-                    const allRecords = [];
+                    // Check if we're on mobile for optimizations but no limits
+                    const isMobile =
+                        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                            navigator.userAgent,
+                        );
+
+                    // Process each file with chunking to avoid memory issues
+                    allData = [];
+                    let totalProcessed = 0;
+                    let fileIndex = 0;
                     console.log(
                         `Processing ${streamingFiles.length} valid streaming history files...`,
+                        isMobile
+                            ? "(Mobile mode: using optimized processing)"
+                            : "",
                     );
 
                     for (const { path, file } of streamingFiles) {
                         try {
+                            fileIndex++;
+                            // Update progress
+                            const progressText = `Processing file ${fileIndex}/${streamingFiles.length}: ${path.split("/").pop()}`;
+                            document.querySelector(
+                                ".processing p",
+                            ).textContent = progressText;
+
                             const content = await file.async("text");
 
                             // Additional check for valid JSON content
@@ -1659,7 +1677,44 @@
                                 console.log(
                                     `Loaded ${data.length} records from ${path}`,
                                 );
-                                allRecords.push(...data);
+
+                                // Process data in smaller chunks for mobile
+                                const chunkSize = isMobile ? 500 : 1000;
+                                for (
+                                    let i = 0;
+                                    i < data.length;
+                                    i += chunkSize
+                                ) {
+                                    const chunk = data.slice(
+                                        i,
+                                        Math.min(i + chunkSize, data.length),
+                                    );
+                                    const validChunk = chunk.filter(
+                                        (item) =>
+                                            item.master_metadata_track_name &&
+                                            item.master_metadata_album_artist_name &&
+                                            item.ms_played > 0 &&
+                                            item.ts,
+                                    );
+
+                                    allData = allData.concat(validChunk);
+                                    totalProcessed += validChunk.length;
+
+                                    // Allow browser to breathe between chunks and update progress
+                                    if (i % (isMobile ? 5000 : 10000) === 0) {
+                                        document.querySelector(
+                                            ".processing p",
+                                        ).textContent =
+                                            `${progressText} - ${totalProcessed.toLocaleString()} records processed`;
+
+                                        await new Promise((resolve) =>
+                                            setTimeout(
+                                                resolve,
+                                                isMobile ? 5 : 1,
+                                            ),
+                                        );
+                                    }
+                                }
                             } else {
                                 console.warn(
                                     `Skipping ${path}: Data is not an array`,
@@ -1673,15 +1728,6 @@
                         }
                     }
 
-                    // Filter valid records
-                    allData = allRecords.filter(
-                        (item) =>
-                            item.master_metadata_track_name &&
-                            item.master_metadata_album_artist_name &&
-                            item.ms_played > 0 &&
-                            item.ts,
-                    );
-
                     if (allData.length === 0) {
                         throw new Error(
                             "No valid listening records found in the uploaded files.",
@@ -1693,9 +1739,28 @@
                     console.log(
                         `Successfully processed ${allData.length} valid listening records from ${streamingFiles.length} files`,
                     );
-                    console.log(
-                        `Data spans from ${new Date(Math.min(...allData.map((item) => new Date(item.ts)))).toLocaleDateString()} to ${new Date(Math.max(...allData.map((item) => new Date(item.ts)))).toLocaleDateString()}`,
-                    );
+
+                    if (allData.length > 0) {
+                        // Calculate date range safely without spread operator
+                        let minDate = new Date(allData[0].ts);
+                        let maxDate = new Date(allData[0].ts);
+                        const dateCheckInterval = Math.max(
+                            1,
+                            Math.floor(allData.length / 1000),
+                        ); // Sample dates to avoid checking every record
+                        for (
+                            let i = 0;
+                            i < allData.length;
+                            i += dateCheckInterval
+                        ) {
+                            const itemDate = new Date(allData[i].ts);
+                            if (itemDate < minDate) minDate = itemDate;
+                            if (itemDate > maxDate) maxDate = itemDate;
+                        }
+                        console.log(
+                            `Data spans from ${minDate.toLocaleDateString()} to ${maxDate.toLocaleDateString()}`,
+                        );
+                    }
 
                     // Short delay to show final step
                     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -1704,12 +1769,42 @@
                     document.getElementById("step4").classList.remove("active");
                     document.getElementById("step4").classList.add("completed");
 
+                    // Clean up temporary variables to free memory
+                    streamingFiles.length = 0;
+
+                    // Force garbage collection hint (browsers may ignore)
+                    if (window.gc) {
+                        window.gc();
+                    }
+
+                    // Reset progress text
+                    document.querySelector(".processing p").textContent =
+                        "Finalizing analysis...";
+
                     // Initialize stats view
                     applyFilter("all");
                     showStatsView();
                 } catch (error) {
                     console.error("Error processing ZIP file:", error);
                     showErrorView(error.message);
+                }
+            }
+
+            // Memory cleanup helper
+            function cleanupMemory() {
+                // Clear any large temporary arrays
+                if (window.tempData) {
+                    window.tempData = null;
+                }
+                // Suggest garbage collection on mobile
+                if (
+                    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                        navigator.userAgent,
+                    )
+                ) {
+                    setTimeout(() => {
+                        if (window.gc) window.gc();
+                    }, 100);
                 }
             }
 
@@ -1756,6 +1851,9 @@
                             period.startsWith("last"))
                     );
                 });
+
+                // Clean up memory after filtering
+                cleanupMemory();
 
                 updateStats();
             }
@@ -1935,10 +2033,12 @@
             function updateTimeInsights() {
                 // Longest session analysis
                 const sessions = calculateSessions();
-                const longestSession = Math.max(
-                    ...sessions.map((s) => s.duration),
-                    0,
-                );
+                let longestSession = 0;
+                for (const session of sessions) {
+                    if (session.duration > longestSession) {
+                        longestSession = session.duration;
+                    }
+                }
                 document.getElementById("longestSession").textContent =
                     formatTime(longestSession);
 
@@ -2114,11 +2214,17 @@
                         const hour = new Date(item.ts).getHours();
                         hourlyData[hour] += formatTimeValue(item.ms_played);
                     });
-                    maxVal = Math.max(...hourlyData);
+                    maxVal = 0;
+                    for (const val of hourlyData) {
+                        if (val > maxVal) maxVal = val;
+                    }
                     label = timeFormat === "hours" ? "h" : "min";
                 } else {
                     hourlyData = calculateHourlyDistribution();
-                    maxVal = Math.max(...hourlyData);
+                    maxVal = 0;
+                    for (const val of hourlyData) {
+                        if (val > maxVal) maxVal = val;
+                    }
                     label = "listens";
                 }
                 const heatmapContainer =
@@ -2255,7 +2361,7 @@
 
                 // Reset filters and display
                 ["artists", "tracks", "albums"].forEach((type) => {
-                    topLists[type].filtered = [...topLists[type].data];
+                    topLists[type].filtered = topLists[type].data.slice();
                     topLists[type].displayed = 20;
                 });
 
@@ -2798,9 +2904,15 @@
                 if (data.length === 0)
                     return { days: 1, start: new Date(), end: new Date() };
 
-                const dates = data.map((item) => new Date(item.ts));
-                const start = new Date(Math.min(...dates));
-                const end = new Date(Math.max(...dates));
+                let minDate = new Date(data[0].ts);
+                let maxDate = new Date(data[0].ts);
+                for (const item of data) {
+                    const itemDate = new Date(item.ts);
+                    if (itemDate < minDate) minDate = itemDate;
+                    if (itemDate > maxDate) maxDate = itemDate;
+                }
+                const start = minDate;
+                const end = maxDate;
                 const days = Math.max(
                     1,
                     Math.ceil((end - start) / (1000 * 60 * 60 * 24)),
@@ -2868,6 +2980,16 @@
                 updateToggleButtons("weeklyChartMode", weeklyChartMode);
                 updateToggleButtons("topListsMode", topListsMode);
                 updateToggleButtons("chartsMode", chartsMode);
+
+                // Show mobile warning if on mobile device
+                const isMobile =
+                    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                        navigator.userAgent,
+                    );
+                if (isMobile) {
+                    document.getElementById("mobileWarning").style.display =
+                        "block";
+                }
             });
         </script>
     </body>
