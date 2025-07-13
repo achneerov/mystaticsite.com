@@ -1272,30 +1272,7 @@
                                 "
                                 >Weekly Pattern:</label
                             >
-                            <div class="toggle-buttons">
-                                <button
-                                    id="toggleWeeklyChart"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('weeklyChartMode')"
-                                >
-                                    By Time
-                                </button>
-                                <button
-                                    id="toggleWeeklyChartListens"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('weeklyChartMode', true)"
-                                >
-                                    By Listens
-                                </button>
-                            </div>
+                            <div class="toggle-buttons"></div>
                         </div>
 
                         <div
@@ -1310,30 +1287,7 @@
                                 "
                                 >Hourly Pattern:</label
                             >
-                            <div class="toggle-buttons">
-                                <button
-                                    id="toggleHourlyChart"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('hourlyChartMode')"
-                                >
-                                    By Time
-                                </button>
-                                <button
-                                    id="toggleHourlyChartListens"
-                                    class="upload-button"
-                                    style="
-                                        padding: 4px 16px;
-                                        font-size: 0.95rem;
-                                    "
-                                    onclick="toggleMode('hourlyChartMode', true)"
-                                >
-                                    By Listens
-                                </button>
-                            </div>
+                            <div class="toggle-buttons"></div>
                         </div>
                     </div>
                 </details>
@@ -1646,8 +1600,6 @@
             };
 
             // Toggle state for each section
-            let weeklyChartMode = "time";
-            let hourlyChartMode = "time";
             let topListsMode = "time";
             let chartsMode = "time";
             let timeFormat = "minutes"; // "minutes" or "hours"
@@ -1704,11 +1656,7 @@
 
             // Toggle UI logic
             function toggleMode(section, toListens) {
-                if (section === "weeklyChartMode") {
-                    weeklyChartMode = toListens ? "listens" : "time";
-                    updateWeeklyChart();
-                    updateToggleButtons("weeklyChartMode", weeklyChartMode);
-                } else if (section === "topListsMode") {
+                if (section === "topListsMode") {
                     topListsMode = toListens ? "listens" : "time";
                     updateTopLists();
                     updateToggleButtons("topListsMode", topListsMode);
@@ -1716,23 +1664,11 @@
                     chartsMode = toListens ? "listens" : "time";
                     updateCharts();
                     updateToggleButtons("chartsMode", chartsMode);
-                } else if (section === "hourlyChartMode") {
-                    hourlyChartMode = toListens ? "listens" : "time";
-                    updateHourlyChart();
-                    updateToggleButtons("hourlyChartMode", hourlyChartMode);
                 }
             }
 
             function updateToggleButtons(section, mode) {
-                if (section === "weeklyChartMode") {
-                    document.getElementById(
-                        "toggleWeeklyChart",
-                    ).style.background = mode === "time" ? "#1db954" : "#222";
-                    document.getElementById(
-                        "toggleWeeklyChartListens",
-                    ).style.background =
-                        mode === "listens" ? "#1db954" : "#222";
-                } else if (section === "topListsMode") {
+                if (section === "topListsMode") {
                     document.getElementById(
                         "toggleTopListsTime",
                     ).style.background = mode === "time" ? "#1db954" : "#222";
@@ -1746,14 +1682,6 @@
                     ).style.background = mode === "time" ? "#1db954" : "#222";
                     document.getElementById(
                         "toggleChartsListens",
-                    ).style.background =
-                        mode === "listens" ? "#1db954" : "#222";
-                } else if (section === "hourlyChartMode") {
-                    document.getElementById(
-                        "toggleHourlyChart",
-                    ).style.background = mode === "time" ? "#1db954" : "#222";
-                    document.getElementById(
-                        "toggleHourlyChartListens",
                     ).style.background =
                         mode === "listens" ? "#1db954" : "#222";
                 }
@@ -2915,7 +2843,7 @@
                 if (!ctx) return;
 
                 let hourlyData, yLabel;
-                if (hourlyChartMode === "time") {
+                if (chartsMode === "time") {
                     hourlyData = new Array(24).fill(0);
                     filteredData.forEach((item) => {
                         const hour = new Date(item.ts).getHours();
@@ -2979,7 +2907,6 @@
                         },
                     },
                 });
-                updateToggleButtons("hourlyChartMode", hourlyChartMode);
             }
 
             function updateWeeklyChart() {
@@ -2987,7 +2914,7 @@
                 if (!ctx) return;
 
                 let weeklyData = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
-                if (weeklyChartMode === "time") {
+                if (chartsMode === "time") {
                     filteredData.forEach((item) => {
                         if (item.ts && item.ms_played) {
                             const day = new Date(item.ts).getDay();
@@ -3022,7 +2949,7 @@
                         datasets: [
                             {
                                 label:
-                                    weeklyChartMode === "time"
+                                    chartsMode === "time"
                                         ? timeFormat === "hours"
                                             ? "Hours Listened"
                                             : "Minutes Listened"
@@ -3058,7 +2985,6 @@
                         },
                     },
                 });
-                updateToggleButtons("weeklyChartMode", weeklyChartMode);
             }
 
             function getDateRange(data) {
