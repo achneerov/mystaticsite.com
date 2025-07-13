@@ -1466,7 +1466,7 @@
                         </div>
                         <div class="chart-container weekly-patterns">
                             <div class="chart-title">
-                                📅 Weekly Listening Pattern
+                                📅 Weekly Distribution
                             </div>
                             <canvas id="weeklyChart"></canvas>
                         </div>
@@ -2964,7 +2964,7 @@
                 if (charts.weeklyChart) charts.weeklyChart.destroy();
 
                 charts.weeklyChart = new Chart(ctx, {
-                    type: "radar",
+                    type: "bar",
                     data: {
                         labels: dayNames,
                         datasets: [
@@ -2976,18 +2976,13 @@
                                             : "Minutes Listened"
                                         : "Listens",
                                 data: weeklyData,
-                                borderColor: "#1db954",
-                                backgroundColor: "rgba(29, 185, 84, 0.2)",
-                                pointBackgroundColor: "#1db954",
+                                backgroundColor: "#1db954",
                             },
                         ],
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        layout: {
-                            padding: 60,
-                        },
                         plugins: {
                             legend: {
                                 labels: { color: "white" },
@@ -2995,20 +2990,18 @@
                             },
                         },
                         scales: {
-                            r: {
-                                min: 0,
+                            x: {
                                 ticks: {
                                     color: "white",
-                                    beginAtZero: true,
-                                    stepSize: undefined,
                                 },
                                 grid: { color: "rgba(255,255,255,0.1)" },
-                                pointLabels: {
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
                                     color: "white",
-                                    font: {
-                                        size: 14,
-                                    },
                                 },
+                                grid: { color: "rgba(255,255,255,0.1)" },
                             },
                         },
                     },
