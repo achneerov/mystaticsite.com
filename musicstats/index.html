@@ -1297,6 +1297,44 @@
                                 </button>
                             </div>
                         </div>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 8px"
+                        >
+                            <label
+                                for="hourlyMode"
+                                style="
+                                    color: #1db954;
+                                    font-weight: bold;
+                                    min-width: 100px;
+                                "
+                                >Hourly Pattern:</label
+                            >
+                            <div class="toggle-buttons">
+                                <button
+                                    id="toggleHourlyChart"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                    "
+                                    onclick="toggleMode('hourlyChartMode')"
+                                >
+                                    By Time
+                                </button>
+                                <button
+                                    id="toggleHourlyChartListens"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                    "
+                                    onclick="toggleMode('hourlyChartMode', true)"
+                                >
+                                    By Listens
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </details>
 
@@ -1609,6 +1647,7 @@
 
             // Toggle state for each section
             let weeklyChartMode = "time";
+            let hourlyChartMode = "time";
             let topListsMode = "time";
             let chartsMode = "time";
             let timeFormat = "minutes"; // "minutes" or "hours"
@@ -1677,6 +1716,10 @@
                     chartsMode = toListens ? "listens" : "time";
                     updateCharts();
                     updateToggleButtons("chartsMode", chartsMode);
+                } else if (section === "hourlyChartMode") {
+                    hourlyChartMode = toListens ? "listens" : "time";
+                    updateHourlyChart();
+                    updateToggleButtons("hourlyChartMode", hourlyChartMode);
                 }
             }
 
@@ -1703,6 +1746,14 @@
                     ).style.background = mode === "time" ? "#1db954" : "#222";
                     document.getElementById(
                         "toggleChartsListens",
+                    ).style.background =
+                        mode === "listens" ? "#1db954" : "#222";
+                } else if (section === "hourlyChartMode") {
+                    document.getElementById(
+                        "toggleHourlyChart",
+                    ).style.background = mode === "time" ? "#1db954" : "#222";
+                    document.getElementById(
+                        "toggleHourlyChartListens",
                     ).style.background =
                         mode === "listens" ? "#1db954" : "#222";
                 }
@@ -2864,7 +2915,7 @@
                 if (!ctx) return;
 
                 let hourlyData, yLabel;
-                if (chartsMode === "time") {
+                if (hourlyChartMode === "time") {
                     hourlyData = new Array(24).fill(0);
                     filteredData.forEach((item) => {
                         const hour = new Date(item.ts).getHours();
@@ -2928,6 +2979,7 @@
                         },
                     },
                 });
+                updateToggleButtons("hourlyChartMode", hourlyChartMode);
             }
 
             function updateWeeklyChart() {
