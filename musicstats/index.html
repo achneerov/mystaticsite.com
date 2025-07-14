@@ -1513,6 +1513,33 @@
 
                     <!-- Listening Patterns Heatmap -->
                 </div>
+                <!-- Print as PDF Button -->
+                <div
+                    id="printButtonContainer"
+                    style="
+                        display: none;
+                        text-align: center;
+                        margin: 40px 0 0 0;
+                    "
+                >
+                    <button
+                        id="printPdfBtn"
+                        class="upload-button"
+                        style="
+                            background: #1db954;
+                            color: #fff;
+                            border: none;
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                            transition:
+                                background 0.2s,
+                                transform 0.2s;
+                        "
+                        onmouseover="this.style.background='#1ed760';this.style.transform='translateY(-2px)'"
+                        onmouseout="this.style.background='#1db954';this.style.transform='none'"
+                    >
+                        📤 Share your stats!
+                    </button>
+                </div>
             </div>
 
             <!-- Error View -->
@@ -2987,6 +3014,41 @@
                         "block";
                 }
             });
+
+            // Print as PDF button logic
+            function updatePrintButtonVisibility() {
+                const btnContainer = document.getElementById(
+                    "printButtonContainer",
+                );
+                if (btnContainer) {
+                    btnContainer.style.display =
+                        filteredData.length > 0 ? "block" : "none";
+                }
+            }
+
+            // Attach print event
+            document.addEventListener("DOMContentLoaded", function () {
+                const printBtn = document.getElementById("printPdfBtn");
+                if (printBtn) {
+                    printBtn.addEventListener("click", function () {
+                        window.print();
+                    });
+                }
+            });
+
+            // Patch updateStats and showStatsView to update print button visibility
+            const _updateStats =
+                typeof updateStats === "function" ? updateStats : null;
+            window.updateStats = function () {
+                if (_updateStats) _updateStats();
+                updatePrintButtonVisibility();
+            };
+            const _showStatsView =
+                typeof showStatsView === "function" ? showStatsView : null;
+            window.showStatsView = function () {
+                if (_showStatsView) _showStatsView();
+                updatePrintButtonVisibility();
+            };
         </script>
     </body>
 </html>
