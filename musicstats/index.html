@@ -1188,30 +1188,76 @@
                             style="display: flex; align-items: center; gap: 8px"
                         >
                             <label
-                                for="statsModeDropdown"
+                                for="topListsMode"
                                 style="
                                     color: #1db954;
                                     font-weight: bold;
-                                    min-width: 180px;
+                                    min-width: 100px;
                                 "
-                                >Top Lists and Charts:</label
+                                >Top Lists:</label
                             >
-                            <select
-                                id="statsModeDropdown"
-                                onchange="toggleModeDropdown(this)"
+                            <div class="toggle-buttons">
+                                <button
+                                    id="toggleTopListsTime"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                    "
+                                    onclick="toggleMode('topListsMode')"
+                                >
+                                    By Time
+                                </button>
+                                <button
+                                    id="toggleTopListsListens"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                    "
+                                    onclick="toggleMode('topListsMode', true)"
+                                >
+                                    By Listens
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 8px"
+                        >
+                            <label
+                                for="chartsMode"
                                 style="
-                                    background: rgba(255, 255, 255, 0.1);
-                                    border: 1px solid rgba(29, 185, 84, 0.5);
-                                    border-radius: 8px;
-                                    padding: 8px 12px;
-                                    color: white;
-                                    font-size: 1rem;
-                                    min-width: 120px;
+                                    color: #1db954;
+                                    font-weight: bold;
+                                    min-width: 100px;
                                 "
+                                >Charts:</label
                             >
-                                <option value="time">By Time</option>
-                                <option value="listens">By Listens</option>
-                            </select>
+                            <div class="toggle-buttons">
+                                <button
+                                    id="toggleChartsTime"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                    "
+                                    onclick="toggleMode('chartsMode')"
+                                >
+                                    By Time
+                                </button>
+                                <button
+                                    id="toggleChartsListens"
+                                    class="upload-button"
+                                    style="
+                                        padding: 4px 16px;
+                                        font-size: 0.95rem;
+                                    "
+                                    onclick="toggleMode('chartsMode', true)"
+                                >
+                                    By Listens
+                                </button>
+                            </div>
                         </div>
 
                         <div
@@ -1535,8 +1581,9 @@
                 albums: { data: [], displayed: 20, filtered: [] },
             };
 
-            // Unified toggle state for both Top Lists and Charts
-            let statsMode = "time";
+            // Toggle state for each section
+            let topListsMode = "time";
+            let chartsMode = "time";
             let timeFormat = "minutes"; // "minutes" or "hours"
             let decimalPrecision = 1; // number of decimal places
 
@@ -1589,15 +1636,38 @@
                 }
             }
 
-            // Unified toggle UI logic for dropdown
-            function toggleModeDropdown(selectElem) {
-                statsMode = selectElem.value;
-                updateTopLists();
-                updateCharts();
+            // Toggle UI logic
+            function toggleMode(section, toListens) {
+                if (section === "topListsMode") {
+                    topListsMode = toListens ? "listens" : "time";
+                    updateTopLists();
+                    updateToggleButtons("topListsMode", topListsMode);
+                } else if (section === "chartsMode") {
+                    chartsMode = toListens ? "listens" : "time";
+                    updateCharts();
+                    updateToggleButtons("chartsMode", chartsMode);
+                }
             }
 
-            // No-op: updateToggleButtons is now obsolete, but kept for compatibility if called elsewhere
-            function updateToggleButtons() {}
+            function updateToggleButtons(section, mode) {
+                if (section === "topListsMode") {
+                    document.getElementById(
+                        "toggleTopListsTime",
+                    ).style.background = mode === "time" ? "#1db954" : "#222";
+                    document.getElementById(
+                        "toggleTopListsListens",
+                    ).style.background =
+                        mode === "listens" ? "#1db954" : "#222";
+                } else if (section === "chartsMode") {
+                    document.getElementById(
+                        "toggleChartsTime",
+                    ).style.background = mode === "time" ? "#1db954" : "#222";
+                    document.getElementById(
+                        "toggleChartsListens",
+                    ).style.background =
+                        mode === "listens" ? "#1db954" : "#222";
+                }
+            }
 
             // View management
             function showUploadView() {
@@ -2295,9 +2365,9 @@
                     artistStats[artist].plays++;
                 });
 
-                let sortKey = statsMode === "time" ? "time" : "plays";
+                let sortKey = topListsMode === "time" ? "time" : "plays";
                 let valueText =
-                    statsMode === "time"
+                    topListsMode === "time"
                         ? (v) => formatTime(v.time)
                         : (v) => `${v.plays} plays`;
 
@@ -2373,7 +2443,7 @@
                 });
 
                 renderTopLists();
-                updateToggleButtons();
+                updateToggleButtons("topListsMode", topListsMode);
             }
 
             function renderTopLists() {
@@ -2389,11 +2459,11 @@
                     container.innerHTML = items
                         .map((item, index) => {
                             let statText =
-                                statsMode === "time"
+                                topListsMode === "time"
                                     ? item.timeText
                                     : item.playsText;
                             let statOther =
-                                statsMode === "time"
+                                topListsMode === "time"
                                     ? item.playsText
                                     : item.timeText;
                             return `
@@ -2442,6 +2512,7 @@
                 updateCountryChart();
                 updateHourlyChart();
                 updateWeeklyChart();
+                updateToggleButtons("chartsMode", chartsMode);
             }
 
             function updateTimeChart() {
@@ -2458,7 +2529,7 @@
                 let groupedData = {};
                 let labelFormat = "month"; // default
                 let yLabel =
-                    statsMode === "time"
+                    chartsMode === "time"
                         ? timeFormat === "hours"
                             ? "Hours Listened"
                             : "Minutes Listened"
@@ -2469,7 +2540,7 @@
                     labelFormat = "day";
                     sortedDays.forEach((day) => {
                         groupedData[day] =
-                            statsMode === "time"
+                            chartsMode === "time"
                                 ? formatTimeValue(dailyData[day].time)
                                 : dailyData[day].tracks;
                     });
@@ -2479,7 +2550,7 @@
                         const key = day.slice(0, 7); // "YYYY-MM"
                         if (!groupedData[key]) groupedData[key] = 0;
                         groupedData[key] +=
-                            statsMode === "time"
+                            chartsMode === "time"
                                 ? formatTimeValue(dailyData[day].time)
                                 : dailyData[day].tracks;
                     });
@@ -2564,7 +2635,7 @@
                 const platforms = {};
                 filteredData.forEach((item) => {
                     if (item.platform && item.ms_played) {
-                        if (statsMode === "time") {
+                        if (chartsMode === "time") {
                             platforms[item.platform] =
                                 (platforms[item.platform] || 0) +
                                 formatTimeValue(item.ms_played);
@@ -2629,7 +2700,7 @@
                                             (value / total) *
                                             100
                                         ).toFixed(1);
-                                        return statsMode === "time"
+                                        return chartsMode === "time"
                                             ? `${label}: ${formatTime(value * (timeFormat === "hours" ? 1000 * 60 * 60 : 1000 * 60))} (${percentage}%)`
                                             : `${label}: ${value} listens (${percentage}%)`;
                                     },
@@ -2660,7 +2731,7 @@
                     const valSpan = document.createElement("span");
                     valSpan.className = "platform-hours";
                     valSpan.textContent =
-                        statsMode === "time"
+                        chartsMode === "time"
                             ? `${formatTime(val * (timeFormat === "hours" ? 1000 * 60 * 60 : 1000 * 60))} (${percentage}%)`
                             : `${val} listens (${percentage}%)`;
 
@@ -2677,7 +2748,7 @@
                 const countries = {};
                 filteredData.forEach((item) => {
                     if (item.conn_country) {
-                        if (statsMode === "time") {
+                        if (chartsMode === "time") {
                             countries[item.conn_country] =
                                 (countries[item.conn_country] || 0) +
                                 formatTimeValue(item.ms_played);
@@ -2702,7 +2773,7 @@
                         datasets: [
                             {
                                 label:
-                                    statsMode === "time"
+                                    chartsMode === "time"
                                         ? timeFormat === "hours"
                                             ? "Hours Listened"
                                             : "Minutes Listened"
@@ -2754,7 +2825,7 @@
                 if (!ctx) return;
 
                 let hourlyData, yLabel;
-                if (statsMode === "time") {
+                if (chartsMode === "time") {
                     hourlyData = new Array(24).fill(0);
                     filteredData.forEach((item) => {
                         const hour = new Date(item.ts).getHours();
@@ -2825,7 +2896,7 @@
                 if (!ctx) return;
 
                 let weeklyData = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
-                if (statsMode === "time") {
+                if (chartsMode === "time") {
                     filteredData.forEach((item) => {
                         if (item.ts && item.ms_played) {
                             const day = new Date(item.ts).getDay();
@@ -2836,7 +2907,7 @@
                     filteredData.forEach((item) => {
                         if (item.ts) {
                             const day = new Date(item.ts).getDay();
-                            weeklyData[day]++;
+                            weeklyData[day] += 1;
                         }
                     });
                 }
@@ -2860,7 +2931,7 @@
                         datasets: [
                             {
                                 label:
-                                    statsMode === "time"
+                                    chartsMode === "time"
                                         ? timeFormat === "hours"
                                             ? "Hours Listened"
                                             : "Minutes Listened"
@@ -2975,7 +3046,8 @@
             // Set initial toggle button states after DOM loads
             window.addEventListener("DOMContentLoaded", () => {
                 updateToggleButtons("weeklyChartMode", weeklyChartMode);
-                updateToggleButtons();
+                updateToggleButtons("topListsMode", topListsMode);
+                updateToggleButtons("chartsMode", chartsMode);
 
                 // Show mobile warning if on mobile device
                 const isMobile =
