@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My Spotify Stats</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div class="container">
+            <div
+                class="header"
+                style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    margin-bottom: 40px;
+                "
+            >
+                <div
+                    style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                    "
+                >
+                    <h1
+                        style="
+                            font-size: 3rem;
+                            margin-bottom: 10px;
+                            color: white;
+                            margin: 0 auto;
+                            text-align: center;
+                            flex: 1 1 auto;
+                            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+                        "
+                    >
+                        🎵 My Spotify Stats
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Upload View -->
+            <div id="uploadView">
+                <div class="upload-container" id="dropZone">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">
+                        <strong
+                            >Upload your Spotify Extended Streaming
+                            History</strong
+                        >
+                        <br />
+                        Drop your .zip file here or click to browse
+                        <br />
+                        <small
+                            >Your data is processed locally - nothing is
+                            uploaded to any server</small
+                        >
+                    </div>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        class="upload-input"
+                        accept=".zip"
+                    />
+                    <button
+                        class="upload-button"
+                        onclick="document.getElementById('fileInput').click()"
+                    >
+                        Choose File
+                    </button>
+                    <div class="file-info" style="display: none" id="fileInfo">
+                        <h4>How to get your Spotify data:</h4>
+                        <ol>
+                            <li>
+                                Go to
+                                <a
+                                    href="https://www.spotify.com/account/privacy/"
+                                    target="_blank"
+                                    style="color: #1db954"
+                                    >Spotify Privacy Settings</a
+                                >
+                            </li>
+                            <li>Scroll down to "Download your data"</li>
+                            <li>
+                                <strong style="color: #1db954"
+                                    >⚠️ IMPORTANT:</strong
+                                >
+                                Request
+                                <strong>"Extended streaming history"</strong>
+                                ONLY
+                                <br />
+                                <span style="color: #ff6b6b; font-weight: bold">
+                                    ❌ DO NOT select any other options - uncheck
+                                    everything else!
+                                </span>
+                            </li>
+                            <li>
+                                Wait for Spotify to email you the download link
+                                (can take up to 30 days)
+                            </li>
+                            <li>
+                                Download your data as a
+                                <strong>.zip</strong> file and upload it
+                                here.<br />
+                                <em>Note for macOS users:</em> If your browser
+                                automatically unzips the file, please
+                                re-compress it (right-click -> compress) before
+                                uploading.
+                            </li>
+                        </ol>
+                        <!-- TikTok Embed Start -->
+                        <blockquote
+                            class="tiktok-embed"
+                            cite="https://www.tiktok.com/@achneerov/video/7524009272519249158"
+                            data-video-id="7524009272519249158"
+                            style="
+                                margin: 20px 0;
+                                width: 100%;
+                                min-width: 0;
+                                max-width: 100%;
+                            "
+                        >
+                            <section>
+                                <a
+                                    target="_blank"
+                                    title="@achneerov"
+                                    href="https://www.tiktok.com/@achneerov?refer=embed"
+                                    >@achneerov</a
+                                >
+                                <p>
+                                    How to download your Spotify extended
+                                    streaming history
+                                </p>
+                                <a
+                                    target="_blank"
+                                    title="♬ original sound - Ach Neerov"
+                                    href="https://www.tiktok.com/music/original-sound-7524009272519249158?refer=embed"
+                                    >♬ original sound - Ach Neerov</a
+                                >
+                            </section>
+                        </blockquote>
+                        <script
+                            async
+                            src="https://www.tiktok.com/embed.js"
+                        ></script>
+                        <!-- TikTok Embed End -->
+                    </div>
+                    <button
+                        class="upload-button"
+                        onclick="toggleFileInfo()"
+                        style="background: rgba(255, 255, 255, 0.1)"
+                    >
+                        📋 How to get my data?
+                    </button>
+                </div>
+            </div>
+
+            <!-- Processing View -->
+            <div id="processingView" class="processing">
+                <h2>Processing your Spotify data...</h2>
+                <div class="processing-steps">
+                    <div class="processing-step" id="step1">
+                        Reading ZIP file
+                    </div>
+                    <div class="processing-step" id="step2">
+                        Parsing JSON data
+                    </div>
+                    <div class="processing-step" id="step3">
+                        Analyzing patterns
+                    </div>
+                    <div class="processing-step" id="step4">
+                        Generating insights
+                    </div>
+                </div>
+                <div class="loading"></div>
+                <p>This may take a few moments...</p>
+            </div>
+
+            <!-- Stats View -->
+            <div id="statsView" class="hidden">
+                <details style="margin-bottom: 1.5em">
+                    <summary
+                        style="
+                            font-size: 1.1rem;
+                            font-weight: bold;
+                            color: #fff;
+                            background: rgba(25, 20, 20, 0.9);
+                            border: 2px solid #1db954;
+                            border-radius: 8px;
+                            padding: 10px 18px;
+                            margin-bottom: 0.5em;
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                            cursor: pointer;
+                            letter-spacing: 0.5px;
+                            transition:
+                                background 0.2s,
+                                color 0.2s;
+                        "
+                    >
+                        ⚙️ Settings
+                    </summary>
+                    <div
+                        class="time-period"
+                        style="
+                            display: grid;
+                            grid-template-columns: repeat(
+                                auto-fit,
+                                minmax(250px, 1fr)
+                            );
+                            gap: 20px;
+                            margin-bottom: 30px;
+                            padding: 20px;
+                            background: rgba(25, 20, 20, 0.7);
+                            border-radius: 15px;
+                            border: 1px solid rgba(29, 185, 84, 0.3);
+                            margin-top: 1em;
+                        "
+                    >
+                        <div
+                            style="display: flex; align-items: center; gap: 8px"
+                        >
+                            <label
+                                for="periodSelect"
+                                style="
+                                    color: #1db954;
+                                    font-weight: bold;
+                                    min-width: 100px;
+                                "
+                                >Time Period:</label
+                            >
+                            <select
+                                id="periodSelect"
+                                onchange="applyFilter(this.value)"
+                                style="
+                                    background: rgba(255, 255, 255, 0.1);
+                                    border: 1px solid rgba(29, 185, 84, 0.5);
+                                    border-radius: 8px;
+                                    padding: 8px 12px;
+                                    color: white;
+                                    font-size: 1rem;
+                                    min-width: 120px;
+                                "
+                            >
+                                <option value="all">All Time</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                                <option value="last30">Last 30 Days</option>
+                                <option value="last7">Last 7 Days</option>
+                            </select>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 8px"
+                        >
+                            <label
+                                for="timeFormatSelect"
+                                style="
+                                    color: #1db954;
+                                    font-weight: bold;
+                                    min-width: 100px;
+                                "
+                                >Time Format:</label
+                            >
+                            <select
+                                id="timeFormatSelect"
+                                onchange="updateTimeFormat(this.value)"
+                                style="
+                                    background: rgba(255, 255, 255, 0.1);
+                                    border: 1px solid rgba(29, 185, 84, 0.5);
+                                    border-radius: 8px;
+                                    padding: 8px 12px;
+                                    color: white;
+                                    font-size: 1rem;
+                                    min-width: 120px;
+                                "
+                            >
+                                <option value="minutes" selected>
+                                    Minutes
+                                </option>
+                                <option value="hours">Hours</option>
+                            </select>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 8px"
+                        >
+                            <label
+                                for="decimalPrecision"
+                                style="
+                                    color: #1db954;
+                                    font-weight: bold;
+                                    min-width: 100px;
+                                "
+                                >Decimal Places:</label
+                            >
+                            <div
+                                style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 5px;
+                                "
+                            >
+                                <button
+                                    onclick="changeDecimalPrecision(-1)"
+                                    class="decimal-precision-btn"
+                                >
+                                    -
+                                </button>
+                                <span
+                                    id="decimalPrecisionValue"
+                                    style="
+                                        min-width: 20px;
+                                        text-align: center;
+                                        color: #1db954;
+                                        font-weight: bold;
+                                    "
+                                    >1</span
+                                >
+                                <button
+                                    onclick="changeDecimalPrecision(1)"
+                                    class="decimal-precision-btn"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 8px"
+                        >
+                            <label
+                                for="statsModeDropdown"
+                                style="
+                                    color: #1db954;
+                                    font-weight: bold;
+                                    min-width: 180px;
+                                "
+                                >Top Lists and Charts:</label
+                            >
+                            <select
+                                id="statsModeDropdown"
+                                onchange="toggleModeDropdown(this)"
+                                style="
+                                    background: rgba(255, 255, 255, 0.1);
+                                    border: 1px solid rgba(29, 185, 84, 0.5);
+                                    border-radius: 8px;
+                                    padding: 8px 12px;
+                                    color: white;
+                                    font-size: 1rem;
+                                    min-width: 120px;
+                                "
+                            >
+                                <option value="time">By Time</option>
+                                <option value="listens">By Listens</option>
+                            </select>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 8px"
+                        >
+                            <div class="toggle-buttons"></div>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 8px"
+                        >
+                            <div class="toggle-buttons"></div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <h3>Total Listening Time</h3>
+                        <div class="big-number" id="totalTime">0h</div>
+                        <div class="sub-stat" id="totalTracks">
+                            0 tracks played
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Daily Average</h3>
+                        <div class="big-number" id="avgDaily">0h</div>
+                        <div class="sub-stat" id="avgTracks">
+                            0 tracks per day
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Unique Artists</h3>
+                        <div class="big-number" id="uniqueArtists">0</div>
+                        <div class="sub-stat" id="uniqueTracks">
+                            0 unique tracks
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Completion Rate</h3>
+                        <div class="big-number" id="skipRate">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="completionBar"></div>
+                        </div>
+                        <div class="sub-stat">Songs played 30+ seconds</div>
+                    </div>
+                </div>
+
+                <!-- Content sections arranged for scrolling -->
+
+                <!-- Top Lists Section -->
+                <div id="top-lists-section" class="content-section">
+                    <h2
+                        style="
+                            font-size: 2rem;
+                            margin-bottom: 10px;
+                            color: white;
+                            margin: 0 auto 30px auto;
+                            text-align: center;
+                            flex: 1 1 auto;
+                            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+                        "
+                    >
+                        🎵 Top Lists
+                    </h2>
+
+                    <div class="top-lists-grid">
+                        <div class="top-list-container">
+                            <div class="top-list-header">
+                                <h3 class="top-list-title">🎤 Top Artists</h3>
+                                <input
+                                    type="text"
+                                    class="search-box"
+                                    placeholder="Search artists..."
+                                    oninput="filterList('artists', this.value)"
+                                />
+                            </div>
+                            <ul class="top-list" id="topArtists"></ul>
+                            <button
+                                class="show-more-btn"
+                                id="showMoreArtists"
+                                onclick="showMoreItems('artists')"
+                            >
+                                Show More Artists
+                            </button>
+                        </div>
+
+                        <div class="top-list-container">
+                            <div class="top-list-header">
+                                <h3 class="top-list-title">🎵 Top Tracks</h3>
+                                <input
+                                    type="text"
+                                    class="search-box"
+                                    placeholder="Search tracks..."
+                                    oninput="filterList('tracks', this.value)"
+                                />
+                            </div>
+                            <ul class="top-list" id="topTracks"></ul>
+                            <button
+                                class="show-more-btn"
+                                id="showMoreTracks"
+                                onclick="showMoreItems('tracks')"
+                            >
+                                Show More Tracks
+                            </button>
+                        </div>
+
+                        <div class="top-list-container">
+                            <div class="top-list-header">
+                                <h3 class="top-list-title">💿 Top Albums</h3>
+                                <input
+                                    type="text"
+                                    class="search-box"
+                                    placeholder="Search albums..."
+                                    oninput="filterList('albums', this.value)"
+                                />
+                            </div>
+                            <ul class="top-list" id="topAlbums"></ul>
+                            <button
+                                class="show-more-btn"
+                                id="showMoreAlbums"
+                                onclick="showMoreItems('albums')"
+                            >
+                                Show More Albums
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div id="charts-section" class="content-section">
+                    <h2
+                        style="
+                            font-size: 2rem;
+                            margin-bottom: 10px;
+                            color: white;
+                            margin: 0 auto 30px auto;
+                            text-align: center;
+                            flex: 1 1 auto;
+                            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+                        "
+                    >
+                        📊 Charts
+                    </h2>
+
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <div class="chart-title">
+                                📈 Listening Over Time
+                            </div>
+                            <canvas id="timeChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">📱 Platform Usage</div>
+                            <div
+                                class="platform-chart-container"
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 15px;
+                                "
+                            >
+                                <div style="height: 250px">
+                                    <canvas id="platformChart"></canvas>
+                                </div>
+                                <div style="height: 120px">
+                                    <div
+                                        class="platform-list"
+                                        id="platformList"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">
+                                🌍 Listening by Country
+                            </div>
+                            <canvas id="countryChart"></canvas>
+                        </div>
+                        <div class="chart-container weekly-patterns">
+                            <div class="chart-title">
+                                📅 Weekly Distribution
+                            </div>
+                            <canvas id="weeklyChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">
+                                ⏰ Hourly Distribution
+                            </div>
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Section -->
+                <div id="insights-section" class="content-section">
+                    <h2
+                        style="
+                            font-size: 2rem;
+                            margin-bottom: 10px;
+                            color: white;
+                            margin: 0 auto 30px auto;
+                            text-align: center;
+                            flex: 1 1 auto;
+                            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+                        "
+                    >
+                        💡 Insights
+                    </h2>
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-title">🏆 Longest Session</div>
+                            <div class="insight-value" id="longestSession">
+                                0h
+                            </div>
+                            <div class="insight-detail" id="sessionDetail">
+                                consecutive listening
+                            </div>
+                        </div>
+
+                        <div class="insight-card">
+                            <div class="insight-title">📅 Most Active Day</div>
+                            <div class="insight-value" id="mostActiveDay">
+                                --
+                            </div>
+                            <div class="insight-detail" id="activeDetails">
+                                --
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🌙 Night Owl Score</div>
+                            <div class="insight-value" id="nightOwlScore">
+                                0%
+                            </div>
+                            <div class="insight-detail">
+                                listening after 10 PM
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🌅 Early Bird Score</div>
+                            <div class="insight-value" id="earlyBirdScore">
+                                0%
+                            </div>
+                            <div class="insight-detail">
+                                listening before 8 AM
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">📊 Variety Score</div>
+                            <div class="insight-value" id="varietyScore">0</div>
+                            <div class="insight-detail">
+                                different artists per week
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🌍 Top Country</div>
+                            <div class="insight-value" id="topCountry">--</div>
+                            <div class="insight-detail" id="countryDetail">
+                                -- listens
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">
+                                📱 Favorite Platform
+                            </div>
+                            <div class="insight-value" id="topPlatform">--</div>
+                            <div class="insight-detail" id="platformDetail">
+                                -- hours
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🔀 Shuffle Usage</div>
+                            <div class="insight-value" id="shuffleRate">0%</div>
+                            <div class="insight-detail">of your listening</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">
+                                📶 Offline Listening
+                            </div>
+                            <div class="insight-value" id="offlineRate">0%</div>
+                            <div class="insight-detail">of your time</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">⏭️ Skip Rate</div>
+                            <div class="insight-value" id="actualSkipRate">
+                                0%
+                            </div>
+                            <div class="insight-detail">tracks skipped</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">🎯 Discovery Score</div>
+                            <div class="insight-value" id="discoveryScore">
+                                0
+                            </div>
+                            <div class="insight-detail">new tracks found</div>
+                        </div>
+                    </div>
+
+                    <!-- Listening Patterns Heatmap -->
+                </div>
+                <!-- Print as PDF Button -->
+                <div
+                    id="printButtonContainer"
+                    style="
+                        display: none;
+                        text-align: center;
+                        margin: 40px 0 0 0;
+                    "
+                >
+                    <button
+                        id="printPdfBtn"
+                        class="upload-button"
+                        style="
+                            background: #1db954;
+                            color: #fff;
+                            border: none;
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                            transition:
+                                background 0.2s,
+                                transform 0.2s;
+                        "
+                        onmouseover="this.style.background='#1ed760';this.style.transform='translateY(-2px)'"
+                        onmouseout="this.style.background='#1db954';this.style.transform='none'"
+                    >
+                        📤 Share your stats!
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error View -->
+            <div id="errorView" class="error">
+                <h3>Error Processing File</h3>
+                <p id="errorMessage"></p>
+                <button class="upload-button" onclick="showUploadView()">
+                    Try Again
+                </button>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
