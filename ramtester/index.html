@@ -215,19 +215,14 @@
             // Sort by timestamp to get most recent first
             const sortedRuns = runs.sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
             const lastRun = sortedRuns[0];
-            const previousRuns = sortedRuns.slice(1);
             
             // Display last run
             const lastRunHtml = this.formatRunDisplay(lastRun, true);
             document.getElementById('lastRunDisplay').innerHTML = lastRunHtml;
             
-            // Display previous runs
-            if (previousRuns.length === 0) {
-              document.getElementById('previousRunsDisplay').innerHTML = '<div class="text-gray-600">No previous runs found</div>';
-            } else {
-              const previousRunsHtml = previousRuns.map(run => this.formatRunDisplay(run, false)).join('');
-              document.getElementById('previousRunsDisplay').innerHTML = previousRunsHtml;
-            }
+            // Display all runs (including the most recent one)
+            const allRunsHtml = sortedRuns.map(run => this.formatRunDisplay(run, false)).join('');
+            document.getElementById('previousRunsDisplay').innerHTML = allRunsHtml;
           } catch (error) {
             console.warn('Failed to update run displays:', error);
           }
