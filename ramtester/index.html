@@ -94,7 +94,6 @@
           this.initializeLocalStorage();
           this.generateBaseJsonData();
           this.initializeEventListeners();
-          this.displaySystemInfo();
           this.updateRunDisplays();
         }
 
@@ -265,23 +264,6 @@
           document.getElementById('stopManualTest').addEventListener('click', () => this.stopManualTest());
         }
 
-        displaySystemInfo() {
-          const info = document.getElementById('systemInfo');
-          let memoryInfo = '';
-          
-          if (navigator.deviceMemory) {
-            memoryInfo = `Device RAM: ~${navigator.deviceMemory}GB | `;
-          }
-          
-          if (performance.memory) {
-            const used = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
-            const total = Math.round(performance.memory.totalJSHeapSize / 1024 / 1024);
-            const limit = Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024);
-            memoryInfo += `JS Heap: ${used}MB used / ${total}MB total / ${limit}MB limit`;
-          }
-          
-          info.innerHTML = memoryInfo;
-        }
 
 
 
@@ -456,8 +438,7 @@
               
               // Increase allocation size gradually
               currentMB = Math.min(currentMB + 25, 500);
-              this.displaySystemInfo();
-            } else {
+                } else {
               consecutiveFailures++;
               
               if (consecutiveFailures >= 3) {
@@ -558,7 +539,6 @@
           }
           
           this.stopManualTest();
-          this.displaySystemInfo();
         }
 
         stopManualTest() {
