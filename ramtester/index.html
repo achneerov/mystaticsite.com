@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAM Stress Tester</title>
+    <!-- Favicon links -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="../images/favicon/favicon.ico">
+    <link rel="manifest" href="../images/favicon/site.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="../images/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../images/favicon/android-chrome-512x512.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-500 shadow">
+      <nav class="container mx-auto flex justify-center py-4">
+        <a href="../index.html" class="mx-4 text-white hover:text-gray-200">My Other Sites</a>
+      </nav>
+    </header>
+    <main class="container mx-auto px-4 mt-10 flex-grow">
+      <h1 class="text-3xl font-bold text-center mb-8">RAM Stress Tester</h1>
+      <div class="space-y-6">
+        <!-- Automatic Stress Test -->
+        <article class="border p-6 rounded-lg bg-white shadow-lg">
+          <h2 class="text-xl font-semibold mb-4">Automatic RAM Stress Test</h2>
+          <p class="text-gray-700 mb-4">This will gradually allocate memory until the browser crashes or reaches its limit.</p>
+          <button id="startAutoTest" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mr-4">Start Auto Test</button>
+          <button id="stopAutoTest" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded" disabled>Stop Test</button>
+          <div id="autoTestResults" class="mt-4"></div>
+        </article>
+
+        <!-- Manual RAM Test -->
+        <article class="border p-6 rounded-lg bg-white shadow-lg">
+          <h2 class="text-xl font-semibold mb-4">Manual RAM Test</h2>
+          <p class="text-gray-700 mb-4">Test a specific amount of RAM allocation.</p>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">Amount (MB):</label>
+            <input type="range" id="ramSlider" min="10" max="2048" value="100" class="w-full mb-2">
+            <div class="flex items-center space-x-4">
+              <input type="number" id="ramInput" min="10" max="8192" value="100" class="border rounded px-3 py-2 w-24">
+              <span class="text-sm text-gray-600">MB</span>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="flex items-center">
+              <input type="checkbox" id="prolongedTest" class="mr-2">
+              <span class="text-sm">Prolonged test (hold memory for 10 seconds)</span>
+            </label>
+          </div>
+
+          <button id="startManualTest" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Test Memory</button>
+          <div id="manualTestResults" class="mt-4"></div>
+        </article>
+
+        <!-- Results Display -->
+        <article class="border p-6 rounded-lg bg-white shadow-lg">
+          <h2 class="text-xl font-semibold mb-4">System Info & Results</h2>
+          <div id="systemInfo" class="text-sm text-gray-600 mb-4"></div>
+          <div id="testHistory" class="space-y-2"></div>
+        </article>
+      </div>
+    </main>
+    <footer class="py-4 mt-auto">
+      <div class="text-center space-y-2">
+        <p class="text-gray-600">&copy; <span id="currentYear"></span>. All rights reserved. </p>
+        <p class="text-gray-600">Created by Alex with ❤️</p>
+      </div>
+    </footer>
+    <script>
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+      class RAMTester {
+        constructor() {
+          this.allocatedMemory = [];
+          this.isAutoTestRunning = false;
+          this.autoTestInterval = null;
+          this.currentAllocatedMB = 0;
+          this.maxReachedMB = 0;
+          this.testHistory = [];
+          
+          this.initializeEventListeners();
+          this.displaySystemInfo();
+        }
+
+        initializeEventListeners() {
+          // Slider and input sync
+          const slider = document.getElementById('ramSlider');
+          const input = document.getElementById('ramInput');
+          
+          slider.addEventListener('input', () => {
+            input.value = slider.value;
+          });
+          
+          input.addEventListener('input', () => {
+            slider.value = Math.min(Math.max(input.value, 10), 2048);
+          });
+
+          // Auto test controls
+          document.getElementById('startAutoTest').addEventListener('click', () => this.startAutoTest());
+          document.getElementById('stopAutoTest').addEventListener('click', () => this.stopAutoTest());
+          
+          // Manual test
+          document.getElementById('startManualTest').addEventListener('click', () => this.startManualTest());
+        }
+
+        displaySystemInfo() {
+          const info = document.getElementById('systemInfo');
+          let memoryInfo = '';
+          
+          if (navigator.deviceMemory) {
+            memoryInfo = `Device RAM: ~${navigator.deviceMemory}GB | `;
+          }
+          
+          if (performance.memory) {
+            const used = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+            const total = Math.round(performance.memory.totalJSHeapSize / 1024 / 1024);
+            const limit = Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024);
+            memoryInfo += `JS Heap: ${used}MB used / ${total}MB total / ${limit}MB limit`;
+          }
+          
+          info.innerHTML = memoryInfo || 'Memory info not available in this browser';
+        }
+
+        allocateMemory(sizeMB) {
+          try {
+            // Create array of specified size (rough MB calculation)
+            const arraySize = sizeMB * 1024 * 256; // 256 integers per KB roughly = 1MB
+            const array = new Array(arraySize);
+            
+            // Fill with random data to prevent optimization
+            for (let i = 0; i < arraySize; i += 1000) {
+              array[i] = Math.random();
+            }
+            
+            this.allocatedMemory.push(array);
+            this.currentAllocatedMB += sizeMB;
+            this.maxReachedMB = Math.max(this.maxReachedMB, this.currentAllocatedMB);
+            
+            return true;
+          } catch (error) {
+            console.error('Memory allocation failed:', error);
+            return false;
+          }
+        }
+
+        releaseMemory() {
+          this.allocatedMemory = [];
+          this.currentAllocatedMB = 0;
+          // Force garbage collection if available
+          if (window.gc) {
+            window.gc();
+          }
+        }
+
+        startAutoTest() {
+          this.isAutoTestRunning = true;
+          document.getElementById('startAutoTest').disabled = true;
+          document.getElementById('stopAutoTest').disabled = false;
+          
+          const resultsDiv = document.getElementById('autoTestResults');
+          resultsDiv.innerHTML = '<div class="text-blue-600">Starting automatic RAM stress test...</div>';
+          
+          let currentMB = 50;
+          let consecutiveFailures = 0;
+          
+          this.autoTestInterval = setInterval(() => {
+            if (!this.isAutoTestRunning) return;
+            
+            const success = this.allocateMemory(currentMB);
+            
+            if (success) {
+              consecutiveFailures = 0;
+              resultsDiv.innerHTML = `
+                <div class="text-green-600">
+                  <strong>Currently allocated: ${this.currentAllocatedMB}MB</strong><br>
+                  <small>Last allocation: ${currentMB}MB - Success</small>
+                </div>`;
+              
+              // Increase allocation size gradually
+              currentMB = Math.min(currentMB + 25, 500);
+              this.displaySystemInfo();
+            } else {
+              consecutiveFailures++;
+              
+              if (consecutiveFailures >= 3) {
+                this.stopAutoTest();
+                resultsDiv.innerHTML = `
+                  <div class="text-red-600">
+                    <strong>Test completed!</strong><br>
+                    Maximum RAM allocated: <strong>${this.maxReachedMB}MB</strong><br>
+                    <small>Browser/system limit reached after ${consecutiveFailures} failed attempts</small>
+                  </div>`;
+                
+                this.addToHistory(`Auto Test: Max ${this.maxReachedMB}MB allocated`);
+                return;
+              }
+              
+              resultsDiv.innerHTML = `
+                <div class="text-orange-600">
+                  <strong>Currently allocated: ${this.currentAllocatedMB}MB</strong><br>
+                  <small>Last allocation: ${currentMB}MB - Failed (${consecutiveFailures}/3)</small>
+                </div>`;
+            }
+          }, 500);
+        }
+
+        stopAutoTest() {
+          this.isAutoTestRunning = false;
+          if (this.autoTestInterval) {
+            clearInterval(this.autoTestInterval);
+          }
+          
+          document.getElementById('startAutoTest').disabled = false;
+          document.getElementById('stopAutoTest').disabled = true;
+          
+          const resultsDiv = document.getElementById('autoTestResults');
+          if (this.maxReachedMB > 0) {
+            resultsDiv.innerHTML = `
+              <div class="text-blue-600">
+                <strong>Test stopped</strong><br>
+                Maximum RAM reached: <strong>${this.maxReachedMB}MB</strong><br>
+                Currently holding: ${this.currentAllocatedMB}MB
+              </div>`;
+          }
+        }
+
+        async startManualTest() {
+          const amountMB = parseInt(document.getElementById('ramInput').value);
+          const prolonged = document.getElementById('prolongedTest').checked;
+          const resultsDiv = document.getElementById('manualTestResults');
+          
+          resultsDiv.innerHTML = '<div class="text-blue-600">Testing memory allocation...</div>';
+          
+          // Release previous allocations
+          this.releaseMemory();
+          
+          const success = this.allocateMemory(amountMB);
+          
+          if (success) {
+            let message = `<div class="text-green-600"><strong>Success!</strong> Allocated ${amountMB}MB of RAM</div>`;
+            
+            if (prolonged) {
+              message = `<div class="text-green-600"><strong>Success!</strong> Allocated ${amountMB}MB of RAM - holding for 10 seconds...</div>`;
+              resultsDiv.innerHTML = message;
+              
+              await new Promise(resolve => setTimeout(resolve, 10000));
+              
+              message = `<div class="text-green-600"><strong>Prolonged test completed!</strong> Successfully held ${amountMB}MB for 10 seconds</div>`;
+            }
+            
+            resultsDiv.innerHTML = message;
+            this.addToHistory(`Manual Test: ${amountMB}MB - Success${prolonged ? ' (10s hold)' : ''}`);
+          } else {
+            resultsDiv.innerHTML = `<div class="text-red-600"><strong>Failed</strong> to allocate ${amountMB}MB of RAM</div>`;
+            this.addToHistory(`Manual Test: ${amountMB}MB - Failed`);
+          }
+          
+          this.displaySystemInfo();
+        }
+
+        addToHistory(result) {
+          const timestamp = new Date().toLocaleTimeString();
+          this.testHistory.unshift(`[${timestamp}] ${result}`);
+          
+          // Keep only last 10 results
+          if (this.testHistory.length > 10) {
+            this.testHistory = this.testHistory.slice(0, 10);
+          }
+          
+          const historyDiv = document.getElementById('testHistory');
+          historyDiv.innerHTML = this.testHistory
+            .map(entry => `<div class="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">${entry}</div>`)
+            .join('');
+        }
+      }
+
+      // Initialize the RAM tester when page loads
+      window.addEventListener('load', () => {
+        new RAMTester();
+      });
+    </script>
+  </body>
+</html>
