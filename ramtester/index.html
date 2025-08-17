@@ -22,11 +22,6 @@
     </header>
     <main class="container mx-auto px-4 mt-10 flex-grow">
       <div class="space-y-6">
-        <!-- Last Run Results -->
-        <article class="border p-6 rounded-lg bg-white shadow-lg">
-          <h2 class="text-xl font-semibold mb-4">Last Run Results</h2>
-          <div id="lastRunResults" class="mb-4 p-3 bg-gray-50 rounded"></div>
-        </article>
 
         <!-- Automatic Stress Test -->
         <article class="border p-6 rounded-lg bg-white shadow-lg">
@@ -61,11 +56,6 @@
           <div id="manualTestResults" class="mt-4"></div>
         </article>
 
-        <!-- Previous Runs -->
-        <article class="border p-6 rounded-lg bg-white shadow-lg">
-          <h2 class="text-xl font-semibold mb-4">Previous Runs</h2>
-          <div id="previousRuns" class="space-y-2"></div>
-        </article>
       </div>
     </main>
     <footer class="py-4 mt-auto">
@@ -83,24 +73,13 @@
           this.isAutoTestRunning = false;
           this.isManualTestRunning = false;
           this.autoTestInterval = null;
-          this.saveInterval = null;
           this.currentAllocatedMB = 0;
           this.maxReachedMB = 0;
-          this.testHistory = [];
-          this.previousRuns = [];
           this.baseJsonData = null;
-          this.lastSaveTime = 0;
-          this.storageKey = 'ramtester-data';
           
           this.generateBaseJsonData();
           this.initializeEventListeners();
           this.displaySystemInfo();
-          this.loadCrashRecoveryData();
-          this.displayLastRunResults();
-          this.loadSessionData();
-          this.loadPreviousRuns();
-          this.startPeriodicSave();
-          this.setupCrashProtection();
         }
 
 
@@ -132,237 +111,6 @@
           info.innerHTML = memoryInfo;
         }
 
-        // Unified localStorage system
-        loadData() {
-          try {
-            const savedData = localStorage.getItem(this.storageKey);
-            if (savedData) {
-              const data = JSON.parse(savedData);
-              console.log(`Loaded data from localStorage [${this.storageKey}]:`, data);
-              return data;
-            }
-          } catch (error) {
-            console.error('Error loading from localStorage:', error);
-          }
-          return {};
-        }
-
-        saveData(newData = {}) {
-          try {
-            const currentData = this.loadData();
-            const updatedData = { ...currentData, ...newData };
-            localStorage.setItem(this.storageKey, JSON.stringify(updatedData));
-            console.log(`Saved data to localStorage [${this.storageKey}]:`, updatedData);
-            this.lastSaveTime = Date.now();
-          } catch (error) {
-            console.error('Error saving to localStorage:', error);
-          }
-        }
-
-        // Separate high-frequency save for crash protection
-        saveCurrentProgress() {
-          try {
-            const progressData = {
-              currentAllocatedMB: this.currentAllocatedMB,
-              maxReachedMB: this.maxReachedMB,
-              isAutoTestRunning: this.isAutoTestRunning,
-              timestamp: Date.now()
-            };
-            
-            // Save live progress within the main data structure
-            this.saveData({ liveProgress: progressData });
-            
-            // Also update main data but less frequently
-            if (Date.now() - this.lastSaveTime > 2000) { // Every 2 seconds
-              this.saveData({ 
-                liveProgress: progressData,
-                lastRun: this.maxReachedMB > 0 ? {
-                  maxRAM: this.maxReachedMB,
-                  date: new Date().toLocaleString(),
-                  timestamp: Date.now(),
-                  status: this.isAutoTestRunning ? 'running' : 'completed'
-                } : undefined
-              });
-            }
-          } catch (error) {
-            console.error('Error saving progress:', error);
-          }
-        }
-
-        startPeriodicSave() {
-          // Save progress every 1 second during tests
-          this.saveInterval = setInterval(() => {
-            if (this.isAutoTestRunning || this.isManualTestRunning) {
-              this.saveCurrentProgress();
-            }
-          }, 1000);
-        }
-
-        setupCrashProtection() {
-          // Save data before page unloads (crash/close)
-          window.addEventListener('beforeunload', () => {
-            if (this.maxReachedMB > 0) {
-              // Save current progress before crash
-              this.saveCurrentProgress();
-            }
-          });
-
-          // Also save on visibility change (tab switch, minimize)
-          document.addEventListener('visibilitychange', () => {
-            if (document.hidden && (this.isAutoTestRunning || this.isManualTestRunning)) {
-              this.saveCurrentProgress();
-            }
-          });
-        }
-
-        loadCrashRecoveryData() {
-          try {
-            const data = this.loadData();
-            if (data.liveProgress) {
-              const liveProgress = data.liveProgress;
-              console.log('Found crash recovery data:', liveProgress);
-              
-              // Check if this was from a recent crash (within last 5 minutes)
-              const timeDiff = Date.now() - liveProgress.timestamp;
-              if (timeDiff < 300000 && liveProgress.maxReachedMB > 0) {
-                // Save crashed run to history
-                this.saveTestResult(liveProgress.maxReachedMB, 'auto', 'crashed');
-                
-                console.log('Recovered crash data:', liveProgress.maxReachedMB + 'MB');
-                return liveProgress;
-              }
-            }
-          } catch (error) {
-            console.error('Error loading crash recovery data:', error);
-          }
-          return null;
-        }
-
-        displayLastRunResults() {
-          try {
-            const data = this.loadData();
-            const lastRunDiv = document.getElementById('lastRunResults');
-            
-            if (data.lastRun && data.lastRun.maxRAM) {
-              const status = data.lastRun.status || 'completed';
-              const statusColor = status === 'crashed' ? 'text-red-600' : 'text-green-600';
-              const statusText = status === 'crashed' ? '(Browser Crashed)' : '';
-              
-              lastRunDiv.innerHTML = `
-                <div class="${statusColor}">
-                  <strong>Last Auto Test: ${data.lastRun.maxRAM}MB ${statusText}</strong><br>
-                  <small class="text-gray-600">Date: ${data.lastRun.date}</small>
-                </div>`;
-            } else {
-              lastRunDiv.innerHTML = '<div class="text-gray-500">No previous test results found</div>';
-            }
-          } catch (error) {
-            console.error('Error displaying last run results:', error);
-            document.getElementById('lastRunResults').innerHTML = '<div class="text-gray-500">Error loading previous results</div>';
-          }
-        }
-
-        saveTestResult(maxRAM, testType = 'auto', status = 'completed') {
-          const testData = {
-            maxRAM: maxRAM,
-            date: new Date().toLocaleString(),
-            timestamp: Date.now(),
-            testType: testType, // 'auto' or 'manual'
-            status: status // 'completed', 'crashed', 'stopped'
-          };
-          
-          // Save as last run
-          this.saveData({ lastRun: testData });
-          
-          // Add to previous runs history
-          this.addToPreviousRuns(testData);
-        }
-
-        addToPreviousRuns(runData) {
-          try {
-            const data = this.loadData();
-            let previousRuns = data.previousRuns || [];
-            
-            // Add new run to the beginning
-            previousRuns.unshift(runData);
-            
-            // Keep only last 20 runs
-            if (previousRuns.length > 20) {
-              previousRuns = previousRuns.slice(0, 20);
-            }
-            
-            // Save back to localStorage
-            this.saveData({ previousRuns: previousRuns });
-            
-            // Update display
-            this.displayPreviousRuns(previousRuns);
-            
-            console.log('Added run to history:', runData);
-          } catch (error) {
-            console.error('Error saving run to history:', error);
-          }
-        }
-
-        loadPreviousRuns() {
-          try {
-            const data = this.loadData();
-            const previousRuns = data.previousRuns || [];
-            this.previousRuns = previousRuns;
-            this.displayPreviousRuns(previousRuns);
-          } catch (error) {
-            console.error('Error loading previous runs:', error);
-          }
-        }
-
-        displayPreviousRuns(runs = null) {
-          try {
-            const runsToDisplay = runs || this.previousRuns;
-            const previousRunsDiv = document.getElementById('previousRuns');
-            
-            if (runsToDisplay.length === 0) {
-              previousRunsDiv.innerHTML = '<div class="text-gray-500">No previous runs found</div>';
-              return;
-            }
-            
-            const runsHtml = runsToDisplay.map((run, index) => {
-              const statusColor = run.status === 'crashed' ? 'text-red-600' : 
-                                run.status === 'stopped' ? 'text-orange-600' : 'text-green-600';
-              const statusText = run.status === 'crashed' ? '(Crashed)' : 
-                               run.status === 'stopped' ? '(Stopped)' : '';
-              const testTypeText = run.testType === 'manual' ? '[Manual]' : '[Auto]';
-              
-              return `
-                <div class="text-sm border-l-2 border-gray-300 pl-3 py-1">
-                  <span class="${statusColor}"><strong>${run.maxRAM}MB</strong> ${statusText}</span>
-                  <span class="text-gray-600">${testTypeText} - ${run.date}</span>
-                </div>`;
-            }).join('');
-            
-            previousRunsDiv.innerHTML = runsHtml;
-          } catch (error) {
-            console.error('Error displaying previous runs:', error);
-            document.getElementById('previousRuns').innerHTML = '<div class="text-gray-500">Error loading previous runs</div>';
-          }
-        }
-
-        saveSessionData() {
-          const sessionData = {
-            testHistory: this.testHistory,
-            currentAllocatedMB: this.currentAllocatedMB,
-            maxReachedMB: this.maxReachedMB,
-            timestamp: Date.now()
-          };
-          this.saveData({ session: sessionData });
-        }
-
-        loadSessionData() {
-          const data = this.loadData();
-          if (data.session) {
-            this.testHistory = data.session.testHistory || [];
-            this.updateTestHistoryDisplay();
-            console.log('Loaded session data:', data.session);
-          }
-        }
 
 
         generateBaseJsonData() {
@@ -529,17 +277,12 @@
               if (consecutiveFailures >= 3) {
                 this.stopAutoTest();
                 
-                // Save result to localStorage
-                this.saveTestResult(this.maxReachedMB, 'auto', 'completed');
-                
                 resultsDiv.innerHTML = `
                   <div class="text-red-600">
                     <strong>Test completed!</strong><br>
                     Maximum RAM allocated: <strong>${this.maxReachedMB}MB</strong><br>
                     <small>Browser/system limit reached after ${consecutiveFailures} failed attempts</small>
                   </div>`;
-                
-                this.displayLastRunResults();
                 return;
               }
               
@@ -558,9 +301,6 @@
             clearInterval(this.autoTestInterval);
           }
           
-          // Save final result
-          this.saveTestResult(this.maxReachedMB, 'auto', 'stopped');
-          this.saveCurrentProgress();
           
           document.getElementById('startAutoTest').disabled = false;
           document.getElementById('stopAutoTest').disabled = true;
@@ -608,7 +348,6 @@
             
             if (this.isManualTestRunning) {
               resultsDiv.innerHTML = `<div class="text-green-600"><strong>Test completed!</strong> Successfully held ${amountMB}MB for ${holdDuration} seconds</div>`;
-              this.saveTestResult(amountMB, 'manual', 'completed');
             }
           } else if (!success) {
             resultsDiv.innerHTML = `<div class="text-red-600"><strong>Failed</strong> to allocate ${amountMB}MB of RAM</div>`;
