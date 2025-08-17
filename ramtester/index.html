@@ -23,9 +23,9 @@
     <main class="container mx-auto px-4 mt-10 flex-grow">
       <div class="space-y-6">
 
-        <!-- Last Run -->
+        <!-- Current/Previous Run -->
         <article class="border p-6 rounded-lg bg-white shadow-lg">
-          <h2 class="text-xl font-semibold mb-4">Last Run</h2>
+          <h2 class="text-xl font-semibold mb-4">Current/Previous Run</h2>
           <div id="lastRunDisplay" class="text-gray-600">No previous runs found</div>
         </article>
 
@@ -35,7 +35,6 @@
           <p class="text-gray-700 mb-4">This will gradually allocate memory until the browser crashes or reaches its limit.</p>
           <button id="startAutoTest" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mr-4">Start Auto Test</button>
           <button id="stopAutoTest" class="bg-gray-400 text-gray-600 px-4 py-2 rounded" disabled>Stop Test</button>
-          <div id="autoTestResults" class="mt-4"></div>
         </article>
 
         <!-- Manual RAM Test -->
@@ -59,12 +58,14 @@
 
           <button id="startManualTest" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mr-4">Test Memory</button>
           <button id="stopManualTest" class="bg-gray-400 text-gray-600 px-4 py-2 rounded" disabled>Stop Test</button>
-          <div id="manualTestResults" class="mt-4"></div>
         </article>
 
-        <!-- Previous Runs -->
+        <!-- All Runs -->
         <article class="border p-6 rounded-lg bg-white shadow-lg">
-          <h2 class="text-xl font-semibold mb-4">Previous Runs</h2>
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">All Runs</h2>
+            <button id="clearHistory" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">Clear History</button>
+          </div>
           <div id="previousRunsDisplay" class="text-gray-600">No previous runs found</div>
         </article>
 
@@ -232,7 +233,7 @@
             'Running...';
           
           const statusClass = run.status === 'completed' ? 'text-green-600' : 
-                             run.status === 'running' ? 'text-blue-600' : 
+                             run.status === 'running' ? 'text-blue-600 font-bold' : 
                              run.status === 'crashed' ? 'text-red-600' : 'text-gray-600';
           
           const typeDisplay = run.type === 'automatic' ? 'Auto Test' : 
@@ -241,13 +242,13 @@
           return `
             <div class="mb-4 p-4 border rounded ${isLastRun ? 'bg-blue-50' : 'bg-gray-50'}">
               <div class="flex justify-between items-start mb-2">
-                <div class="font-medium">${typeDisplay}</div>
-                <div class="text-sm text-gray-500">${date} ${time}</div>
+                <div class="${isLastRun ? 'font-bold text-lg' : 'font-medium'}">${typeDisplay}</div>
+                <div class="${isLastRun ? 'text-base' : 'text-sm'} text-gray-500">${date} ${time}</div>
               </div>
-              <div class="text-sm space-y-1">
+              <div class="${isLastRun ? 'text-base' : 'text-sm'} space-y-1">
                 <div>Max RAM: <span class="font-medium">${run.maxMB || 0}MB</span></div>
                 <div>Duration: <span class="font-medium">${duration}</span></div>
-                <div class="${statusClass}">Status: ${run.status || 'unknown'}</div>
+                <div class="${statusClass}">${run.status === 'running' ? '🔄 Currently Running' : run.status === 'crashed' ? 'Status: crashed (Which is good!)' : `Status: ${run.status || 'unknown'}`}</div>
               </div>
             </div>
           `;
@@ -262,6 +263,9 @@
           // Manual test
           document.getElementById('startManualTest').addEventListener('click', () => this.startManualTest());
           document.getElementById('stopManualTest').addEventListener('click', () => this.stopManualTest());
+          
+          // Clear history
+          document.getElementById('clearHistory').addEventListener('click', () => this.clearHistory());
         }
 
 
@@ -415,8 +419,6 @@
           this.saveRunData(runData);
           this.startPeriodicSaving();
           
-          const resultsDiv = document.getElementById('autoTestResults');
-          resultsDiv.innerHTML = '<div class="text-blue-600">Starting automatic RAM stress test...</div>';
           
           let currentMB = 50;
           let consecutiveFailures = 0;
@@ -428,11 +430,6 @@
             
             if (success) {
               consecutiveFailures = 0;
-              resultsDiv.innerHTML = `
-                <div class="text-green-600">
-                  <strong>Currently allocated: ${this.currentAllocatedMB}MB</strong><br>
-                  <small>Last allocation: ${currentMB}MB - Success</small>
-                </div>`;
               
               // Progress is now saved automatically every second
               
@@ -443,21 +440,9 @@
               
               if (consecutiveFailures >= 3) {
                 this.stopAutoTest();
-                
-                resultsDiv.innerHTML = `
-                  <div class="text-red-600">
-                    <strong>Test completed!</strong><br>
-                    Maximum RAM allocated: <strong>${this.maxReachedMB}MB</strong><br>
-                    <small>Browser/system limit reached after ${consecutiveFailures} failed attempts</small>
-                  </div>`;
                 return;
               }
               
-              resultsDiv.innerHTML = `
-                <div class="text-orange-600">
-                  <strong>Currently allocated: ${this.currentAllocatedMB}MB</strong><br>
-                  <small>Last allocation: ${currentMB}MB - Failed (${consecutiveFailures}/3)</small>
-                </div>`;
             }
           }, 500);
         }
@@ -475,22 +460,12 @@
           document.getElementById('stopAutoTest').disabled = true;
           document.getElementById('stopAutoTest').className = 'bg-gray-400 text-gray-600 px-4 py-2 rounded';
           
-          const resultsDiv = document.getElementById('autoTestResults');
-          if (this.maxReachedMB > 0) {
-            resultsDiv.innerHTML = `
-              <div class="text-blue-600">
-                <strong>Test stopped</strong><br>
-                Maximum RAM reached: <strong>${this.maxReachedMB}MB</strong><br>
-                Currently holding: ${this.currentAllocatedMB}MB
-              </div>`;
-          }
         }
 
 
         async startManualTest() {
           const amountMB = parseInt(document.getElementById('ramInput').value);
           const holdDuration = parseInt(document.getElementById('holdDuration').value);
-          const resultsDiv = document.getElementById('manualTestResults');
           
           this.isManualTestRunning = true;
           document.getElementById('startManualTest').disabled = true;
@@ -513,29 +488,16 @@
           this.saveRunData(runData);
           this.startPeriodicSaving();
           
-          resultsDiv.innerHTML = '<div class="text-blue-600">Testing memory allocation...</div>';
-          
           // Release previous allocations
           this.releaseMemory();
           
           const success = this.allocateMemory(amountMB);
           
           if (success && this.isManualTestRunning) {
-            resultsDiv.innerHTML = `<div class="text-green-600"><strong>Success!</strong> Allocated ${amountMB}MB of RAM - holding for ${holdDuration} seconds...</div>`;
-            
             // Wait for the specified duration with ability to stop
             for (let i = 0; i < holdDuration && this.isManualTestRunning; i++) {
               await new Promise(resolve => setTimeout(resolve, 1000));
-              if (this.isManualTestRunning) {
-                resultsDiv.innerHTML = `<div class="text-green-600"><strong>Holding...</strong> ${amountMB}MB allocated - ${holdDuration - i - 1} seconds remaining</div>`;
-              }
             }
-            
-            if (this.isManualTestRunning) {
-              resultsDiv.innerHTML = `<div class="text-green-600"><strong>Test completed!</strong> Successfully held ${amountMB}MB for ${holdDuration} seconds</div>`;
-            }
-          } else if (!success) {
-            resultsDiv.innerHTML = `<div class="text-red-600"><strong>Failed</strong> to allocate ${amountMB}MB of RAM</div>`;
           }
           
           this.stopManualTest();
@@ -548,6 +510,13 @@
           document.getElementById('startManualTest').disabled = false;
           document.getElementById('stopManualTest').disabled = true;
           document.getElementById('stopManualTest').className = 'bg-gray-400 text-gray-600 px-4 py-2 rounded';
+        }
+
+        clearHistory() {
+          if (confirm('Are you sure you want to clear all run history? This cannot be undone.')) {
+            localStorage.setItem('runs', JSON.stringify([]));
+            this.updateRunDisplays();
+          }
         }
 
       }
