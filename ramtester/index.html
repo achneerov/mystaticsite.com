@@ -99,9 +99,10 @@
         }
 
         initializeLocalStorage() {
-          const existingRuns = localStorage.getItem('runs');
-          if (!existingRuns) {
-            localStorage.setItem('runs', JSON.stringify([]));
+          const existingData = localStorage.getItem('ramtester-data');
+          if (!existingData) {
+            const initialData = { runs: [] };
+            localStorage.setItem('ramtester-data', JSON.stringify(initialData));
           } else {
             this.handleCrashedRuns();
           }
@@ -109,7 +110,8 @@
 
         handleCrashedRuns() {
           try {
-            const runs = JSON.parse(localStorage.getItem('runs') || '[]');
+            const data = JSON.parse(localStorage.getItem('ramtester-data') || '{"runs":[]}');
+            const runs = data.runs || [];
             let updated = false;
             
             runs.forEach(run => {
@@ -121,7 +123,8 @@
             });
             
             if (updated) {
-              localStorage.setItem('runs', JSON.stringify(runs));
+              data.runs = runs;
+              localStorage.setItem('ramtester-data', JSON.stringify(data));
             }
           } catch (error) {
             console.warn('Failed to handle crashed runs:', error);
@@ -134,7 +137,8 @@
 
         saveRunData(runData) {
           try {
-            const runs = JSON.parse(localStorage.getItem('runs') || '[]');
+            const data = JSON.parse(localStorage.getItem('ramtester-data') || '{"runs":[]}');
+            const runs = data.runs || [];
             
             const existingRunIndex = runs.findIndex(run => run.id === runData.id);
             if (existingRunIndex >= 0) {
@@ -147,7 +151,8 @@
               runs.splice(0, runs.length - 100);
             }
             
-            localStorage.setItem('runs', JSON.stringify(runs));
+            data.runs = runs;
+            localStorage.setItem('ramtester-data', JSON.stringify(data));
             this.updateRunDisplays();
           } catch (error) {
             console.warn('Failed to save run data:', error);
@@ -176,7 +181,8 @@
         updateCurrentRun() {
           if (!this.currentRunId) return;
           
-          const runs = JSON.parse(localStorage.getItem('runs') || '[]');
+          const data = JSON.parse(localStorage.getItem('ramtester-data') || '{"runs":[]}');
+          const runs = data.runs || [];
           const runIndex = runs.findIndex(run => run.id === this.currentRunId);
           
           if (runIndex >= 0) {
@@ -189,14 +195,16 @@
               runs[runIndex].status = 'completed';
             }
             
-            localStorage.setItem('runs', JSON.stringify(runs));
+            data.runs = runs;
+            localStorage.setItem('ramtester-data', JSON.stringify(data));
             this.updateRunDisplays();
           }
         }
 
         updateRunDisplays() {
           try {
-            const runs = JSON.parse(localStorage.getItem('runs') || '[]');
+            const data = JSON.parse(localStorage.getItem('ramtester-data') || '{"runs":[]}');
+            const runs = data.runs || [];
             
             if (runs.length === 0) {
               document.getElementById('lastRunDisplay').innerHTML = '<div class="text-gray-600">No previous runs found</div>';
@@ -514,7 +522,8 @@
 
         clearHistory() {
           if (confirm('Are you sure you want to clear all run history? This cannot be undone.')) {
-            localStorage.setItem('runs', JSON.stringify([]));
+            const data = { runs: [] };
+            localStorage.setItem('ramtester-data', JSON.stringify(data));
             this.updateRunDisplays();
           }
         }
