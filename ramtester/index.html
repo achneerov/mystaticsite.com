@@ -275,78 +275,17 @@
 
 
         generateBaseJsonData() {
-          // Generate approximately 1MB of JSON data
-          const data = {
-            metadata: {
-              purpose: "RAM testing data",
-              size_target: "1MB",
-              generated_by: "RAM Tester",
-              version: "1.0"
-            },
-            test_data: {
-              arrays: [],
-              objects: {},
-              strings: [],
-              numbers: []
-            }
-          };
-
-          // Add arrays with various data types
-          for (let i = 0; i < 50; i++) {
-            const arr = [];
-            for (let j = 0; j < 100; j++) {
-              arr.push(Math.floor(Math.random() * 1000000));
-            }
-            data.test_data.arrays.push(arr);
-          }
-
-          // Add objects with nested structures
-          for (let i = 0; i < 20; i++) {
-            const objKey = `object_${i}`;
-            data.test_data.objects[objKey] = {
-              id: i,
-              name: this.generateRandomString(50),
-              description: this.generateRandomString(200),
-              properties: {
-                type: ["A", "B", "C", "D"][Math.floor(Math.random() * 4)],
-                value: Math.random() * 1000,
-                active: Math.random() > 0.5,
-                tags: Array.from({length: 10}, () => this.generateRandomString(10))
-              },
-              nested_data: {
-                level1: {
-                  level2: {
-                    level3: {
-                      data: Array.from({length: 50}, () => Math.floor(Math.random() * 100))
-                    }
-                  }
-                }
-              }
-            };
-          }
-
-          // Add large strings
-          for (let i = 0; i < 10; i++) {
-            data.test_data.strings.push(this.generateRandomString(5000));
-          }
-
-          // Add numbers array
-          data.test_data.numbers = Array.from({length: 1000}, () => Math.random() * 2000 - 1000);
-
-          // Add padding to reach approximately 1MB
-          const jsonString = JSON.stringify(data);
-          const currentSize = new Blob([jsonString]).size;
-          const targetSize = 1048576; // 1MB
+          // Create base ArrayBuffer of 1MB
+          const bufferSize = 1024 * 1024; // 1MB
+          this.baseJsonData = new ArrayBuffer(bufferSize);
           
-          if (currentSize < targetSize) {
-            const paddingNeeded = targetSize - currentSize - 100;
-            if (paddingNeeded > 0) {
-              data.test_data.padding = this.generateRandomString(paddingNeeded);
-            }
+          // Fill with random data to prevent optimization
+          const view = new Uint8Array(this.baseJsonData);
+          for (let i = 0; i < view.length; i++) {
+            view[i] = Math.floor(Math.random() * 256);
           }
-
-          this.baseJsonData = data;
-          console.log(`Generated base JSON data: ~${Math.round(new Blob([JSON.stringify(data)]).size / 1024)}KB`);
+          
+          console.log(`Generated base ArrayBuffer: ${Math.round(bufferSize / 1024)}KB`);
         }
 
         generateRandomString(length) {
@@ -361,7 +300,7 @@
         allocateMemory(sizeMB) {
           try {
             if (!this.baseJsonData) {
-              console.error('Base JSON data not ready');
+              console.error('Base ArrayBuffer not ready');
               return false;
             }
 
@@ -370,13 +309,15 @@
             const copies = [];
             
             for (let i = 0; i < copiesNeeded; i++) {
-              // Create deep copy using JSON parse/stringify
-              const copy = JSON.parse(JSON.stringify(this.baseJsonData));
+              // Create new ArrayBuffer and copy data
+              const copy = new ArrayBuffer(this.baseJsonData.byteLength);
+              const copyView = new Uint8Array(copy);
+              const sourceView = new Uint8Array(this.baseJsonData);
               
-              // Add some uniqueness to prevent optimization
-              copy.copy_id = i;
-              copy.timestamp = Date.now();
-              copy.random_data = Math.random();
+              // Copy data and add uniqueness to prevent optimization
+              copyView.set(sourceView);
+              copyView[0] = i % 256; // Make each buffer unique
+              copyView[copyView.length - 1] = (Date.now() % 256);
               
               copies.push(copy);
             }
@@ -385,7 +326,7 @@
             this.currentAllocatedMB += sizeMB;
             this.maxReachedMB = Math.max(this.maxReachedMB, this.currentAllocatedMB);
             
-            console.log(`Allocated ${sizeMB}MB (${copiesNeeded} copies), total: ${this.currentAllocatedMB}MB`);
+            console.log(`Allocated ${sizeMB}MB (${copiesNeeded} buffers), total: ${this.currentAllocatedMB}MB`);
             return true;
           } catch (error) {
             console.error('Memory allocation failed:', error);
@@ -404,6 +345,11 @@
 
         startAutoTest() {
           this.isAutoTestRunning = true;
+          
+          // Reset memory state for new test
+          this.releaseMemory();
+          this.maxReachedMB = 0;
+          
           document.getElementById('startAutoTest').disabled = true;
           document.getElementById('stopAutoTest').disabled = false;
           document.getElementById('stopAutoTest').className = 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded';
@@ -458,6 +404,9 @@
           
           this.updateCurrentRun();
           this.stopPeriodicSaving();
+          
+          // Release memory after test completes
+          this.releaseMemory();
           
           document.getElementById('startAutoTest').disabled = false;
           document.getElementById('stopAutoTest').disabled = true;
