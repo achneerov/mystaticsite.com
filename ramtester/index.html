@@ -237,7 +237,7 @@
           
           const statusClass = run.status === 'completed' ? 'text-green-600' : 
                              run.status === 'running' ? 'text-blue-600 font-bold' : 
-                             run.status === 'crashed' ? 'text-red-600' : 'text-gray-600';
+                             run.status === 'crashed' ? 'text-green-600' : 'text-gray-600';
           
           const typeDisplay = run.type === 'automatic' ? 'Auto Test' : 
                              `Manual Test (${run.targetMB}MB for ${run.holdDuration}s)`;
@@ -251,7 +251,7 @@
               <div class="${isLastRun ? 'text-base' : 'text-sm'} space-y-1">
                 <div>Max RAM: <span class="font-medium">${run.maxMB || 0}MB</span></div>
                 <div>Duration: <span class="font-medium">${duration}</span></div>
-                <div class="${statusClass}">${run.status === 'running' ? '🔄 Currently Running' : run.status === 'crashed' ? 'Status: crashed (Which is good!)' : `Status: ${run.status || 'unknown'}`}</div>
+                <div class="${statusClass}">${run.status === 'running' ? '🔄 Currently Running' : run.status === 'crashed' ? 'Status: crashed (Which means we hit the ram limit, which is good!)' : `Status: ${run.status || 'unknown'}`}</div>
               </div>
             </div>
           `;
