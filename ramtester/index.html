@@ -23,6 +23,12 @@
     <main class="container mx-auto px-4 mt-10 flex-grow">
       <div class="space-y-6">
 
+        <!-- Last Run -->
+        <article class="border p-6 rounded-lg bg-white shadow-lg">
+          <h2 class="text-xl font-semibold mb-4">Last Run</h2>
+          <div id="lastRunDisplay" class="text-gray-600">No previous runs found</div>
+        </article>
+
         <!-- Automatic Stress Test -->
         <article class="border p-6 rounded-lg bg-white shadow-lg">
           <h2 class="text-xl font-semibold mb-4">Automatic RAM Stress Test</h2>
@@ -56,6 +62,12 @@
           <div id="manualTestResults" class="mt-4"></div>
         </article>
 
+        <!-- Previous Runs -->
+        <article class="border p-6 rounded-lg bg-white shadow-lg">
+          <h2 class="text-xl font-semibold mb-4">Previous Runs</h2>
+          <div id="previousRunsDisplay" class="text-gray-600">No previous runs found</div>
+        </article>
+
       </div>
     </main>
     <footer class="py-4 mt-auto">
@@ -76,10 +88,170 @@
           this.currentAllocatedMB = 0;
           this.maxReachedMB = 0;
           this.baseJsonData = null;
+          this.currentRunId = null;
+          this.saveInterval = null;
           
+          this.initializeLocalStorage();
           this.generateBaseJsonData();
           this.initializeEventListeners();
           this.displaySystemInfo();
+          this.updateRunDisplays();
+        }
+
+        initializeLocalStorage() {
+          const existingRuns = localStorage.getItem('runs');
+          if (!existingRuns) {
+            localStorage.setItem('runs', JSON.stringify([]));
+          } else {
+            this.handleCrashedRuns();
+          }
+        }
+
+        handleCrashedRuns() {
+          try {
+            const runs = JSON.parse(localStorage.getItem('runs') || '[]');
+            let updated = false;
+            
+            runs.forEach(run => {
+              if (run.status === 'running') {
+                run.status = 'crashed';
+                run.endTime = run.lastUpdate || run.startTime;
+                updated = true;
+              }
+            });
+            
+            if (updated) {
+              localStorage.setItem('runs', JSON.stringify(runs));
+            }
+          } catch (error) {
+            console.warn('Failed to handle crashed runs:', error);
+          }
+        }
+
+        generateRunId() {
+          return Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+        }
+
+        saveRunData(runData) {
+          try {
+            const runs = JSON.parse(localStorage.getItem('runs') || '[]');
+            
+            const existingRunIndex = runs.findIndex(run => run.id === runData.id);
+            if (existingRunIndex >= 0) {
+              runs[existingRunIndex] = runData;
+            } else {
+              runs.push(runData);
+            }
+            
+            if (runs.length > 100) {
+              runs.splice(0, runs.length - 100);
+            }
+            
+            localStorage.setItem('runs', JSON.stringify(runs));
+            this.updateRunDisplays();
+          } catch (error) {
+            console.warn('Failed to save run data:', error);
+          }
+        }
+
+        startPeriodicSaving() {
+          if (this.saveInterval) {
+            clearInterval(this.saveInterval);
+          }
+          
+          this.saveInterval = setInterval(() => {
+            if (this.currentRunId && (this.isAutoTestRunning || this.isManualTestRunning)) {
+              this.updateCurrentRun();
+            }
+          }, 1000);
+        }
+
+        stopPeriodicSaving() {
+          if (this.saveInterval) {
+            clearInterval(this.saveInterval);
+            this.saveInterval = null;
+          }
+        }
+
+        updateCurrentRun() {
+          if (!this.currentRunId) return;
+          
+          const runs = JSON.parse(localStorage.getItem('runs') || '[]');
+          const runIndex = runs.findIndex(run => run.id === this.currentRunId);
+          
+          if (runIndex >= 0) {
+            runs[runIndex].currentMB = this.currentAllocatedMB;
+            runs[runIndex].maxMB = this.maxReachedMB;
+            runs[runIndex].lastUpdate = Date.now();
+            
+            if (!this.isAutoTestRunning && !this.isManualTestRunning) {
+              runs[runIndex].endTime = Date.now();
+              runs[runIndex].status = 'completed';
+            }
+            
+            localStorage.setItem('runs', JSON.stringify(runs));
+            this.updateRunDisplays();
+          }
+        }
+
+        updateRunDisplays() {
+          try {
+            const runs = JSON.parse(localStorage.getItem('runs') || '[]');
+            
+            if (runs.length === 0) {
+              document.getElementById('lastRunDisplay').innerHTML = '<div class="text-gray-600">No previous runs found</div>';
+              document.getElementById('previousRunsDisplay').innerHTML = '<div class="text-gray-600">No previous runs found</div>';
+              return;
+            }
+            
+            // Sort by timestamp to get most recent first
+            const sortedRuns = runs.sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+            const lastRun = sortedRuns[0];
+            const previousRuns = sortedRuns.slice(1);
+            
+            // Display last run
+            const lastRunHtml = this.formatRunDisplay(lastRun, true);
+            document.getElementById('lastRunDisplay').innerHTML = lastRunHtml;
+            
+            // Display previous runs
+            if (previousRuns.length === 0) {
+              document.getElementById('previousRunsDisplay').innerHTML = '<div class="text-gray-600">No previous runs found</div>';
+            } else {
+              const previousRunsHtml = previousRuns.map(run => this.formatRunDisplay(run, false)).join('');
+              document.getElementById('previousRunsDisplay').innerHTML = previousRunsHtml;
+            }
+          } catch (error) {
+            console.warn('Failed to update run displays:', error);
+          }
+        }
+
+        formatRunDisplay(run, isLastRun) {
+          const date = new Date(run.startTime).toLocaleDateString();
+          const time = new Date(run.startTime).toLocaleTimeString();
+          const duration = run.endTime ? 
+            Math.round((run.endTime - run.startTime) / 1000) + 's' : 
+            'Running...';
+          
+          const statusClass = run.status === 'completed' ? 'text-green-600' : 
+                             run.status === 'running' ? 'text-blue-600' : 
+                             run.status === 'crashed' ? 'text-red-600' : 'text-gray-600';
+          
+          const typeDisplay = run.type === 'automatic' ? 'Auto Test' : 
+                             `Manual Test (${run.targetMB}MB for ${run.holdDuration}s)`;
+          
+          return `
+            <div class="mb-4 p-4 border rounded ${isLastRun ? 'bg-blue-50' : 'bg-gray-50'}">
+              <div class="flex justify-between items-start mb-2">
+                <div class="font-medium">${typeDisplay}</div>
+                <div class="text-sm text-gray-500">${date} ${time}</div>
+              </div>
+              <div class="text-sm space-y-1">
+                <div>Max RAM: <span class="font-medium">${run.maxMB || 0}MB</span></div>
+                <div>Duration: <span class="font-medium">${duration}</span></div>
+                <div class="${statusClass}">Status: ${run.status || 'unknown'}</div>
+              </div>
+            </div>
+          `;
         }
 
 
@@ -247,6 +419,20 @@
           document.getElementById('stopAutoTest').disabled = false;
           document.getElementById('stopAutoTest').className = 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded';
           
+          this.currentRunId = this.generateRunId();
+          const runData = {
+            id: this.currentRunId,
+            type: 'automatic',
+            startTime: Date.now(),
+            endTime: null,
+            maxMB: 0,
+            currentMB: 0,
+            status: 'running',
+            lastUpdate: Date.now()
+          };
+          this.saveRunData(runData);
+          this.startPeriodicSaving();
+          
           const resultsDiv = document.getElementById('autoTestResults');
           resultsDiv.innerHTML = '<div class="text-blue-600">Starting automatic RAM stress test...</div>';
           
@@ -301,6 +487,8 @@
             clearInterval(this.autoTestInterval);
           }
           
+          this.updateCurrentRun();
+          this.stopPeriodicSaving();
           
           document.getElementById('startAutoTest').disabled = false;
           document.getElementById('stopAutoTest').disabled = true;
@@ -327,6 +515,22 @@
           document.getElementById('startManualTest').disabled = true;
           document.getElementById('stopManualTest').disabled = false;
           document.getElementById('stopManualTest').className = 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded';
+          
+          this.currentRunId = this.generateRunId();
+          const runData = {
+            id: this.currentRunId,
+            type: 'manual',
+            startTime: Date.now(),
+            endTime: null,
+            targetMB: amountMB,
+            holdDuration: holdDuration,
+            maxMB: 0,
+            currentMB: 0,
+            status: 'running',
+            lastUpdate: Date.now()
+          };
+          this.saveRunData(runData);
+          this.startPeriodicSaving();
           
           resultsDiv.innerHTML = '<div class="text-blue-600">Testing memory allocation...</div>';
           
@@ -359,6 +563,8 @@
 
         stopManualTest() {
           this.isManualTestRunning = false;
+          this.updateCurrentRun();
+          this.stopPeriodicSaving();
           document.getElementById('startManualTest').disabled = false;
           document.getElementById('stopManualTest').disabled = true;
           document.getElementById('stopManualTest').className = 'bg-gray-400 text-gray-600 px-4 py-2 rounded';
