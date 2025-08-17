@@ -21,14 +21,19 @@
       </nav>
     </header>
     <main class="container mx-auto px-4 mt-10 flex-grow">
-      <h1 class="text-3xl font-bold text-center mb-8">RAM Stress Tester</h1>
       <div class="space-y-6">
+        <!-- Last Run Results -->
+        <article class="border p-6 rounded-lg bg-white shadow-lg">
+          <h2 class="text-xl font-semibold mb-4">Last Run Results</h2>
+          <div id="lastRunResults" class="mb-4 p-3 bg-gray-50 rounded"></div>
+        </article>
+
         <!-- Automatic Stress Test -->
         <article class="border p-6 rounded-lg bg-white shadow-lg">
           <h2 class="text-xl font-semibold mb-4">Automatic RAM Stress Test</h2>
           <p class="text-gray-700 mb-4">This will gradually allocate memory until the browser crashes or reaches its limit.</p>
-          <button id="startAutoTest" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mr-4">Start Auto Test</button>
-          <button id="stopAutoTest" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded" disabled>Stop Test</button>
+          <button id="startAutoTest" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mr-4">Start Auto Test</button>
+          <button id="stopAutoTest" class="bg-gray-400 text-gray-600 px-4 py-2 rounded" disabled>Stop Test</button>
           <div id="autoTestResults" class="mt-4"></div>
         </article>
 
@@ -37,31 +42,29 @@
           <h2 class="text-xl font-semibold mb-4">Manual RAM Test</h2>
           <p class="text-gray-700 mb-4">Test a specific amount of RAM allocation.</p>
           
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Amount (MB):</label>
-            <input type="range" id="ramSlider" min="10" max="2048" value="100" class="w-full mb-2">
-            <div class="flex items-center space-x-4">
-              <input type="number" id="ramInput" min="10" max="8192" value="100" class="border rounded px-3 py-2 w-24">
-              <span class="text-sm text-gray-600">MB</span>
+          <div class="mb-4 flex items-end space-x-6">
+            <div>
+              <label class="block text-sm font-medium mb-2">Amount (MB):</label>
+              <div class="flex items-center space-x-2">
+                <input type="number" id="ramInput" min="8" max="131072" value="1024" class="border rounded px-3 py-2 w-32">
+                <span class="text-sm text-gray-600">MB</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Hold Duration (seconds):</label>
+              <input type="number" id="holdDuration" min="1" max="300" value="30" class="border rounded px-3 py-2 w-20">
             </div>
           </div>
 
-          <div class="mb-4">
-            <label class="flex items-center">
-              <input type="checkbox" id="prolongedTest" class="mr-2">
-              <span class="text-sm">Prolonged test (hold memory for 10 seconds)</span>
-            </label>
-          </div>
-
-          <button id="startManualTest" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Test Memory</button>
+          <button id="startManualTest" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mr-4">Test Memory</button>
+          <button id="stopManualTest" class="bg-gray-400 text-gray-600 px-4 py-2 rounded" disabled>Stop Test</button>
           <div id="manualTestResults" class="mt-4"></div>
         </article>
 
-        <!-- Results Display -->
+        <!-- Previous Runs -->
         <article class="border p-6 rounded-lg bg-white shadow-lg">
-          <h2 class="text-xl font-semibold mb-4">System Info & Results</h2>
-          <div id="systemInfo" class="text-sm text-gray-600 mb-4"></div>
-          <div id="testHistory" class="space-y-2"></div>
+          <h2 class="text-xl font-semibold mb-4">Previous Runs</h2>
+          <div id="previousRuns" class="space-y-2"></div>
         </article>
       </div>
     </main>
@@ -78,34 +81,37 @@
         constructor() {
           this.allocatedMemory = [];
           this.isAutoTestRunning = false;
+          this.isManualTestRunning = false;
           this.autoTestInterval = null;
+          this.saveInterval = null;
           this.currentAllocatedMB = 0;
           this.maxReachedMB = 0;
           this.testHistory = [];
+          this.previousRuns = [];
+          this.baseJsonData = null;
+          this.lastSaveTime = 0;
+          this.storageKey = 'ramtester-data';
           
+          this.generateBaseJsonData();
           this.initializeEventListeners();
           this.displaySystemInfo();
+          this.loadCrashRecoveryData();
+          this.displayLastRunResults();
+          this.loadSessionData();
+          this.loadPreviousRuns();
+          this.startPeriodicSave();
+          this.setupCrashProtection();
         }
 
-        initializeEventListeners() {
-          // Slider and input sync
-          const slider = document.getElementById('ramSlider');
-          const input = document.getElementById('ramInput');
-          
-          slider.addEventListener('input', () => {
-            input.value = slider.value;
-          });
-          
-          input.addEventListener('input', () => {
-            slider.value = Math.min(Math.max(input.value, 10), 2048);
-          });
 
+        initializeEventListeners() {
           // Auto test controls
           document.getElementById('startAutoTest').addEventListener('click', () => this.startAutoTest());
           document.getElementById('stopAutoTest').addEventListener('click', () => this.stopAutoTest());
           
           // Manual test
           document.getElementById('startManualTest').addEventListener('click', () => this.startManualTest());
+          document.getElementById('stopManualTest').addEventListener('click', () => this.stopManualTest());
         }
 
         displaySystemInfo() {
@@ -123,24 +129,354 @@
             memoryInfo += `JS Heap: ${used}MB used / ${total}MB total / ${limit}MB limit`;
           }
           
-          info.innerHTML = memoryInfo || 'Memory info not available in this browser';
+          info.innerHTML = memoryInfo;
+        }
+
+        // Unified localStorage system
+        loadData() {
+          try {
+            const savedData = localStorage.getItem(this.storageKey);
+            if (savedData) {
+              const data = JSON.parse(savedData);
+              console.log(`Loaded data from localStorage [${this.storageKey}]:`, data);
+              return data;
+            }
+          } catch (error) {
+            console.error('Error loading from localStorage:', error);
+          }
+          return {};
+        }
+
+        saveData(newData = {}) {
+          try {
+            const currentData = this.loadData();
+            const updatedData = { ...currentData, ...newData };
+            localStorage.setItem(this.storageKey, JSON.stringify(updatedData));
+            console.log(`Saved data to localStorage [${this.storageKey}]:`, updatedData);
+            this.lastSaveTime = Date.now();
+          } catch (error) {
+            console.error('Error saving to localStorage:', error);
+          }
+        }
+
+        // Separate high-frequency save for crash protection
+        saveCurrentProgress() {
+          try {
+            const progressData = {
+              currentAllocatedMB: this.currentAllocatedMB,
+              maxReachedMB: this.maxReachedMB,
+              isAutoTestRunning: this.isAutoTestRunning,
+              timestamp: Date.now()
+            };
+            
+            // Save live progress within the main data structure
+            this.saveData({ liveProgress: progressData });
+            
+            // Also update main data but less frequently
+            if (Date.now() - this.lastSaveTime > 2000) { // Every 2 seconds
+              this.saveData({ 
+                liveProgress: progressData,
+                lastRun: this.maxReachedMB > 0 ? {
+                  maxRAM: this.maxReachedMB,
+                  date: new Date().toLocaleString(),
+                  timestamp: Date.now(),
+                  status: this.isAutoTestRunning ? 'running' : 'completed'
+                } : undefined
+              });
+            }
+          } catch (error) {
+            console.error('Error saving progress:', error);
+          }
+        }
+
+        startPeriodicSave() {
+          // Save progress every 1 second during tests
+          this.saveInterval = setInterval(() => {
+            if (this.isAutoTestRunning || this.isManualTestRunning) {
+              this.saveCurrentProgress();
+            }
+          }, 1000);
+        }
+
+        setupCrashProtection() {
+          // Save data before page unloads (crash/close)
+          window.addEventListener('beforeunload', () => {
+            if (this.maxReachedMB > 0) {
+              // Save current progress before crash
+              this.saveCurrentProgress();
+            }
+          });
+
+          // Also save on visibility change (tab switch, minimize)
+          document.addEventListener('visibilitychange', () => {
+            if (document.hidden && (this.isAutoTestRunning || this.isManualTestRunning)) {
+              this.saveCurrentProgress();
+            }
+          });
+        }
+
+        loadCrashRecoveryData() {
+          try {
+            const data = this.loadData();
+            if (data.liveProgress) {
+              const liveProgress = data.liveProgress;
+              console.log('Found crash recovery data:', liveProgress);
+              
+              // Check if this was from a recent crash (within last 5 minutes)
+              const timeDiff = Date.now() - liveProgress.timestamp;
+              if (timeDiff < 300000 && liveProgress.maxReachedMB > 0) {
+                // Save crashed run to history
+                this.saveTestResult(liveProgress.maxReachedMB, 'auto', 'crashed');
+                
+                console.log('Recovered crash data:', liveProgress.maxReachedMB + 'MB');
+                return liveProgress;
+              }
+            }
+          } catch (error) {
+            console.error('Error loading crash recovery data:', error);
+          }
+          return null;
+        }
+
+        displayLastRunResults() {
+          try {
+            const data = this.loadData();
+            const lastRunDiv = document.getElementById('lastRunResults');
+            
+            if (data.lastRun && data.lastRun.maxRAM) {
+              const status = data.lastRun.status || 'completed';
+              const statusColor = status === 'crashed' ? 'text-red-600' : 'text-green-600';
+              const statusText = status === 'crashed' ? '(Browser Crashed)' : '';
+              
+              lastRunDiv.innerHTML = `
+                <div class="${statusColor}">
+                  <strong>Last Auto Test: ${data.lastRun.maxRAM}MB ${statusText}</strong><br>
+                  <small class="text-gray-600">Date: ${data.lastRun.date}</small>
+                </div>`;
+            } else {
+              lastRunDiv.innerHTML = '<div class="text-gray-500">No previous test results found</div>';
+            }
+          } catch (error) {
+            console.error('Error displaying last run results:', error);
+            document.getElementById('lastRunResults').innerHTML = '<div class="text-gray-500">Error loading previous results</div>';
+          }
+        }
+
+        saveTestResult(maxRAM, testType = 'auto', status = 'completed') {
+          const testData = {
+            maxRAM: maxRAM,
+            date: new Date().toLocaleString(),
+            timestamp: Date.now(),
+            testType: testType, // 'auto' or 'manual'
+            status: status // 'completed', 'crashed', 'stopped'
+          };
+          
+          // Save as last run
+          this.saveData({ lastRun: testData });
+          
+          // Add to previous runs history
+          this.addToPreviousRuns(testData);
+        }
+
+        addToPreviousRuns(runData) {
+          try {
+            const data = this.loadData();
+            let previousRuns = data.previousRuns || [];
+            
+            // Add new run to the beginning
+            previousRuns.unshift(runData);
+            
+            // Keep only last 20 runs
+            if (previousRuns.length > 20) {
+              previousRuns = previousRuns.slice(0, 20);
+            }
+            
+            // Save back to localStorage
+            this.saveData({ previousRuns: previousRuns });
+            
+            // Update display
+            this.displayPreviousRuns(previousRuns);
+            
+            console.log('Added run to history:', runData);
+          } catch (error) {
+            console.error('Error saving run to history:', error);
+          }
+        }
+
+        loadPreviousRuns() {
+          try {
+            const data = this.loadData();
+            const previousRuns = data.previousRuns || [];
+            this.previousRuns = previousRuns;
+            this.displayPreviousRuns(previousRuns);
+          } catch (error) {
+            console.error('Error loading previous runs:', error);
+          }
+        }
+
+        displayPreviousRuns(runs = null) {
+          try {
+            const runsToDisplay = runs || this.previousRuns;
+            const previousRunsDiv = document.getElementById('previousRuns');
+            
+            if (runsToDisplay.length === 0) {
+              previousRunsDiv.innerHTML = '<div class="text-gray-500">No previous runs found</div>';
+              return;
+            }
+            
+            const runsHtml = runsToDisplay.map((run, index) => {
+              const statusColor = run.status === 'crashed' ? 'text-red-600' : 
+                                run.status === 'stopped' ? 'text-orange-600' : 'text-green-600';
+              const statusText = run.status === 'crashed' ? '(Crashed)' : 
+                               run.status === 'stopped' ? '(Stopped)' : '';
+              const testTypeText = run.testType === 'manual' ? '[Manual]' : '[Auto]';
+              
+              return `
+                <div class="text-sm border-l-2 border-gray-300 pl-3 py-1">
+                  <span class="${statusColor}"><strong>${run.maxRAM}MB</strong> ${statusText}</span>
+                  <span class="text-gray-600">${testTypeText} - ${run.date}</span>
+                </div>`;
+            }).join('');
+            
+            previousRunsDiv.innerHTML = runsHtml;
+          } catch (error) {
+            console.error('Error displaying previous runs:', error);
+            document.getElementById('previousRuns').innerHTML = '<div class="text-gray-500">Error loading previous runs</div>';
+          }
+        }
+
+        saveSessionData() {
+          const sessionData = {
+            testHistory: this.testHistory,
+            currentAllocatedMB: this.currentAllocatedMB,
+            maxReachedMB: this.maxReachedMB,
+            timestamp: Date.now()
+          };
+          this.saveData({ session: sessionData });
+        }
+
+        loadSessionData() {
+          const data = this.loadData();
+          if (data.session) {
+            this.testHistory = data.session.testHistory || [];
+            this.updateTestHistoryDisplay();
+            console.log('Loaded session data:', data.session);
+          }
+        }
+
+
+        generateBaseJsonData() {
+          // Generate approximately 1MB of JSON data
+          const data = {
+            metadata: {
+              purpose: "RAM testing data",
+              size_target: "1MB",
+              generated_by: "RAM Tester",
+              version: "1.0"
+            },
+            test_data: {
+              arrays: [],
+              objects: {},
+              strings: [],
+              numbers: []
+            }
+          };
+
+          // Add arrays with various data types
+          for (let i = 0; i < 50; i++) {
+            const arr = [];
+            for (let j = 0; j < 100; j++) {
+              arr.push(Math.floor(Math.random() * 1000000));
+            }
+            data.test_data.arrays.push(arr);
+          }
+
+          // Add objects with nested structures
+          for (let i = 0; i < 20; i++) {
+            const objKey = `object_${i}`;
+            data.test_data.objects[objKey] = {
+              id: i,
+              name: this.generateRandomString(50),
+              description: this.generateRandomString(200),
+              properties: {
+                type: ["A", "B", "C", "D"][Math.floor(Math.random() * 4)],
+                value: Math.random() * 1000,
+                active: Math.random() > 0.5,
+                tags: Array.from({length: 10}, () => this.generateRandomString(10))
+              },
+              nested_data: {
+                level1: {
+                  level2: {
+                    level3: {
+                      data: Array.from({length: 50}, () => Math.floor(Math.random() * 100))
+                    }
+                  }
+                }
+              }
+            };
+          }
+
+          // Add large strings
+          for (let i = 0; i < 10; i++) {
+            data.test_data.strings.push(this.generateRandomString(5000));
+          }
+
+          // Add numbers array
+          data.test_data.numbers = Array.from({length: 1000}, () => Math.random() * 2000 - 1000);
+
+          // Add padding to reach approximately 1MB
+          const jsonString = JSON.stringify(data);
+          const currentSize = new Blob([jsonString]).size;
+          const targetSize = 1048576; // 1MB
+          
+          if (currentSize < targetSize) {
+            const paddingNeeded = targetSize - currentSize - 100;
+            if (paddingNeeded > 0) {
+              data.test_data.padding = this.generateRandomString(paddingNeeded);
+            }
+          }
+
+          this.baseJsonData = data;
+          console.log(`Generated base JSON data: ~${Math.round(new Blob([JSON.stringify(data)]).size / 1024)}KB`);
+        }
+
+        generateRandomString(length) {
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+          let result = '';
+          for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return result;
         }
 
         allocateMemory(sizeMB) {
           try {
-            // Create array of specified size (rough MB calculation)
-            const arraySize = sizeMB * 1024 * 256; // 256 integers per KB roughly = 1MB
-            const array = new Array(arraySize);
+            if (!this.baseJsonData) {
+              console.error('Base JSON data not ready');
+              return false;
+            }
+
+            // Calculate how many copies we need (each copy is ~1MB)
+            const copiesNeeded = Math.max(1, Math.round(sizeMB));
+            const copies = [];
             
-            // Fill with random data to prevent optimization
-            for (let i = 0; i < arraySize; i += 1000) {
-              array[i] = Math.random();
+            for (let i = 0; i < copiesNeeded; i++) {
+              // Create deep copy using JSON parse/stringify
+              const copy = JSON.parse(JSON.stringify(this.baseJsonData));
+              
+              // Add some uniqueness to prevent optimization
+              copy.copy_id = i;
+              copy.timestamp = Date.now();
+              copy.random_data = Math.random();
+              
+              copies.push(copy);
             }
             
-            this.allocatedMemory.push(array);
+            this.allocatedMemory.push(...copies);
             this.currentAllocatedMB += sizeMB;
             this.maxReachedMB = Math.max(this.maxReachedMB, this.currentAllocatedMB);
             
+            console.log(`Allocated ${sizeMB}MB (${copiesNeeded} copies), total: ${this.currentAllocatedMB}MB`);
             return true;
           } catch (error) {
             console.error('Memory allocation failed:', error);
@@ -161,6 +497,7 @@
           this.isAutoTestRunning = true;
           document.getElementById('startAutoTest').disabled = true;
           document.getElementById('stopAutoTest').disabled = false;
+          document.getElementById('stopAutoTest').className = 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded';
           
           const resultsDiv = document.getElementById('autoTestResults');
           resultsDiv.innerHTML = '<div class="text-blue-600">Starting automatic RAM stress test...</div>';
@@ -181,6 +518,8 @@
                   <small>Last allocation: ${currentMB}MB - Success</small>
                 </div>`;
               
+              // Progress is now saved automatically every second
+              
               // Increase allocation size gradually
               currentMB = Math.min(currentMB + 25, 500);
               this.displaySystemInfo();
@@ -189,6 +528,10 @@
               
               if (consecutiveFailures >= 3) {
                 this.stopAutoTest();
+                
+                // Save result to localStorage
+                this.saveTestResult(this.maxReachedMB, 'auto', 'completed');
+                
                 resultsDiv.innerHTML = `
                   <div class="text-red-600">
                     <strong>Test completed!</strong><br>
@@ -196,7 +539,7 @@
                     <small>Browser/system limit reached after ${consecutiveFailures} failed attempts</small>
                   </div>`;
                 
-                this.addToHistory(`Auto Test: Max ${this.maxReachedMB}MB allocated`);
+                this.displayLastRunResults();
                 return;
               }
               
@@ -215,8 +558,13 @@
             clearInterval(this.autoTestInterval);
           }
           
+          // Save final result
+          this.saveTestResult(this.maxReachedMB, 'auto', 'stopped');
+          this.saveCurrentProgress();
+          
           document.getElementById('startAutoTest').disabled = false;
           document.getElementById('stopAutoTest').disabled = true;
+          document.getElementById('stopAutoTest').className = 'bg-gray-400 text-gray-600 px-4 py-2 rounded';
           
           const resultsDiv = document.getElementById('autoTestResults');
           if (this.maxReachedMB > 0) {
@@ -229,10 +577,16 @@
           }
         }
 
+
         async startManualTest() {
           const amountMB = parseInt(document.getElementById('ramInput').value);
-          const prolonged = document.getElementById('prolongedTest').checked;
+          const holdDuration = parseInt(document.getElementById('holdDuration').value);
           const resultsDiv = document.getElementById('manualTestResults');
+          
+          this.isManualTestRunning = true;
+          document.getElementById('startManualTest').disabled = true;
+          document.getElementById('stopManualTest').disabled = false;
+          document.getElementById('stopManualTest').className = 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded';
           
           resultsDiv.innerHTML = '<div class="text-blue-600">Testing memory allocation...</div>';
           
@@ -241,42 +595,36 @@
           
           const success = this.allocateMemory(amountMB);
           
-          if (success) {
-            let message = `<div class="text-green-600"><strong>Success!</strong> Allocated ${amountMB}MB of RAM</div>`;
+          if (success && this.isManualTestRunning) {
+            resultsDiv.innerHTML = `<div class="text-green-600"><strong>Success!</strong> Allocated ${amountMB}MB of RAM - holding for ${holdDuration} seconds...</div>`;
             
-            if (prolonged) {
-              message = `<div class="text-green-600"><strong>Success!</strong> Allocated ${amountMB}MB of RAM - holding for 10 seconds...</div>`;
-              resultsDiv.innerHTML = message;
-              
-              await new Promise(resolve => setTimeout(resolve, 10000));
-              
-              message = `<div class="text-green-600"><strong>Prolonged test completed!</strong> Successfully held ${amountMB}MB for 10 seconds</div>`;
+            // Wait for the specified duration with ability to stop
+            for (let i = 0; i < holdDuration && this.isManualTestRunning; i++) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              if (this.isManualTestRunning) {
+                resultsDiv.innerHTML = `<div class="text-green-600"><strong>Holding...</strong> ${amountMB}MB allocated - ${holdDuration - i - 1} seconds remaining</div>`;
+              }
             }
             
-            resultsDiv.innerHTML = message;
-            this.addToHistory(`Manual Test: ${amountMB}MB - Success${prolonged ? ' (10s hold)' : ''}`);
-          } else {
+            if (this.isManualTestRunning) {
+              resultsDiv.innerHTML = `<div class="text-green-600"><strong>Test completed!</strong> Successfully held ${amountMB}MB for ${holdDuration} seconds</div>`;
+              this.saveTestResult(amountMB, 'manual', 'completed');
+            }
+          } else if (!success) {
             resultsDiv.innerHTML = `<div class="text-red-600"><strong>Failed</strong> to allocate ${amountMB}MB of RAM</div>`;
-            this.addToHistory(`Manual Test: ${amountMB}MB - Failed`);
           }
           
+          this.stopManualTest();
           this.displaySystemInfo();
         }
 
-        addToHistory(result) {
-          const timestamp = new Date().toLocaleTimeString();
-          this.testHistory.unshift(`[${timestamp}] ${result}`);
-          
-          // Keep only last 10 results
-          if (this.testHistory.length > 10) {
-            this.testHistory = this.testHistory.slice(0, 10);
-          }
-          
-          const historyDiv = document.getElementById('testHistory');
-          historyDiv.innerHTML = this.testHistory
-            .map(entry => `<div class="text-sm text-gray-700 border-l-2 border-gray-300 pl-2">${entry}</div>`)
-            .join('');
+        stopManualTest() {
+          this.isManualTestRunning = false;
+          document.getElementById('startManualTest').disabled = false;
+          document.getElementById('stopManualTest').disabled = true;
+          document.getElementById('stopManualTest').className = 'bg-gray-400 text-gray-600 px-4 py-2 rounded';
         }
+
       }
 
       // Initialize the RAM tester when page loads
