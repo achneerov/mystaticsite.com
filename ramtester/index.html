@@ -91,6 +91,8 @@
           this.baseJsonData = null;
           this.currentRunId = null;
           this.saveInterval = null;
+          this.manualTestCompleted = false;
+          this.autoTestCompleted = false;
           
           this.initializeLocalStorage();
           this.generateBaseJsonData();
@@ -116,9 +118,19 @@
             
             runs.forEach(run => {
               if (run.status === 'running') {
-                run.status = 'crashed';
-                run.endTime = run.lastUpdate || run.startTime;
-                updated = true;
+                // Only mark as crashed if the last update was more than 10 seconds ago
+                // This indicates the browser actually crashed rather than just allocation failure
+                const timeSinceLastUpdate = Date.now() - (run.lastUpdate || run.startTime);
+                if (timeSinceLastUpdate > 10000) {
+                  run.status = 'crashed';
+                  run.endTime = run.lastUpdate || run.startTime;
+                  updated = true;
+                } else {
+                  // Recent activity suggests allocation failure, not crash
+                  run.status = 'stopped';
+                  run.endTime = run.lastUpdate || run.startTime;
+                  updated = true;
+                }
               }
             });
             
@@ -192,7 +204,13 @@
             
             if (!this.isAutoTestRunning && !this.isManualTestRunning) {
               runs[runIndex].endTime = Date.now();
-              runs[runIndex].status = 'completed';
+              // For manual tests, only mark as completed if the test ran for the full duration
+              if (runs[runIndex].type === 'manual') {
+                runs[runIndex].status = this.manualTestCompleted ? 'completed' : 'stopped';
+              } else {
+                // For auto tests, completed means we found the memory limit
+                runs[runIndex].status = this.autoTestCompleted ? 'completed' : 'stopped';
+              }
             }
             
             data.runs = runs;
@@ -237,7 +255,8 @@
           
           const statusClass = run.status === 'completed' ? 'text-green-600' : 
                              run.status === 'running' ? 'text-blue-600 font-bold' : 
-                             run.status === 'crashed' ? 'text-green-600' : 'text-gray-600';
+                             run.status === 'crashed' ? 'text-green-600' : 
+                             run.status === 'stopped' ? 'text-red-600' : 'text-gray-600';
           
           const typeDisplay = run.type === 'automatic' ? 'Auto Test' : 
                              `Manual Test (${run.targetMB}MB for ${run.holdDuration}s)`;
@@ -251,7 +270,7 @@
               <div class="${isLastRun ? 'text-base' : 'text-sm'} space-y-1">
                 <div>Max RAM: <span class="font-medium">${run.maxMB || 0}MB</span></div>
                 <div>Duration: <span class="font-medium">${duration}</span></div>
-                <div class="${statusClass}">${run.status === 'running' ? '🔄 Currently Running' : run.status === 'crashed' ? 'Status: crashed (Which means we hit the ram limit, which is good!)' : `Status: ${run.status || 'unknown'}`}</div>
+                <div class="${statusClass}">${run.status === 'running' ? '🔄 Currently Running' : run.status === 'crashed' ? 'Status: crashed (Which means we hit the ram limit, which is good!)' : run.status === 'stopped' ? 'Status: stopped (Did not complete full duration)' : `Status: ${run.status || 'unknown'}`}</div>
               </div>
             </div>
           `;
@@ -345,6 +364,7 @@
 
         startAutoTest() {
           this.isAutoTestRunning = true;
+          this.autoTestCompleted = false;
           
           // Reset memory state for new test
           this.releaseMemory();
@@ -388,6 +408,8 @@
               consecutiveFailures++;
               
               if (consecutiveFailures >= 3) {
+                // Auto test successfully found the memory limit!
+                this.autoTestCompleted = true;
                 this.stopAutoTest();
                 return;
               }
@@ -420,6 +442,7 @@
           const holdDuration = parseInt(document.getElementById('holdDuration').value);
           
           this.isManualTestRunning = true;
+          this.manualTestCompleted = false;
           document.getElementById('startManualTest').disabled = true;
           document.getElementById('stopManualTest').disabled = false;
           document.getElementById('stopManualTest').className = 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded';
@@ -445,10 +468,20 @@
           
           const success = this.allocateMemory(amountMB);
           
-          if (success && this.isManualTestRunning) {
+          if (!success) {
+            // Memory allocation failed - mark as stopped immediately
+            this.stopManualTest();
+            return;
+          }
+          
+          if (this.isManualTestRunning) {
             // Wait for the specified duration with ability to stop
             for (let i = 0; i < holdDuration && this.isManualTestRunning; i++) {
               await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            // If we completed the full duration, mark as completed
+            if (this.isManualTestRunning) {
+              this.manualTestCompleted = true;
             }
           }
           
