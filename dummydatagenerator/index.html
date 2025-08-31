@@ -76,30 +76,31 @@
           <div class="flex flex-wrap gap-2 mb-4">
             <button class="select-all-btn bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition-colors text-sm font-medium">Select All</button>
             <button class="clear-all-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-200 transition-colors text-sm font-medium">Clear All</button>
-            <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-200 transition-colors text-sm font-medium" data-category="data">Data Files</button>
-            <button class="category-btn bg-green-100 text-green-700 px-4 py-2 rounded-full hover:bg-green-200 transition-colors text-sm font-medium" data-category="office">Office</button>
-            <button class="category-btn bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full hover:bg-yellow-200 transition-colors text-sm font-medium" data-category="image">Images</button>
-            <button class="category-btn bg-red-100 text-red-700 px-4 py-2 rounded-full hover:bg-red-200 transition-colors text-sm font-medium" data-category="web">Web</button>
+            <button class="category-btn bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full hover:bg-blue-200 transition-colors text-xs font-medium" data-category="data">📊 Data</button>
+            <button class="category-btn bg-green-100 text-green-700 px-3 py-1.5 rounded-full hover:bg-green-200 transition-colors text-xs font-medium" data-category="office">📝 Office</button>
+            <button class="category-btn bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-full hover:bg-yellow-200 transition-colors text-xs font-medium" data-category="image">🖼️ Images</button>
+            <button class="category-btn bg-red-100 text-red-700 px-3 py-1.5 rounded-full hover:bg-red-200 transition-colors text-xs font-medium" data-category="web">🌐 Web</button>
+            <button class="category-btn bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-200 transition-colors text-xs font-medium" data-category="code">⚡ Code</button>
+            <button class="category-btn bg-pink-100 text-pink-700 px-3 py-1.5 rounded-full hover:bg-pink-200 transition-colors text-xs font-medium" data-category="audio">🎵 Audio</button>
+            <button class="category-btn bg-cyan-100 text-cyan-700 px-3 py-1.5 rounded-full hover:bg-cyan-200 transition-colors text-xs font-medium" data-category="video">🎬 Video</button>
+            <button class="category-btn bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full hover:bg-orange-200 transition-colors text-xs font-medium" data-category="archive">🗜️ Archive</button>
+            <button class="category-btn bg-teal-100 text-teal-700 px-3 py-1.5 rounded-full hover:bg-teal-200 transition-colors text-xs font-medium" data-category="database">🗃️ Database</button>
+            <button class="category-btn bg-lime-100 text-lime-700 px-3 py-1.5 rounded-full hover:bg-lime-200 transition-colors text-xs font-medium" data-category="config">⚙️ Config</button>
+            <button class="category-btn bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full hover:bg-slate-200 transition-colors text-xs font-medium" data-category="text">📄 Text</button>
+            <button class="category-btn bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full hover:bg-amber-200 transition-colors text-xs font-medium" data-category="fonts">🔤 Fonts</button>
+            <button class="category-btn bg-violet-100 text-violet-700 px-3 py-1.5 rounded-full hover:bg-violet-200 transition-colors text-xs font-medium" data-category="cad">📐 CAD/3D</button>
           </div>
           
           <div id="fileTypesContainer" class="file-grid border rounded-lg bg-gray-50 p-4"></div>
         </div>
         
-        <div class="grid md:grid-cols-2 gap-8 mb-8">
-          <div>
-            <label class="block text-lg font-semibold text-gray-700 mb-3">
-              📊 Files per type:
-            </label>
-            <input type="number" id="fileCount" value="3" min="1" max="50" 
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg">
-          </div>
-          <div>
-            <label class="block text-lg font-semibold text-gray-700 mb-3">
-              📈 Records per file:
-            </label>
-            <input type="number" id="recordCount" value="10" min="1" max="1000" 
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg">
-          </div>
+        <div class="mb-8">
+          <label class="block text-lg font-semibold text-gray-700 mb-3">
+            📊 Files per type:
+          </label>
+          <input type="number" id="fileCount" value="3" min="1" max="50" 
+                 class="w-64 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg"
+                 inputmode="numeric" pattern="[0-9]*" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
         </div>
         
         <div class="text-center">
@@ -134,7 +135,12 @@
           {id: 'avro', name: 'Avro', ext: 'avro', emoji: '🦅', description: 'Data Serialization'},
           {id: 'tsv', name: 'TSV', ext: 'tsv', emoji: '📋', description: 'Tab Separated Values'},
           {id: 'ndjson', name: 'NDJSON', ext: 'ndjson', emoji: '📊', description: 'Newline Delimited JSON'},
-          {id: 'rdf', name: 'RDF', ext: 'rdf', emoji: '🔗', description: 'Resource Description Framework'}
+          {id: 'rdf', name: 'RDF', ext: 'rdf', emoji: '🔗', description: 'Resource Description Framework'},
+          {id: 'jsonl', name: 'JSON Lines', ext: 'jsonl', emoji: '📊', description: 'JSON Lines Format'},
+          {id: 'bson', name: 'BSON', ext: 'bson', emoji: '📦', description: 'Binary JSON'},
+          {id: 'msgpack', name: 'MessagePack', ext: 'msgpack', emoji: '📨', description: 'Binary Serialization'},
+          {id: 'protobuf', name: 'Protocol Buffers', ext: 'proto', emoji: '⚡', description: 'Google Protocol Buffers'},
+          {id: 'thrift', name: 'Apache Thrift', ext: 'thrift', emoji: '🔄', description: 'Apache Thrift IDL'}
         ],
         
         // Office Files
@@ -146,7 +152,17 @@
           {id: 'rtf', name: 'Rich Text', ext: 'rtf', emoji: '📄', description: 'Rich Text Format'},
           {id: 'odt', name: 'OpenDocument Text', ext: 'odt', emoji: '📝', description: 'LibreOffice Writer'},
           {id: 'ods', name: 'OpenDocument Spreadsheet', ext: 'ods', emoji: '📊', description: 'LibreOffice Calc'},
-          {id: 'odp', name: 'OpenDocument Presentation', ext: 'odp', emoji: '🎯', description: 'LibreOffice Impress'}
+          {id: 'odp', name: 'OpenDocument Presentation', ext: 'odp', emoji: '🎯', description: 'LibreOffice Impress'},
+          {id: 'doc', name: 'Word 97-2003', ext: 'doc', emoji: '📝', description: 'Microsoft Word Legacy'},
+          {id: 'xls', name: 'Excel 97-2003', ext: 'xls', emoji: '📊', description: 'Microsoft Excel Legacy'},
+          {id: 'ppt', name: 'PowerPoint 97-2003', ext: 'ppt', emoji: '🎯', description: 'Microsoft PowerPoint Legacy'},
+          {id: 'pages', name: 'Apple Pages', ext: 'pages', emoji: '📄', description: 'Apple iWork Pages'},
+          {id: 'numbers', name: 'Apple Numbers', ext: 'numbers', emoji: '📊', description: 'Apple iWork Numbers'},
+          {id: 'keynote', name: 'Apple Keynote', ext: 'keynote', emoji: '🎯', description: 'Apple iWork Keynote'},
+          {id: 'epub', name: 'EPUB', ext: 'epub', emoji: '📚', description: 'Electronic Publication'},
+          {id: 'mobi', name: 'MOBI', ext: 'mobi', emoji: '📖', description: 'Mobipocket eBook'},
+          {id: 'azw', name: 'AZW', ext: 'azw', emoji: '📘', description: 'Amazon Kindle'},
+          {id: 'djvu', name: 'DjVu', ext: 'djvu', emoji: '📜', description: 'DjVu Document'}
         ],
         
         // Image Files
@@ -158,7 +174,64 @@
           {id: 'svg', name: 'SVG Vector', ext: 'svg', emoji: '🎨', description: 'Scalable Vector Graphics'},
           {id: 'webp', name: 'WebP Image', ext: 'webp', emoji: '🌐', description: 'Web Picture Format'},
           {id: 'tiff', name: 'TIFF Image', ext: 'tiff', emoji: '📸', description: 'Tagged Image File Format'},
-          {id: 'ico', name: 'Icon File', ext: 'ico', emoji: '⭐', description: 'Icon File Format'}
+          {id: 'ico', name: 'Icon File', ext: 'ico', emoji: '⭐', description: 'Icon File Format'},
+          {id: 'psd', name: 'Photoshop', ext: 'psd', emoji: '🎨', description: 'Adobe Photoshop Document'},
+          {id: 'ai', name: 'Illustrator', ext: 'ai', emoji: '🎨', description: 'Adobe Illustrator'},
+          {id: 'sketch', name: 'Sketch', ext: 'sketch', emoji: '✏️', description: 'Sketch Design File'},
+          {id: 'fig', name: 'Figma', ext: 'fig', emoji: '🎨', description: 'Figma Design File'},
+          {id: 'xcf', name: 'GIMP', ext: 'xcf', emoji: '🖌️', description: 'GIMP Project File'},
+          {id: 'raw', name: 'Camera RAW', ext: 'raw', emoji: '📸', description: 'RAW Camera Image'},
+          {id: 'cr2', name: 'Canon RAW', ext: 'cr2', emoji: '📸', description: 'Canon RAW Image'},
+          {id: 'nef', name: 'Nikon RAW', ext: 'nef', emoji: '📸', description: 'Nikon RAW Image'},
+          {id: 'dng', name: 'Adobe DNG', ext: 'dng', emoji: '📸', description: 'Digital Negative'},
+          {id: 'heic', name: 'HEIC', ext: 'heic', emoji: '📱', description: 'High Efficiency Image Container'}
+        ],
+        
+        // Audio Files
+        audio: [
+          {id: 'mp3', name: 'MP3 Audio', ext: 'mp3', emoji: '🎵', description: 'MPEG-1 Audio Layer 3'},
+          {id: 'wav', name: 'WAV Audio', ext: 'wav', emoji: '🎶', description: 'Waveform Audio File'},
+          {id: 'flac', name: 'FLAC Audio', ext: 'flac', emoji: '🎼', description: 'Free Lossless Audio Codec'},
+          {id: 'ogg', name: 'OGG Vorbis', ext: 'ogg', emoji: '🎧', description: 'Ogg Vorbis Audio'},
+          {id: 'aac', name: 'AAC Audio', ext: 'aac', emoji: '🎵', description: 'Advanced Audio Coding'},
+          {id: 'm4a', name: 'M4A Audio', ext: 'm4a', emoji: '🎶', description: 'MPEG-4 Audio'},
+          {id: 'wma', name: 'WMA Audio', ext: 'wma', emoji: '🎵', description: 'Windows Media Audio'},
+          {id: 'aiff', name: 'AIFF Audio', ext: 'aiff', emoji: '🎼', description: 'Audio Interchange File Format'},
+          {id: 'opus', name: 'Opus Audio', ext: 'opus', emoji: '🎧', description: 'Opus Audio Codec'},
+          {id: 'mid', name: 'MIDI', ext: 'mid', emoji: '🎹', description: 'Musical Instrument Digital Interface'},
+          {id: 'amr', name: 'AMR Audio', ext: 'amr', emoji: '📞', description: 'Adaptive Multi-Rate Audio'}
+        ],
+        
+        // Video Files
+        video: [
+          {id: 'mp4', name: 'MP4 Video', ext: 'mp4', emoji: '🎬', description: 'MPEG-4 Video'},
+          {id: 'avi', name: 'AVI Video', ext: 'avi', emoji: '🎞️', description: 'Audio Video Interleave'},
+          {id: 'mov', name: 'QuickTime', ext: 'mov', emoji: '🎥', description: 'Apple QuickTime Movie'},
+          {id: 'wmv', name: 'WMV Video', ext: 'wmv', emoji: '🎬', description: 'Windows Media Video'},
+          {id: 'flv', name: 'Flash Video', ext: 'flv', emoji: '⚡', description: 'Flash Video Format'},
+          {id: 'webm', name: 'WebM Video', ext: 'webm', emoji: '🌐', description: 'Web Media Format'},
+          {id: 'mkv', name: 'Matroska', ext: 'mkv', emoji: '🎭', description: 'Matroska Video'},
+          {id: '3gp', name: '3GP Video', ext: '3gp', emoji: '📱', description: '3GPP Multimedia'},
+          {id: 'ts', name: 'MPEG Transport', ext: 'ts', emoji: '📺', description: 'MPEG Transport Stream'},
+          {id: 'm4v', name: 'iTunes Video', ext: 'm4v', emoji: '🍎', description: 'iTunes Video File'},
+          {id: 'vob', name: 'DVD Video', ext: 'vob', emoji: '💿', description: 'DVD Video Object'}
+        ],
+        
+        // Archive Files
+        archive: [
+          {id: 'zip', name: 'ZIP Archive', ext: 'zip', emoji: '🗜️', description: 'ZIP Compressed Archive'},
+          {id: 'rar', name: 'RAR Archive', ext: 'rar', emoji: '📦', description: 'RAR Compressed Archive'},
+          {id: '7z', name: '7-Zip Archive', ext: '7z', emoji: '🗃️', description: '7-Zip Compressed Archive'},
+          {id: 'tar', name: 'TAR Archive', ext: 'tar', emoji: '📄', description: 'Tape Archive'},
+          {id: 'gz', name: 'GZIP Archive', ext: 'gz', emoji: '🗜️', description: 'GZIP Compressed File'},
+          {id: 'bz2', name: 'BZIP2 Archive', ext: 'bz2', emoji: '📦', description: 'BZIP2 Compressed File'},
+          {id: 'xz', name: 'XZ Archive', ext: 'xz', emoji: '🗃️', description: 'XZ Compressed File'},
+          {id: 'iso', name: 'ISO Image', ext: 'iso', emoji: '💿', description: 'ISO Disc Image'},
+          {id: 'dmg', name: 'Mac Disk Image', ext: 'dmg', emoji: '🍎', description: 'Apple Disk Image'},
+          {id: 'cab', name: 'Cabinet File', ext: 'cab', emoji: '🗄️', description: 'Microsoft Cabinet'},
+          {id: 'deb', name: 'Debian Package', ext: 'deb', emoji: '📦', description: 'Debian Software Package'},
+          {id: 'rpm', name: 'RPM Package', ext: 'rpm', emoji: '🔴', description: 'Red Hat Package Manager'},
+          {id: 'msi', name: 'Windows Installer', ext: 'msi', emoji: '🪟', description: 'Microsoft Installer Package'}
         ],
         
         // Web Files
@@ -170,7 +243,14 @@
           {id: 'php', name: 'PHP', ext: 'php', emoji: '🐘', description: 'PHP Hypertext Preprocessor'},
           {id: 'jsp', name: 'JSP', ext: 'jsp', emoji: '☕', description: 'JavaServer Pages'},
           {id: 'asp', name: 'ASP', ext: 'asp', emoji: '🌐', description: 'Active Server Pages'},
-          {id: 'md', name: 'Markdown', ext: 'md', emoji: '📝', description: 'Markdown Documentation'}
+          {id: 'aspx', name: 'ASP.NET', ext: 'aspx', emoji: '🔷', description: 'ASP.NET Web Page'},
+          {id: 'vue', name: 'Vue Component', ext: 'vue', emoji: '💚', description: 'Vue.js Single File Component'},
+          {id: 'jsx', name: 'React JSX', ext: 'jsx', emoji: '⚛️', description: 'React JSX Component'},
+          {id: 'tsx', name: 'React TypeScript', ext: 'tsx', emoji: '⚛️', description: 'React TypeScript Component'},
+          {id: 'scss', name: 'Sass CSS', ext: 'scss', emoji: '🎨', description: 'Syntactically Awesome Stylesheets'},
+          {id: 'sass', name: 'Sass', ext: 'sass', emoji: '🎨', description: 'Sass Stylesheet'},
+          {id: 'less', name: 'Less CSS', ext: 'less', emoji: '🎨', description: 'Less CSS Preprocessor'},
+          {id: 'stylus', name: 'Stylus CSS', ext: 'stylus', emoji: '🎨', description: 'Stylus CSS Preprocessor'}
         ],
         
         // Programming Files
@@ -182,7 +262,35 @@
           {id: 'cs', name: 'C#', ext: 'cs', emoji: '🔷', description: 'C# Source Code'},
           {id: 'go', name: 'Go', ext: 'go', emoji: '🐹', description: 'Go Source Code'},
           {id: 'rs', name: 'Rust', ext: 'rs', emoji: '🦀', description: 'Rust Source Code'},
-          {id: 'rb', name: 'Ruby', ext: 'rb', emoji: '💎', description: 'Ruby Script'}
+          {id: 'rb', name: 'Ruby', ext: 'rb', emoji: '💎', description: 'Ruby Script'},
+          {id: 'swift', name: 'Swift', ext: 'swift', emoji: '🦉', description: 'Swift Programming Language'},
+          {id: 'kt', name: 'Kotlin', ext: 'kt', emoji: '🟣', description: 'Kotlin Source Code'},
+          {id: 'scala', name: 'Scala', ext: 'scala', emoji: '🔺', description: 'Scala Source Code'},
+          {id: 'clj', name: 'Clojure', ext: 'clj', emoji: '🌿', description: 'Clojure Source Code'},
+          {id: 'hs', name: 'Haskell', ext: 'hs', emoji: '🔮', description: 'Haskell Source Code'},
+          {id: 'ml', name: 'OCaml', ext: 'ml', emoji: '🐪', description: 'OCaml Source Code'},
+          {id: 'fs', name: 'F#', ext: 'fs', emoji: '📊', description: 'F# Source Code'},
+          {id: 'vb', name: 'Visual Basic', ext: 'vb', emoji: '🔷', description: 'Visual Basic Source Code'},
+          {id: 'pl', name: 'Perl', ext: 'pl', emoji: '🐪', description: 'Perl Script'},
+          {id: 'r', name: 'R Script', ext: 'r', emoji: '📊', description: 'R Statistical Language'},
+          {id: 'matlab', name: 'MATLAB', ext: 'm', emoji: '🔢', description: 'MATLAB Script'},
+          {id: 'lua', name: 'Lua', ext: 'lua', emoji: '🌙', description: 'Lua Script'},
+          {id: 'dart', name: 'Dart', ext: 'dart', emoji: '🎯', description: 'Dart Programming Language'},
+          {id: 'elm', name: 'Elm', ext: 'elm', emoji: '🌳', description: 'Elm Programming Language'},
+          {id: 'ex', name: 'Elixir', ext: 'ex', emoji: '💧', description: 'Elixir Source Code'},
+          {id: 'erl', name: 'Erlang', ext: 'erl', emoji: '📞', description: 'Erlang Source Code'}
+        ],
+        
+        // Database Files
+        database: [
+          {id: 'db', name: 'Database', ext: 'db', emoji: '🗃️', description: 'Generic Database File'},
+          {id: 'sqlite', name: 'SQLite Database', ext: 'sqlite', emoji: '🗄️', description: 'SQLite Database'},
+          {id: 'sqlite3', name: 'SQLite3 Database', ext: 'sqlite3', emoji: '🗄️', description: 'SQLite3 Database'},
+          {id: 'mdb', name: 'Access Database', ext: 'mdb', emoji: '🔷', description: 'Microsoft Access Database'},
+          {id: 'accdb', name: 'Access 2007+', ext: 'accdb', emoji: '🔷', description: 'Microsoft Access 2007+ Database'},
+          {id: 'dbf', name: 'dBase Database', ext: 'dbf', emoji: '📊', description: 'dBase Database File'},
+          {id: 'frm', name: 'MySQL Table', ext: 'frm', emoji: '🐬', description: 'MySQL Table Format'},
+          {id: 'ibd', name: 'MySQL Data', ext: 'ibd', emoji: '🐬', description: 'MySQL InnoDB Data'}
         ],
         
         // Config Files
@@ -192,16 +300,56 @@
           {id: 'properties', name: 'Properties', ext: 'properties', emoji: '🔧', description: 'Java Properties'},
           {id: 'env', name: 'Environment', ext: 'env', emoji: '🌍', description: 'Environment Variables'},
           {id: 'dockerfile', name: 'Dockerfile', ext: 'dockerfile', emoji: '🐳', description: 'Docker Configuration'},
-          {id: 'makefile', name: 'Makefile', ext: 'makefile', emoji: '🏗️', description: 'Build Configuration'}
+          {id: 'makefile', name: 'Makefile', ext: 'makefile', emoji: '🏗️', description: 'Build Configuration'},
+          {id: 'conf', name: 'Config File', ext: 'conf', emoji: '⚙️', description: 'Generic Configuration'},
+          {id: 'cfg', name: 'Config File', ext: 'cfg', emoji: '⚙️', description: 'Configuration File'},
+          {id: 'plist', name: 'Property List', ext: 'plist', emoji: '🍎', description: 'Apple Property List'},
+          {id: 'reg', name: 'Registry File', ext: 'reg', emoji: '🪟', description: 'Windows Registry'},
+          {id: 'service', name: 'Systemd Service', ext: 'service', emoji: '⚙️', description: 'Linux Systemd Service'},
+          {id: 'desktop', name: 'Desktop Entry', ext: 'desktop', emoji: '🖥️', description: 'Linux Desktop Entry'}
         ],
         
         // Text Files
         text: [
           {id: 'txt', name: 'Plain Text', ext: 'txt', emoji: '📄', description: 'Plain Text File'},
           {id: 'log', name: 'Log File', ext: 'log', emoji: '📝', description: 'Application Logs'},
+          {id: 'md', name: 'Markdown', ext: 'md', emoji: '📝', description: 'Markdown Documentation'},
           {id: 'readme', name: 'README', ext: 'readme', emoji: '📖', description: 'Documentation'},
           {id: 'license', name: 'License', ext: 'license', emoji: '⚖️', description: 'License File'},
-          {id: 'gitignore', name: 'Gitignore', ext: 'gitignore', emoji: '🚫', description: 'Git Ignore Rules'}
+          {id: 'gitignore', name: 'Gitignore', ext: 'gitignore', emoji: '🚫', description: 'Git Ignore Rules'},
+          {id: 'changelog', name: 'Changelog', ext: 'changelog', emoji: '📋', description: 'Change Log'},
+          {id: 'todo', name: 'TODO List', ext: 'todo', emoji: '✅', description: 'TODO List File'},
+          {id: 'authors', name: 'Authors', ext: 'authors', emoji: '👥', description: 'Authors File'},
+          {id: 'contributors', name: 'Contributors', ext: 'contributors', emoji: '🤝', description: 'Contributors File'},
+          {id: 'news', name: 'News', ext: 'news', emoji: '📰', description: 'News File'},
+          {id: 'install', name: 'Install', ext: 'install', emoji: '🔧', description: 'Installation Instructions'}
+        ],
+        
+        // Font Files
+        fonts: [
+          {id: 'ttf', name: 'TrueType Font', ext: 'ttf', emoji: '🔤', description: 'TrueType Font'},
+          {id: 'otf', name: 'OpenType Font', ext: 'otf', emoji: '🔤', description: 'OpenType Font'},
+          {id: 'woff', name: 'Web Font', ext: 'woff', emoji: '🌐', description: 'Web Open Font Format'},
+          {id: 'woff2', name: 'Web Font 2', ext: 'woff2', emoji: '🌐', description: 'Web Open Font Format 2'},
+          {id: 'eot', name: 'EOT Font', ext: 'eot', emoji: '🔤', description: 'Embedded OpenType'},
+          {id: 'pfb', name: 'PostScript Font', ext: 'pfb', emoji: '📄', description: 'PostScript Font Binary'},
+          {id: 'pfm', name: 'PostScript Metrics', ext: 'pfm', emoji: '📏', description: 'PostScript Font Metrics'}
+        ],
+        
+        // 3D & CAD Files
+        cad: [
+          {id: 'dwg', name: 'AutoCAD Drawing', ext: 'dwg', emoji: '📐', description: 'AutoCAD Drawing'},
+          {id: 'dxf', name: 'AutoCAD Exchange', ext: 'dxf', emoji: '📐', description: 'Drawing Exchange Format'},
+          {id: 'obj', name: '3D Object', ext: 'obj', emoji: '🎲', description: 'Wavefront OBJ 3D Model'},
+          {id: 'fbx', name: 'FBX 3D Model', ext: 'fbx', emoji: '🎭', description: 'Autodesk FBX 3D Model'},
+          {id: 'dae', name: 'COLLADA', ext: 'dae', emoji: '🎲', description: 'COLLADA 3D Model'},
+          {id: 'blend', name: 'Blender File', ext: 'blend', emoji: '🌀', description: 'Blender 3D Project'},
+          {id: 'max', name: '3ds Max', ext: 'max', emoji: '📦', description: '3ds Max Scene'},
+          {id: 'maya', name: 'Maya Scene', ext: 'ma', emoji: '🎭', description: 'Autodesk Maya Scene'},
+          {id: 'c4d', name: 'Cinema 4D', ext: 'c4d', emoji: '🎬', description: 'Cinema 4D Project'},
+          {id: 'skp', name: 'SketchUp', ext: 'skp', emoji: '🏗️', description: 'SketchUp Model'},
+          {id: 'step', name: 'STEP File', ext: 'step', emoji: '⚙️', description: 'Standard for Exchange of Product Data'},
+          {id: 'iges', name: 'IGES File', ext: 'iges', emoji: '🔧', description: 'Initial Graphics Exchange Specification'}
         ]
       };
       
@@ -214,7 +362,6 @@
       const generateBtn = document.getElementById('generateBtn');
       const statusDiv = document.getElementById('status');
       const fileCountInput = document.getElementById('fileCount');
-      const recordCountInput = document.getElementById('recordCount');
       const searchInput = document.getElementById('searchInput');
       const fileTypesContainer = document.getElementById('fileTypesContainer');
       const selectedCount = document.getElementById('selectedCount');
@@ -262,13 +409,13 @@
       // File generators (simplified - many will generate text-based representations)
       const generators = {
         // Data formats
-        json: (recordCount) => {
-          const data = Array.from({ length: recordCount }, () => generateRandomData());
+        json: () => {
+          const data = Array.from({ length: 10 }, () => generateRandomData());
           return JSON.stringify(data, null, 2);
         },
         
-        csv: (recordCount) => {
-          const data = Array.from({ length: recordCount }, () => generateRandomData());
+        csv: () => {
+          const data = Array.from({ length: 10 }, () => generateRandomData());
           const headers = Object.keys(data[0]).join(',') + '\n';
           const rows = data.map(row => Object.values(row).map(val => 
             typeof val === 'string' && val.includes(',') ? `"${val}"` : val
@@ -276,8 +423,8 @@
           return headers + rows;
         },
         
-        xml: (recordCount) => {
-          const data = Array.from({ length: recordCount }, () => generateRandomData());
+        xml: () => {
+          const data = Array.from({ length: 10 }, () => generateRandomData());
           let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<records>\n';
           data.forEach(record => {
             xml += '  <record>\n';
@@ -290,8 +437,8 @@
           return xml;
         },
         
-        yaml: (recordCount) => {
-          const data = Array.from({ length: recordCount }, () => generateRandomData());
+        yaml: () => {
+          const data = Array.from({ length: 10 }, () => generateRandomData());
           let yaml = 'records:\n';
           data.forEach(record => {
             yaml += '  -\n';
@@ -302,8 +449,8 @@
           return yaml;
         },
         
-        sql: (recordCount) => {
-          const data = Array.from({ length: recordCount }, () => generateRandomData());
+        sql: () => {
+          const data = Array.from({ length: 10 }, () => generateRandomData());
           const firstRecord = data[0];
           let sql = 'CREATE TABLE IF NOT EXISTS sample_data (\n';
           sql += Object.keys(firstRecord).map(key => {
@@ -416,15 +563,296 @@ console.log(processor.process().export());`;
         },
         
         // Default text generator for unsupported types
-        default: (recordCount) => {
-          const data = Array.from({ length: Math.min(recordCount, 10) }, () => generateRandomData());
-          return `Sample data file containing ${recordCount} records\n\n` + 
+        default: () => {
+          const data = Array.from({ length: 10 }, () => generateRandomData());
+          return `Sample data file containing 10 records\n\n` + 
                  data.map((record, i) => `Record ${i + 1}:\n${Object.entries(record).map(([k, v]) => `  ${k}: ${v}`).join('\n')}`).join('\n\n');
         }
       };
       
-      // Add generators for other file types
-      ['txt', 'log', 'md', 'py', 'java', 'cpp', 'c', 'cs', 'go', 'rs', 'rb', 'php', 'ts', 'ini', 'toml', 'properties', 'env'].forEach(ext => {
+      // Specialized generators for different file types
+      generators.tsv = () => {
+        const data = Array.from({ length: 10 }, () => generateRandomData());
+        const headers = Object.keys(data[0]).join('\t') + '\n';
+        const rows = data.map(row => Object.values(row).join('\t')).join('\n');
+        return headers + rows;
+      };
+      
+      generators.jsonl = () => {
+        const data = Array.from({ length: 10 }, () => generateRandomData());
+        return data.map(record => JSON.stringify(record)).join('\n');
+      };
+      
+      generators.ndjson = generators.jsonl;
+      
+      generators.md = () => {
+        const data = Array.from({ length: 5 }, () => generateRandomData());
+        return `# Sample Documentation\n\nThis is a sample markdown file with dummy data.\n\n## Data Table\n\n| ID | Name | Company | Price |\n|----|----|----|----|
+${data.map(d => `| ${d.id} | ${d.name} | ${d.company} | $${d.price} |`).join('\n')}
+
+## Features
+- ✅ Feature 1: Data processing
+- ✅ Feature 2: Export capabilities  
+- ✅ Feature 3: Multiple formats
+- 🚧 Feature 4: Advanced analytics (coming soon)
+
+## Code Example
+
+\`\`\`javascript
+const data = ${JSON.stringify(data[0], null, 2)};
+console.log('Processing:', data.name);
+\`\`\`
+
+## Installation
+
+\`\`\`bash
+npm install sample-package
+\`\`\``;
+      };
+      
+      generators.py = () => {
+        const data = generateRandomData();
+        return `#!/usr/bin/env python3
+"""
+Sample Python script with dummy data
+Generated on: ${new Date().toISOString()}
+"""
+
+import json
+import datetime
+from dataclasses import dataclass
+from typing import List, Dict, Any
+
+@dataclass
+class SampleRecord:
+    id: int
+    name: str
+    email: str
+    company: str
+    price: float
+    active: bool
+
+# Sample data
+sample_data = ${JSON.stringify(data, null, 4).replace(/"/g, '"').replace(/true|false/g, match => match.charAt(0).toUpperCase() + match.slice(1))}
+
+def process_data(record: Dict[str, Any]) -> SampleRecord:
+    """Convert dictionary to SampleRecord object."""
+    return SampleRecord(
+        id=record['id'],
+        name=record['name'],
+        email=record['email'],
+        company=record['company'],
+        price=float(record['price']),
+        active=record['active']
+    )
+
+def main():
+    """Main function to demonstrate data processing."""
+    print(f"Processing record: {sample_data['name']}")
+    print(f"Company: {sample_data['company']}")
+    print(f"Price: ${sample_data['price']}")
+    
+    # Process the record
+    record = process_data(sample_data)
+    print(f"Processed: {record}")
+
+if __name__ == "__main__":
+    main()`;
+      };
+      
+      generators.java = () => {
+        const data = generateRandomData();
+        return `/**
+ * Sample Java class with dummy data
+ * Generated on: ${new Date().toISOString()}
+ */
+package com.example.dummy;
+
+import java.util.*;
+import java.time.LocalDateTime;
+
+public class SampleData {
+    private int id;
+    private String name;
+    private String email;
+    private String company;
+    private double price;
+    private boolean active;
+    
+    // Constructor
+    public SampleData(int id, String name, String email, String company, double price, boolean active) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.company = company;
+        this.price = price;
+        this.active = active;
+    }
+    
+    // Sample data instance
+    public static SampleData createSample() {
+        return new SampleData(
+            ${data.id},
+            "${data.name}",
+            "${data.email}",
+            "${data.company}",
+            ${data.price},
+            ${data.active}
+        );
+    }
+    
+    // Getters
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    public String getCompany() { return company; }
+    public double getPrice() { return price; }
+    public boolean isActive() { return active; }
+    
+    @Override
+    public String toString() {
+        return String.format("SampleData{id=%d, name='%s', company='%s', price=%.2f}", 
+                           id, name, company, price);
+    }
+    
+    public static void main(String[] args) {
+        SampleData sample = createSample();
+        System.out.println("Processing: " + sample);
+        System.out.println("Active status: " + sample.isActive());
+    }
+}`;
+      };
+      
+      // Add binary file generators (these create placeholder content)
+      ['mp3', 'wav', 'flac', 'ogg', 'aac', 'm4a', 'wma', 'aiff', 'opus', 'mid', 'amr'].forEach(ext => {
+        generators[ext] = () => {
+          const data = generateRandomData();
+          return `# ${ext.toUpperCase()} Audio File Placeholder
+# This would contain binary audio data in a real implementation
+# 
+# Metadata:
+# Title: Sample Track
+# Artist: ${data.name}
+# Album: Demo Album
+# Duration: ${Math.floor(Math.random() * 300) + 60} seconds
+# Bitrate: ${ext === 'wav' ? '1411 kbps (uncompressed)' : Math.floor(Math.random() * 320) + 128 + ' kbps'}
+# Sample Rate: ${ext === 'wav' ? '44.1 kHz' : '44.1 kHz'}
+# Generated: ${new Date().toISOString()}
+#
+# File would contain binary audio data here...`;
+        };
+      });
+      
+      // Video file generators
+      ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', '3gp', 'ts', 'm4v', 'vob'].forEach(ext => {
+        generators[ext] = () => {
+          const data = generateRandomData();
+          return `# ${ext.toUpperCase()} Video File Placeholder
+# This would contain binary video data in a real implementation
+#
+# Metadata:
+# Title: Sample Video
+# Duration: ${Math.floor(Math.random() * 3600) + 300} seconds
+# Resolution: ${getRandomItem(['1920x1080', '1280x720', '3840x2160', '1366x768'])}
+# Frame Rate: ${getRandomItem(['23.98', '24', '25', '29.97', '30', '60'])} fps
+# Codec: ${ext === 'mp4' ? 'H.264' : ext === 'webm' ? 'VP9' : 'Various'}
+# File Size: ${Math.floor(Math.random() * 2000) + 100} MB
+# Created: ${new Date().toISOString()}
+#
+# Binary video stream would be here...`;
+        };
+      });
+      
+      // Archive file generators
+      ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'iso', 'dmg', 'cab', 'deb', 'rpm', 'msi'].forEach(ext => {
+        generators[ext] = () => {
+          const files = Array.from({length: Math.floor(Math.random() * 10) + 3}, (_, i) => 
+            `file_${i + 1}.${getRandomItem(['txt', 'json', 'csv', 'png', 'pdf'])}`
+          );
+          return `# ${ext.toUpperCase()} Archive File Placeholder
+# This would contain compressed binary data in a real implementation
+#
+# Archive Contents:
+${files.map(f => `# - ${f} (${Math.floor(Math.random() * 1000) + 10} KB)`).join('\n')}
+#
+# Compression: ${Math.floor(Math.random() * 60) + 40}% ratio
+# Total Files: ${files.length}
+# Uncompressed Size: ${Math.floor(Math.random() * 5000) + 1000} KB
+# Created: ${new Date().toISOString()}
+#
+# Compressed data would be here...`;
+        };
+      });
+      
+      // Database file generators
+      ['db', 'sqlite', 'sqlite3', 'mdb', 'accdb', 'dbf', 'frm', 'ibd'].forEach(ext => {
+        generators[ext] = () => {
+          const tables = ['users', 'products', 'orders', 'categories', 'settings'];
+          return `# ${ext.toUpperCase()} Database File Placeholder
+# This would contain binary database data in a real implementation
+#
+# Database Schema:
+${tables.map(table => `# Table: ${table} (${Math.floor(Math.random() * 1000) + 100} records)`).join('\n')}
+#
+# Engine: ${ext.includes('sqlite') ? 'SQLite' : ext.includes('mdb') ? 'Microsoft Jet' : 'InnoDB'}
+# Size: ${Math.floor(Math.random() * 100) + 10} MB
+# Created: ${new Date().toISOString()}
+# Last Modified: ${new Date().toISOString()}
+#
+# Binary database content would be here...`;
+        };
+      });
+      
+      // Font file generators
+      ['ttf', 'otf', 'woff', 'woff2', 'eot', 'pfb', 'pfm'].forEach(ext => {
+        generators[ext] = () => {
+          const fontNames = ['Sample Sans', 'Demo Serif', 'Example Mono', 'Test Display'];
+          const fontName = getRandomItem(fontNames);
+          return `# ${ext.toUpperCase()} Font File Placeholder
+# This would contain binary font data in a real implementation
+#
+# Font Information:
+# Family: ${fontName}
+# Style: ${getRandomItem(['Regular', 'Bold', 'Italic', 'Bold Italic'])}
+# Weight: ${getRandomItem(['300', '400', '500', '600', '700', '800'])}
+# Format: ${ext.toUpperCase()}
+# Characters: ${Math.floor(Math.random() * 1000) + 256}
+# Created: ${new Date().toISOString()}
+#
+# Binary font data would be here...`;
+        };
+      });
+      
+      // CAD/3D file generators
+      ['dwg', 'dxf', 'obj', 'fbx', 'dae', 'blend', 'max', 'ma', 'c4d', 'skp', 'step', 'iges'].forEach(ext => {
+        generators[ext] = () => {
+          return `# ${ext.toUpperCase()} 3D/CAD File Placeholder
+# This would contain 3D model or CAD data in a real implementation
+#
+# Model Information:
+# Objects: ${Math.floor(Math.random() * 50) + 5}
+# Vertices: ${Math.floor(Math.random() * 10000) + 1000}
+# Faces: ${Math.floor(Math.random() * 8000) + 500}
+# Materials: ${Math.floor(Math.random() * 10) + 1}
+# Textures: ${Math.floor(Math.random() * 5) + 0}
+# Units: ${getRandomItem(['mm', 'cm', 'inches', 'feet'])}
+# Created: ${new Date().toISOString()}
+#
+# 3D/CAD data would be here...`;
+        };
+      });
+      
+      // Add default generators for remaining extensions
+      const allExtensions = [];
+      Object.values(fileTypes).forEach(category => {
+        category.forEach(type => {
+          if (!allExtensions.includes(type.ext)) {
+            allExtensions.push(type.ext);
+          }
+        });
+      });
+      
+      allExtensions.forEach(ext => {
         if (!generators[ext]) {
           generators[ext] = generators.default;
         }
@@ -715,7 +1143,6 @@ console.log(processor.process().export());`;
         }
         
         const fileCount = parseInt(fileCountInput.value);
-        const recordCount = parseInt(recordCountInput.value);
         
         statusDiv.textContent = '⚙️ Generating files...';
         statusDiv.className = 'text-center text-blue-600 text-lg font-medium';
@@ -739,10 +1166,10 @@ console.log(processor.process().export());`;
               
               if (imageTypes.includes(type.ext)) {
                 // Handle async image generation
-                content = await generator(recordCount);
+                content = await generator();
               } else {
                 // Handle sync text generation
-                content = generator(recordCount);
+                content = generator();
               }
               
               zip.file(`${type.name.replace(/\s+/g, '_')}_${i}.${type.ext}`, content);
