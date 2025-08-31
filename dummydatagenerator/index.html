@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dummy Data Generator</title>
+    <!-- Favicon links -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="../images/favicon/favicon.ico">
+    <link rel="manifest" href="../images/favicon/site.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="../images/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../images/favicon/android-chrome-512x512.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      .file-type-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+      .file-type-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      }
+      .file-type-card.selected {
+        border-color: #3b82f6;
+        background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+      }
+      .search-container {
+        position: relative;
+      }
+      .file-grid {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .category-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(249, 250, 251, 0.95);
+        backdrop-filter: blur(10px);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <header class="gradient-bg shadow-lg">
+      <nav class="container mx-auto flex justify-between items-center py-6 px-4">
+        <a href="../index.html" class="text-white hover:text-gray-200 font-semibold transition-colors">🏠 My Other Sites</a>
+        <a href="mailto:support@mystaticsite.com?subject=Improvement Request - Dummy Data Generator&body=Hello,%0D%0A%0D%0AI suggest that you should do X" class="bg-white text-purple-600 px-6 py-2 rounded-full hover:bg-gray-100 transition-colors font-semibold shadow-md">💡 Improvements?</a>
+      </nav>
+    </header>
+    <main class="container mx-auto px-4 mt-10 flex-grow max-w-6xl">
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+          🚀 Dummy Data Generator
+        </h1>
+        <p class="text-xl text-gray-600">Generate realistic dummy files in any format you need</p>
+      </div>
+      
+      <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+            📁 Select File Types
+            <span id="selectedCount" class="ml-4 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">0 selected</span>
+          </h2>
+          
+          <div class="search-container mb-6">
+            <input type="text" id="searchInput" placeholder="Search file types..." 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg">
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <span class="text-gray-400 text-xl">🔍</span>
+            </div>
+          </div>
+          
+          <div class="flex flex-wrap gap-2 mb-4">
+            <button class="select-all-btn bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition-colors text-sm font-medium">Select All</button>
+            <button class="clear-all-btn bg-gray-100 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-200 transition-colors text-sm font-medium">Clear All</button>
+            <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-200 transition-colors text-sm font-medium" data-category="data">Data Files</button>
+            <button class="category-btn bg-green-100 text-green-700 px-4 py-2 rounded-full hover:bg-green-200 transition-colors text-sm font-medium" data-category="office">Office</button>
+            <button class="category-btn bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full hover:bg-yellow-200 transition-colors text-sm font-medium" data-category="image">Images</button>
+            <button class="category-btn bg-red-100 text-red-700 px-4 py-2 rounded-full hover:bg-red-200 transition-colors text-sm font-medium" data-category="web">Web</button>
+          </div>
+          
+          <div id="fileTypesContainer" class="file-grid border rounded-lg bg-gray-50 p-4"></div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+          <div>
+            <label class="block text-lg font-semibold text-gray-700 mb-3">
+              📊 Files per type:
+            </label>
+            <input type="number" id="fileCount" value="3" min="1" max="50" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg">
+          </div>
+          <div>
+            <label class="block text-lg font-semibold text-gray-700 mb-3">
+              📈 Records per file:
+            </label>
+            <input type="number" id="recordCount" value="10" min="1" max="1000" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg">
+          </div>
+        </div>
+        
+        <div class="text-center">
+          <button id="generateBtn" 
+                  class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl transition-all transform hover:scale-105 shadow-lg text-lg">
+            ✨ Generate & Download Zip
+          </button>
+        </div>
+      </div>
+      
+      <div id="status" class="text-center text-lg font-medium"></div>
+    </main>
+    <footer class="py-4 mt-auto">
+      <div class="text-center space-y-2">
+        <p class="text-gray-600">&copy; <span id="currentYear"></span>. All rights reserved. </p>
+        <p class="text-gray-600">Created by Alex with ❤️</p>
+      </div>
+    </footer>
+    <script>
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+      
+      // Comprehensive file type definitions
+      const fileTypes = {
+        // Data Files
+        data: [
+          {id: 'json', name: 'JSON', ext: 'json', emoji: '📊', description: 'JavaScript Object Notation'},
+          {id: 'csv', name: 'CSV', ext: 'csv', emoji: '📈', description: 'Comma Separated Values'},
+          {id: 'xml', name: 'XML', ext: 'xml', emoji: '📄', description: 'Extensible Markup Language'},
+          {id: 'yaml', name: 'YAML', ext: 'yaml', emoji: '⚙️', description: 'YAML Ain\'t Markup Language'},
+          {id: 'sql', name: 'SQL', ext: 'sql', emoji: '🗄️', description: 'Structured Query Language'},
+          {id: 'parquet', name: 'Parquet', ext: 'parquet', emoji: '🏛️', description: 'Columnar Storage'},
+          {id: 'avro', name: 'Avro', ext: 'avro', emoji: '🦅', description: 'Data Serialization'},
+          {id: 'tsv', name: 'TSV', ext: 'tsv', emoji: '📋', description: 'Tab Separated Values'},
+          {id: 'ndjson', name: 'NDJSON', ext: 'ndjson', emoji: '📊', description: 'Newline Delimited JSON'},
+          {id: 'rdf', name: 'RDF', ext: 'rdf', emoji: '🔗', description: 'Resource Description Framework'}
+        ],
+        
+        // Office Files
+        office: [
+          {id: 'docx', name: 'Word Document', ext: 'docx', emoji: '📝', description: 'Microsoft Word'},
+          {id: 'xlsx', name: 'Excel Spreadsheet', ext: 'xlsx', emoji: '📊', description: 'Microsoft Excel'},
+          {id: 'pptx', name: 'PowerPoint', ext: 'pptx', emoji: '🎯', description: 'Microsoft PowerPoint'},
+          {id: 'pdf', name: 'PDF', ext: 'pdf', emoji: '📄', description: 'Portable Document Format'},
+          {id: 'rtf', name: 'Rich Text', ext: 'rtf', emoji: '📄', description: 'Rich Text Format'},
+          {id: 'odt', name: 'OpenDocument Text', ext: 'odt', emoji: '📝', description: 'LibreOffice Writer'},
+          {id: 'ods', name: 'OpenDocument Spreadsheet', ext: 'ods', emoji: '📊', description: 'LibreOffice Calc'},
+          {id: 'odp', name: 'OpenDocument Presentation', ext: 'odp', emoji: '🎯', description: 'LibreOffice Impress'}
+        ],
+        
+        // Image Files
+        image: [
+          {id: 'png', name: 'PNG Image', ext: 'png', emoji: '🖼️', description: 'Portable Network Graphics'},
+          {id: 'jpg', name: 'JPEG Image', ext: 'jpg', emoji: '📷', description: 'Joint Photographic Experts Group'},
+          {id: 'gif', name: 'GIF Image', ext: 'gif', emoji: '🎞️', description: 'Graphics Interchange Format'},
+          {id: 'bmp', name: 'Bitmap Image', ext: 'bmp', emoji: '🖼️', description: 'Bitmap Image File'},
+          {id: 'svg', name: 'SVG Vector', ext: 'svg', emoji: '🎨', description: 'Scalable Vector Graphics'},
+          {id: 'webp', name: 'WebP Image', ext: 'webp', emoji: '🌐', description: 'Web Picture Format'},
+          {id: 'tiff', name: 'TIFF Image', ext: 'tiff', emoji: '📸', description: 'Tagged Image File Format'},
+          {id: 'ico', name: 'Icon File', ext: 'ico', emoji: '⭐', description: 'Icon File Format'}
+        ],
+        
+        // Web Files
+        web: [
+          {id: 'html', name: 'HTML', ext: 'html', emoji: '🌐', description: 'HyperText Markup Language'},
+          {id: 'css', name: 'CSS', ext: 'css', emoji: '🎨', description: 'Cascading Style Sheets'},
+          {id: 'js', name: 'JavaScript', ext: 'js', emoji: '⚡', description: 'JavaScript Code'},
+          {id: 'ts', name: 'TypeScript', ext: 'ts', emoji: '📘', description: 'TypeScript Code'},
+          {id: 'php', name: 'PHP', ext: 'php', emoji: '🐘', description: 'PHP Hypertext Preprocessor'},
+          {id: 'jsp', name: 'JSP', ext: 'jsp', emoji: '☕', description: 'JavaServer Pages'},
+          {id: 'asp', name: 'ASP', ext: 'asp', emoji: '🌐', description: 'Active Server Pages'},
+          {id: 'md', name: 'Markdown', ext: 'md', emoji: '📝', description: 'Markdown Documentation'}
+        ],
+        
+        // Programming Files
+        code: [
+          {id: 'py', name: 'Python', ext: 'py', emoji: '🐍', description: 'Python Script'},
+          {id: 'java', name: 'Java', ext: 'java', emoji: '☕', description: 'Java Source Code'},
+          {id: 'cpp', name: 'C++', ext: 'cpp', emoji: '⚙️', description: 'C++ Source Code'},
+          {id: 'c', name: 'C', ext: 'c', emoji: '🔧', description: 'C Source Code'},
+          {id: 'cs', name: 'C#', ext: 'cs', emoji: '🔷', description: 'C# Source Code'},
+          {id: 'go', name: 'Go', ext: 'go', emoji: '🐹', description: 'Go Source Code'},
+          {id: 'rs', name: 'Rust', ext: 'rs', emoji: '🦀', description: 'Rust Source Code'},
+          {id: 'rb', name: 'Ruby', ext: 'rb', emoji: '💎', description: 'Ruby Script'}
+        ],
+        
+        // Config Files
+        config: [
+          {id: 'ini', name: 'INI Config', ext: 'ini', emoji: '⚙️', description: 'Configuration File'},
+          {id: 'toml', name: 'TOML', ext: 'toml', emoji: '📋', description: 'Tom\'s Obvious Minimal Language'},
+          {id: 'properties', name: 'Properties', ext: 'properties', emoji: '🔧', description: 'Java Properties'},
+          {id: 'env', name: 'Environment', ext: 'env', emoji: '🌍', description: 'Environment Variables'},
+          {id: 'dockerfile', name: 'Dockerfile', ext: 'dockerfile', emoji: '🐳', description: 'Docker Configuration'},
+          {id: 'makefile', name: 'Makefile', ext: 'makefile', emoji: '🏗️', description: 'Build Configuration'}
+        ],
+        
+        // Text Files
+        text: [
+          {id: 'txt', name: 'Plain Text', ext: 'txt', emoji: '📄', description: 'Plain Text File'},
+          {id: 'log', name: 'Log File', ext: 'log', emoji: '📝', description: 'Application Logs'},
+          {id: 'readme', name: 'README', ext: 'readme', emoji: '📖', description: 'Documentation'},
+          {id: 'license', name: 'License', ext: 'license', emoji: '⚖️', description: 'License File'},
+          {id: 'gitignore', name: 'Gitignore', ext: 'gitignore', emoji: '🚫', description: 'Git Ignore Rules'}
+        ]
+      };
+      
+      let allFileTypes = [];
+      Object.values(fileTypes).forEach(category => {
+        allFileTypes.push(...category);
+      });
+      
+      // DOM Elements
+      const generateBtn = document.getElementById('generateBtn');
+      const statusDiv = document.getElementById('status');
+      const fileCountInput = document.getElementById('fileCount');
+      const recordCountInput = document.getElementById('recordCount');
+      const searchInput = document.getElementById('searchInput');
+      const fileTypesContainer = document.getElementById('fileTypesContainer');
+      const selectedCount = document.getElementById('selectedCount');
+      
+      let selectedTypes = new Set();
+      
+      // Dummy data for generation
+      const dummyData = {
+        names: ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown', 'Charlie Wilson', 'Diana Davis', 'Eve Miller', 'Frank Garcia', 'Grace Lee', 'Henry Kim', 'Isabella Chen', 'Jack Thompson', 'Kate Wilson', 'Liam Martinez', 'Maya Patel', 'Noah Jackson', 'Olivia Rodriguez', 'Peter Chang', 'Quinn Taylor', 'Rachel Davis'],
+        emails: ['john@example.com', 'jane@example.com', 'bob@example.com', 'alice@example.com', 'charlie@example.com', 'diana@example.com', 'eve@example.com', 'frank@example.com', 'grace@example.com', 'henry@example.com'],
+        companies: ['TechCorp', 'DataSystems', 'WebSolutions', 'CloudWorks', 'DevStudio', 'CodeFactory', 'InnovateLabs', 'FutureTech', 'SmartSystems', 'NextGen Solutions'],
+        cities: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Jacksonville', 'Fort Worth', 'Columbus', 'Charlotte'],
+        products: ['Widget A', 'Gadget B', 'Tool C', 'Device D', 'Component E', 'Module F', 'System G', 'Framework H', 'Platform I', 'Service J'],
+        departments: ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance', 'Operations', 'IT', 'Legal', 'R&D', 'Customer Support'],
+        colors: ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown', 'black', 'white', 'gray', 'cyan', 'magenta'],
+        categories: ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports', 'Toys', 'Food', 'Health', 'Automotive', 'Beauty']
+      };
+      
+      function getRandomItem(array) {
+        return array[Math.floor(Math.random() * array.length)];
+      }
+      
+      function generateRandomData() {
+        return {
+          id: Math.floor(Math.random() * 100000),
+          name: getRandomItem(dummyData.names),
+          email: getRandomItem(dummyData.emails),
+          company: getRandomItem(dummyData.companies),
+          city: getRandomItem(dummyData.cities),
+          product: getRandomItem(dummyData.products),
+          department: getRandomItem(dummyData.departments),
+          category: getRandomItem(dummyData.categories),
+          color: getRandomItem(dummyData.colors),
+          price: (Math.random() * 1000).toFixed(2),
+          quantity: Math.floor(Math.random() * 100) + 1,
+          score: (Math.random() * 100).toFixed(1),
+          active: Math.random() > 0.5,
+          date: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          timestamp: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+          phone: `+1-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
+          website: `https://${getRandomItem(dummyData.companies).toLowerCase().replace(/\s+/g, '')}.com`
+        };
+      }
+      
+      // File generators (simplified - many will generate text-based representations)
+      const generators = {
+        // Data formats
+        json: (recordCount) => {
+          const data = Array.from({ length: recordCount }, () => generateRandomData());
+          return JSON.stringify(data, null, 2);
+        },
+        
+        csv: (recordCount) => {
+          const data = Array.from({ length: recordCount }, () => generateRandomData());
+          const headers = Object.keys(data[0]).join(',') + '\n';
+          const rows = data.map(row => Object.values(row).map(val => 
+            typeof val === 'string' && val.includes(',') ? `"${val}"` : val
+          ).join(',')).join('\n');
+          return headers + rows;
+        },
+        
+        xml: (recordCount) => {
+          const data = Array.from({ length: recordCount }, () => generateRandomData());
+          let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<records>\n';
+          data.forEach(record => {
+            xml += '  <record>\n';
+            Object.entries(record).forEach(([key, value]) => {
+              xml += `    <${key}>${value}</${key}>\n`;
+            });
+            xml += '  </record>\n';
+          });
+          xml += '</records>';
+          return xml;
+        },
+        
+        yaml: (recordCount) => {
+          const data = Array.from({ length: recordCount }, () => generateRandomData());
+          let yaml = 'records:\n';
+          data.forEach(record => {
+            yaml += '  -\n';
+            Object.entries(record).forEach(([key, value]) => {
+              yaml += `    ${key}: ${typeof value === 'string' ? `"${value}"` : value}\n`;
+            });
+          });
+          return yaml;
+        },
+        
+        sql: (recordCount) => {
+          const data = Array.from({ length: recordCount }, () => generateRandomData());
+          const firstRecord = data[0];
+          let sql = 'CREATE TABLE IF NOT EXISTS sample_data (\n';
+          sql += Object.keys(firstRecord).map(key => {
+            const value = firstRecord[key];
+            if (typeof value === 'number') return `  ${key} DECIMAL(10,2)`;
+            if (typeof value === 'boolean') return `  ${key} BOOLEAN`;
+            if (key.includes('date') || key.includes('timestamp')) return `  ${key} DATETIME`;
+            return `  ${key} VARCHAR(255)`;
+          }).join(',\n');
+          sql += '\n);\n\n';
+          
+          data.forEach(record => {
+            const values = Object.values(record).map(val => 
+              typeof val === 'string' ? `'${val.replace(/'/g, "''")}'` : val
+            ).join(', ');
+            sql += `INSERT INTO sample_data VALUES (${values});\n`;
+          });
+          return sql;
+        },
+        
+        // Web files
+        html: () => {
+          const data = Array.from({ length: 5 }, () => generateRandomData());
+          return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Data</title>
+</head>
+<body>
+    <h1>Sample Data</h1>
+    <table border="1">
+        <thead>
+            <tr>${Object.keys(data[0]).map(key => `<th>${key}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+            ${data.map(row => `<tr>${Object.values(row).map(val => `<td>${val}</td>`).join('')}</tr>`).join('\n')}
+        </tbody>
+    </table>
+</body>
+</html>`;
+        },
+        
+        css: () => {
+          return `.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    background-color: #${Math.floor(Math.random()*16777215).toString(16)};
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}`;
+        },
+        
+        js: () => {
+          const data = generateRandomData();
+          return `// Sample JavaScript file
+const sampleData = ${JSON.stringify(data, null, 2)};
+
+function processData(data) {
+    return data.map(item => ({
+        ...item,
+        processed: true,
+        timestamp: new Date().toISOString()
+    }));
+}
+
+class DataProcessor {
+    constructor(data) {
+        this.data = data;
+        this.processed = false;
+    }
+    
+    process() {
+        this.data = processData(this.data);
+        this.processed = true;
+        return this;
+    }
+    
+    export() {
+        return JSON.stringify(this.data, null, 2);
+    }
+}
+
+// Usage
+const processor = new DataProcessor([sampleData]);
+console.log(processor.process().export());`;
+        },
+        
+        // Default text generator for unsupported types
+        default: (recordCount) => {
+          const data = Array.from({ length: Math.min(recordCount, 10) }, () => generateRandomData());
+          return `Sample data file containing ${recordCount} records\n\n` + 
+                 data.map((record, i) => `Record ${i + 1}:\n${Object.entries(record).map(([k, v]) => `  ${k}: ${v}`).join('\n')}`).join('\n\n');
+        }
+      };
+      
+      // Add generators for other file types
+      ['txt', 'log', 'md', 'py', 'java', 'cpp', 'c', 'cs', 'go', 'rs', 'rb', 'php', 'ts', 'ini', 'toml', 'properties', 'env'].forEach(ext => {
+        if (!generators[ext]) {
+          generators[ext] = generators.default;
+        }
+      });
+      
+      // Image generators using Canvas API
+      function createImageCanvas(width = 800, height = 600, type = 'sample') {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, width, height);
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
+        const color1 = getRandomItem(colors);
+        const color2 = getRandomItem(colors.filter(c => c !== color1));
+        gradient.addColorStop(0, color1);
+        gradient.addColorStop(1, color2);
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+        
+        if (type === 'chart') {
+          // Generate a simple chart
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.fillRect(50, 50, width - 100, height - 100);
+          
+          // Draw bars
+          const barCount = 6;
+          const barWidth = (width - 200) / barCount;
+          const maxHeight = height - 200;
+          
+          for (let i = 0; i < barCount; i++) {
+            const barHeight = Math.random() * maxHeight * 0.8 + maxHeight * 0.1;
+            const x = 100 + i * barWidth + barWidth * 0.1;
+            const y = height - 100 - barHeight;
+            
+            ctx.fillStyle = getRandomItem(colors);
+            ctx.fillRect(x, y, barWidth * 0.8, barHeight);
+            
+            // Add labels
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Item ${i + 1}`, x + barWidth * 0.4, height - 70);
+          }
+          
+          // Title
+          ctx.fillStyle = '#333';
+          ctx.font = 'bold 24px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('Sample Chart Data', width / 2, 35);
+          
+        } else if (type === 'photo') {
+          // Create photo-like image with shapes
+          for (let i = 0; i < 20; i++) {
+            ctx.fillStyle = getRandomItem(colors) + '80';
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            const radius = Math.random() * 100 + 20;
+            
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          
+          // Add text overlay
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.fillRect(20, height - 80, width - 40, 60);
+          ctx.fillStyle = '#333';
+          ctx.font = 'bold 20px Arial';
+          ctx.textAlign = 'left';
+          ctx.fillText('Sample Photo', 30, height - 50);
+          ctx.font = '14px Arial';
+          ctx.fillText(new Date().toLocaleDateString(), 30, height - 30);
+          
+        } else {
+          // Default sample image with text
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.fillRect(width * 0.1, height * 0.4, width * 0.8, height * 0.2);
+          
+          ctx.fillStyle = '#333';
+          ctx.font = 'bold 36px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('SAMPLE IMAGE', width / 2, height / 2);
+          
+          ctx.font = '18px Arial';
+          ctx.fillText(`${width} × ${height}`, width / 2, height / 2 + 40);
+          
+          const data = generateRandomData();
+          ctx.font = '14px Arial';
+          ctx.fillText(`ID: ${data.id} | ${data.name}`, width / 2, height / 2 + 70);
+        }
+        
+        return canvas;
+      }
+      
+      function canvasToBlob(canvas, type = 'image/png', quality = 0.9) {
+        return new Promise(resolve => {
+          canvas.toBlob(resolve, type, quality);
+        });
+      }
+      
+      // Image generators
+      generators.png = async () => {
+        const types = ['sample', 'chart', 'photo'];
+        const canvas = createImageCanvas(800, 600, getRandomItem(types));
+        return await canvasToBlob(canvas, 'image/png');
+      };
+      
+      generators.jpg = async () => {
+        const types = ['sample', 'chart', 'photo'];
+        const canvas = createImageCanvas(1200, 800, getRandomItem(types));
+        return await canvasToBlob(canvas, 'image/jpeg', 0.85);
+      };
+      
+      generators.webp = async () => {
+        const canvas = createImageCanvas(600, 400, 'chart');
+        return await canvasToBlob(canvas, 'image/webp', 0.8);
+      };
+      
+      generators.bmp = async () => {
+        // BMP as PNG (browsers don't support BMP canvas export)
+        const canvas = createImageCanvas(400, 300, 'sample');
+        return await canvasToBlob(canvas, 'image/png');
+      };
+      
+      generators.gif = async () => {
+        // GIF as PNG (static image)
+        const canvas = createImageCanvas(500, 500, 'photo');
+        return await canvasToBlob(canvas, 'image/png');
+      };
+      
+      generators.tiff = async () => {
+        // TIFF as PNG
+        const canvas = createImageCanvas(1000, 700, 'chart');
+        return await canvasToBlob(canvas, 'image/png');
+      };
+      
+      generators.ico = async () => {
+        // ICO as small PNG
+        const canvas = createImageCanvas(64, 64, 'sample');
+        return await canvasToBlob(canvas, 'image/png');
+      };
+      
+      // Special generators for binary-like files (non-image files still get text representations)
+      ['pdf', 'docx', 'xlsx', 'pptx'].forEach(ext => {
+        generators[ext] = () => `# This is a placeholder for a ${ext.toUpperCase()} file\n# In a real implementation, this would contain binary data\n# File generated on: ${new Date().toISOString()}\n# Sample metadata: ${JSON.stringify(generateRandomData(), null, 2)}`;
+      });
+      
+      // SVG generator
+      generators.svg = () => {
+        const colors = ['red', 'blue', 'green', 'purple', 'orange'];
+        const color = getRandomItem(colors);
+        return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="80" fill="${color}" stroke="black" stroke-width="2"/>
+    <text x="100" y="105" text-anchor="middle" font-family="Arial" font-size="16" fill="white">Sample SVG</text>
+</svg>`;
+      };
+      
+      // Initialize UI
+      function renderFileTypes(filteredTypes = allFileTypes) {
+        fileTypesContainer.innerHTML = '';
+        
+        const categorizedTypes = {};
+        filteredTypes.forEach(type => {
+          Object.entries(fileTypes).forEach(([categoryKey, categoryTypes]) => {
+            if (categoryTypes.includes(type)) {
+              if (!categorizedTypes[categoryKey]) categorizedTypes[categoryKey] = [];
+              categorizedTypes[categoryKey].push(type);
+            }
+          });
+        });
+        
+        Object.entries(categorizedTypes).forEach(([categoryKey, types]) => {
+          const categoryName = categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+          
+          const categoryDiv = document.createElement('div');
+          categoryDiv.className = 'mb-4';
+          
+          const categoryHeader = document.createElement('div');
+          categoryHeader.className = 'category-header py-2 px-3 mb-2 border-b-2 border-gray-200';
+          categoryHeader.innerHTML = `<h3 class="font-semibold text-gray-700">${categoryName} Files</h3>`;
+          
+          const typeGrid = document.createElement('div');
+          typeGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3';
+          
+          types.forEach(type => {
+            const card = document.createElement('div');
+            card.className = `file-type-card p-3 rounded-lg bg-white border cursor-pointer ${selectedTypes.has(type.id) ? 'selected' : ''}`;
+            card.dataset.typeId = type.id;
+            
+            card.innerHTML = `
+              <div class="flex items-center space-x-3">
+                <span class="text-2xl">${type.emoji}</span>
+                <div class="flex-1">
+                  <div class="font-medium text-gray-900">${type.name}</div>
+                  <div class="text-sm text-gray-500">.${type.ext}</div>
+                </div>
+                <input type="checkbox" class="file-type-checkbox" ${selectedTypes.has(type.id) ? 'checked' : ''}>
+              </div>
+              <div class="text-xs text-gray-400 mt-1">${type.description}</div>
+            `;
+            
+            card.addEventListener('click', () => toggleFileType(type.id, card));
+            typeGrid.appendChild(card);
+          });
+          
+          categoryDiv.appendChild(categoryHeader);
+          categoryDiv.appendChild(typeGrid);
+          fileTypesContainer.appendChild(categoryDiv);
+        });
+        
+        updateSelectedCount();
+      }
+      
+      function toggleFileType(typeId, cardElement) {
+        const checkbox = cardElement.querySelector('.file-type-checkbox');
+        
+        if (selectedTypes.has(typeId)) {
+          selectedTypes.delete(typeId);
+          cardElement.classList.remove('selected');
+          checkbox.checked = false;
+        } else {
+          selectedTypes.add(typeId);
+          cardElement.classList.add('selected');
+          checkbox.checked = true;
+        }
+        
+        updateSelectedCount();
+      }
+      
+      function updateSelectedCount() {
+        selectedCount.textContent = `${selectedTypes.size} selected`;
+      }
+      
+      // Event listeners
+      searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filtered = allFileTypes.filter(type => 
+          type.name.toLowerCase().includes(searchTerm) ||
+          type.ext.toLowerCase().includes(searchTerm) ||
+          type.description.toLowerCase().includes(searchTerm)
+        );
+        renderFileTypes(filtered);
+      });
+      
+      document.querySelector('.select-all-btn').addEventListener('click', () => {
+        const visibleTypes = document.querySelectorAll('.file-type-card');
+        visibleTypes.forEach(card => {
+          const typeId = card.dataset.typeId;
+          if (!selectedTypes.has(typeId)) {
+            selectedTypes.add(typeId);
+            card.classList.add('selected');
+            card.querySelector('.file-type-checkbox').checked = true;
+          }
+        });
+        updateSelectedCount();
+      });
+      
+      document.querySelector('.clear-all-btn').addEventListener('click', () => {
+        selectedTypes.clear();
+        document.querySelectorAll('.file-type-card').forEach(card => {
+          card.classList.remove('selected');
+          card.querySelector('.file-type-checkbox').checked = false;
+        });
+        updateSelectedCount();
+      });
+      
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const category = btn.dataset.category;
+          const categoryTypes = fileTypes[category] || [];
+          categoryTypes.forEach(type => {
+            selectedTypes.add(type.id);
+          });
+          renderFileTypes();
+        });
+      });
+      
+      generateBtn.addEventListener('click', async () => {
+        if (selectedTypes.size === 0) {
+          statusDiv.textContent = '⚠️ Please select at least one file type.';
+          statusDiv.className = 'text-center text-red-600 text-lg font-medium';
+          return;
+        }
+        
+        const fileCount = parseInt(fileCountInput.value);
+        const recordCount = parseInt(recordCountInput.value);
+        
+        statusDiv.textContent = '⚙️ Generating files...';
+        statusDiv.className = 'text-center text-blue-600 text-lg font-medium';
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '⏳ Generating...';
+        
+        const zip = new JSZip();
+        const imageTypes = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'tiff', 'ico'];
+        
+        try {
+          // Process each selected type
+          for (const typeId of Array.from(selectedTypes)) {
+            const type = allFileTypes.find(t => t.id === typeId);
+            const generator = generators[type.ext] || generators.default;
+            
+            // Update status for current type
+            statusDiv.textContent = `⚙️ Generating ${type.name} files...`;
+            
+            for (let i = 1; i <= fileCount; i++) {
+              let content;
+              
+              if (imageTypes.includes(type.ext)) {
+                // Handle async image generation
+                content = await generator(recordCount);
+              } else {
+                // Handle sync text generation
+                content = generator(recordCount);
+              }
+              
+              zip.file(`${type.name.replace(/\s+/g, '_')}_${i}.${type.ext}`, content);
+            }
+          }
+          
+          statusDiv.textContent = '📦 Creating zip file...';
+          const blob = await zip.generateAsync({type: 'blob'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `dummy_data_${Date.now()}.zip`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+          statusDiv.textContent = `✅ Successfully generated ${selectedTypes.size * fileCount} files!`;
+          statusDiv.className = 'text-center text-green-600 text-lg font-medium';
+        } catch (error) {
+          console.error('Generation error:', error);
+          statusDiv.textContent = '❌ Error generating files. Please try again.';
+          statusDiv.className = 'text-center text-red-600 text-lg font-medium';
+        }
+        
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '✨ Generate & Download Zip';
+      });
+      
+      // Initialize
+      renderFileTypes();
+    </script>
+  </body>
+</html>
