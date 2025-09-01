@@ -14,6 +14,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-easyprint@2.1.9/dist/bundle.js"></script>
   </head>
   <body class="bg-gray-100 h-screen flex flex-col">
     <header class="bg-blue-500 shadow h-[5vh] flex items-center">
@@ -42,7 +43,7 @@
           
           <div class="flex flex-col gap-2 pt-4 border-t">
             <button id="downloadBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors text-sm">
-              Download
+              Download Points
             </button>
             <button id="uploadBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors text-sm">
               Upload
@@ -51,6 +52,9 @@
             <button id="deleteAllBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors text-sm">
               Delete All
             </button>
+            <div class="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded">
+              💡 Use the printer icon on the map to download/export the map image
+            </div>
           </div>
         </div>
         
@@ -83,6 +87,16 @@
           position: 'bottomright',
           metric: true,
           imperial: false
+        }).addTo(map);
+        
+        // Add built-in print/export control
+        L.easyPrint({
+          title: 'Download Map',
+          position: 'topleft',
+          sizeModes: ['A4Portrait', 'A4Landscape', 'Current'],
+          filename: 'camping-map',
+          exportOnly: true,
+          hideControlContainer: false
         }).addTo(map);
         
         // Add double-click event to add points
@@ -345,6 +359,7 @@
         link.click();
         URL.revokeObjectURL(url);
       }
+      
       
       // Upload points
       function uploadPoints() {
