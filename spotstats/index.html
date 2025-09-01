@@ -6,6 +6,9 @@
         <title>My Spotify Stats</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
@@ -39,7 +42,7 @@
                             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
                         "
                     >
-                        🎵 My Spotify Stats
+                         My Spotify Stats
                     </h1>
                 </div>
             </div>
@@ -88,14 +91,14 @@
                             <li>Scroll down to "Download your data"</li>
                             <li>
                                 <strong style="color: #1db954"
-                                    >⚠️ IMPORTANT:</strong
+                                    > IMPORTANT:</strong
                                 >
                                 Request
                                 <strong>"Extended streaming history"</strong>
                                 ONLY
                                 <br />
                                 <span style="color: #ff6b6b; font-weight: bold">
-                                    ❌ DO NOT select any other options - uncheck
+                                     DO NOT select any other options - uncheck
                                     everything else!
                                 </span>
                             </li>
@@ -155,7 +158,7 @@
                         onclick="toggleFileInfo()"
                         style="background: rgba(255, 255, 255, 0.1)"
                     >
-                        📋 How to get my data?
+                         How to get my data?
                     </button>
                 </div>
             </div>
@@ -202,7 +205,7 @@
                                 color 0.2s;
                         "
                     >
-                        ⚙️ Settings
+                        ⚙ Settings
                     </summary>
                     <div
                         class="time-period"
@@ -423,13 +426,13 @@
                             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
                         "
                     >
-                        🎵 Top Lists
+                         Top Lists
                     </h2>
 
                     <div class="top-lists-grid">
                         <div class="top-list-container">
                             <div class="top-list-header">
-                                <h3 class="top-list-title">🎤 Top Artists</h3>
+                                <h3 class="top-list-title"> Top Artists</h3>
                                 <input
                                     type="text"
                                     class="search-box"
@@ -449,7 +452,7 @@
 
                         <div class="top-list-container">
                             <div class="top-list-header">
-                                <h3 class="top-list-title">🎵 Top Tracks</h3>
+                                <h3 class="top-list-title"> Top Tracks</h3>
                                 <input
                                     type="text"
                                     class="search-box"
@@ -469,7 +472,7 @@
 
                         <div class="top-list-container">
                             <div class="top-list-header">
-                                <h3 class="top-list-title">💿 Top Albums</h3>
+                                <h3 class="top-list-title"> Albums</h3>
                                 <input
                                     type="text"
                                     class="search-box"
@@ -502,18 +505,18 @@
                             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
                         "
                     >
-                        📊 Charts
+                         Charts
                     </h2>
 
                     <div class="charts-grid">
                         <div class="chart-container">
                             <div class="chart-title">
-                                📈 Listening Over Time
+                                 Listening Over Time
                             </div>
                             <canvas id="timeChart"></canvas>
                         </div>
                         <div class="chart-container">
-                            <div class="chart-title">📱 Platform Usage</div>
+                            <div class="chart-title"> Platform Usage</div>
                             <div
                                 class="platform-chart-container"
                                 style="
@@ -535,19 +538,19 @@
                         </div>
                         <div class="chart-container">
                             <div class="chart-title">
-                                🌍 Listening by Country
+                                 Listening by Country
                             </div>
                             <canvas id="countryChart"></canvas>
                         </div>
                         <div class="chart-container weekly-patterns">
                             <div class="chart-title">
-                                📅 Weekly Distribution
+                                 Weekly Distribution
                             </div>
                             <canvas id="weeklyChart"></canvas>
                         </div>
                         <div class="chart-container">
                             <div class="chart-title">
-                                ⏰ Hourly Distribution
+                                 Hourly Distribution
                             </div>
                             <canvas id="hourlyChart"></canvas>
                         </div>
@@ -571,7 +574,7 @@
                     </h2>
                     <div class="insights-grid">
                         <div class="insight-card">
-                            <div class="insight-title">🏆 Longest Session</div>
+                            <div class="insight-title"> Longest Session</div>
                             <div class="insight-value" id="longestSession">
                                 0h
                             </div>
@@ -581,7 +584,7 @@
                         </div>
 
                         <div class="insight-card">
-                            <div class="insight-title">📅 Most Active Day</div>
+                            <div class="insight-title"> Most Active Day</div>
                             <div class="insight-value" id="mostActiveDay">
                                 --
                             </div>
@@ -590,7 +593,7 @@
                             </div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-title">🌙 Night Owl Score</div>
+                            <div class="insight-title"> Night Owl Score</div>
                             <div class="insight-value" id="nightOwlScore">
                                 0%
                             </div>
@@ -599,7 +602,7 @@
                             </div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-title">🌅 Early Bird Score</div>
+                            <div class="insight-title"> Early Bird Score</div>
                             <div class="insight-value" id="earlyBirdScore">
                                 0%
                             </div>
@@ -608,14 +611,14 @@
                             </div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-title">📊 Variety Score</div>
+                            <div class="insight-title"> Variety Score</div>
                             <div class="insight-value" id="varietyScore">0</div>
                             <div class="insight-detail">
                                 different artists per week
                             </div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-title">🌍 Top Country</div>
+                            <div class="insight-title"> Top Country</div>
                             <div class="insight-value" id="topCountry">--</div>
                             <div class="insight-detail" id="countryDetail">
                                 -- listens
@@ -631,26 +634,26 @@
                             </div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-title">🔀 Shuffle Usage</div>
+                            <div class="insight-title"> Shuffle Usage</div>
                             <div class="insight-value" id="shuffleRate">0%</div>
                             <div class="insight-detail">of your listening</div>
                         </div>
                         <div class="insight-card">
                             <div class="insight-title">
-                                📶 Offline Listening
+                                 Offline Listening
                             </div>
                             <div class="insight-value" id="offlineRate">0%</div>
                             <div class="insight-detail">of your time</div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-title">⏭️ Skip Rate</div>
+                            <div class="insight-title">⏭ Skip Rate</div>
                             <div class="insight-value" id="actualSkipRate">
                                 0%
                             </div>
                             <div class="insight-detail">tracks skipped</div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-title">🎯 Discovery Score</div>
+                            <div class="insight-title"> Discovery Score</div>
                             <div class="insight-value" id="discoveryScore">
                                 0
                             </div>
@@ -684,7 +687,7 @@
                         onmouseover="this.style.background='#1ed760';this.style.transform='translateY(-2px)'"
                         onmouseout="this.style.background='#1db954';this.style.transform='none'"
                     >
-                        📤 Share your stats!
+                         Share your stats!
                     </button>
                 </div>
             </div>
