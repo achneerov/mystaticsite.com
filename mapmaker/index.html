@@ -43,9 +43,13 @@
           </div>
           
           <div class="flex gap-2 pt-4 border-t">
-            <button id="saveBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors">
-              Save
+            <button id="downloadBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors">
+              Download
             </button>
+            <button id="uploadBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors">
+              Upload
+            </button>
+            <input type="file" id="uploadInput" accept=".json" style="display: none;">
             <button id="deleteAllBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors">
               Delete All
             </button>
@@ -302,8 +306,8 @@
         }
       }
       
-      // Save points
-      function savePoints() {
+      // Download points
+      function downloadPoints() {
         const dataStr = JSON.stringify(points, null, 2);
         const dataBlob = new Blob([dataStr], {type: 'application/json'});
         const url = URL.createObjectURL(dataBlob);
@@ -312,6 +316,56 @@
         link.download = 'map-points.json';
         link.click();
         URL.revokeObjectURL(url);
+      }
+      
+      // Upload points
+      function uploadPoints() {
+        document.getElementById('uploadInput').click();
+      }
+      
+      // Handle file upload
+      function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const uploadedPoints = JSON.parse(e.target.result);
+            
+            // Validate the uploaded data structure
+            if (Array.isArray(uploadedPoints)) {
+              // Find the highest existing point ID to continue numbering
+              const maxId = uploadedPoints.length > 0 
+                ? Math.max(...uploadedPoints.map(p => p.id || 0))
+                : 0;
+              pointCounter = Math.max(pointCounter, maxId);
+              
+              // Set the uploaded points
+              points = uploadedPoints.map(point => ({
+                id: point.id || ++pointCounter,
+                name: point.name || 'Imported Point',
+                lat: parseFloat(point.lat) || 45.5017,
+                lng: parseFloat(point.lng) || -73.5673,
+                color: point.color || getRandomColor(),
+                size: point.size || 'medium',
+                shape: point.shape || 'circle'
+              }));
+              
+              renderPoints();
+              updateMap();
+              alert(`Successfully loaded ${points.length} points!`);
+            } else {
+              alert('Invalid file format. Please upload a valid JSON file with point data.');
+            }
+          } catch (error) {
+            alert('Error reading file. Please make sure it\'s a valid JSON file.');
+          }
+        };
+        reader.readAsText(file);
+        
+        // Reset the input so the same file can be uploaded again
+        event.target.value = '';
       }
       
       // Update point input fields when dragged on map
@@ -441,7 +495,9 @@
         initMap();
         
         document.getElementById('addPointBtn').addEventListener('click', addPoint);
-        document.getElementById('saveBtn').addEventListener('click', savePoints);
+        document.getElementById('downloadBtn').addEventListener('click', downloadPoints);
+        document.getElementById('uploadBtn').addEventListener('click', uploadPoints);
+        document.getElementById('uploadInput').addEventListener('change', handleFileUpload);
         document.getElementById('deleteAllBtn').addEventListener('click', deleteAllPoints);
       });
     </script>
