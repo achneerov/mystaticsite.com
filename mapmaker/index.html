@@ -26,8 +26,6 @@
       </nav>
     </header>
     <main class="max-w-none mx-6 mt-10 flex-grow">
-      <h1 class="text-3xl font-bold text-center mb-8">Map Maker</h1>
-      
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <!-- Points Panel -->
         <div class="bg-white rounded-lg shadow-lg p-6">
@@ -59,18 +57,11 @@
         <!-- Map Panel -->
         <div class="bg-white rounded-lg shadow-lg p-6 lg:col-span-2">
           <h2 class="text-xl font-semibold mb-4">Map Preview</h2>
-          <div id="map" class="w-full h-[60vh] border rounded"></div>
+          <div id="map" class="w-full h-[75vh] border rounded"></div>
         </div>
       </div>
     </main>
-    <footer class="py-4 mt-auto">
-      <div class="text-center space-y-2">
-        <p class="text-gray-600">&copy; <span id="currentYear"></span>. All rights reserved. </p>
-        <p class="text-gray-600">Created by Alex with ❤️</p>
-      </div>
-    </footer>
     <script>
-      document.getElementById('currentYear').textContent = new Date().getFullYear();
       
       // Map Maker functionality
       let points = [];
