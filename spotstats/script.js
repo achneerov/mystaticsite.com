@@ -1091,7 +1091,7 @@ function updatePlatformChart() {
                         "#eb4d4b",
                         "#6c5ce7",
                     ],
-                    borderWidth: 0,
+                    borderWidth: 1,
                     borderColor: "#000",
                 },
             ],
