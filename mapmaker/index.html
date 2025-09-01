@@ -71,7 +71,9 @@
       
       // Initialize map
       function initMap() {
-        map = L.map('map').setView([45.5017, -73.5673], 10); // Default to Montreal
+        map = L.map('map', {
+          doubleClickZoom: false
+        }).setView([45.5017, -73.5673], 10); // Default to Montreal
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '© OpenStreetMap contributors'
         }).addTo(map);
