@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>whatever</title>
+    <title>Map Maker</title>
     <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png">
@@ -12,6 +12,8 @@
     <link rel="icon" type="image/png" sizes="192x192" href="../images/favicon/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="../images/favicon/android-chrome-512x512.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   </head>
   <body class="bg-gray-100 min-h-screen flex flex-col">
     <header class="bg-blue-500 shadow">
@@ -24,12 +26,37 @@
       </nav>
     </header>
     <main class="container mx-auto px-4 mt-10 flex-grow">
-      <h1 class="text-3xl font-bold text-center mb-8">test</h1>
-      <div class="space-y-6">
-        <article class="border p-6 rounded-lg bg-white shadow-lg">
-          <h2 class="text-xl font-semibold mb-2">test h2</h2>
-          <p class="text-gray-700">This is a test</p>
-        </article>
+      <h1 class="text-3xl font-bold text-center mb-8">Map Maker</h1>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Points Panel -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Points</h2>
+            <button id="addPointBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+              + Add Point
+            </button>
+          </div>
+          
+          <div id="pointsList" class="space-y-2 mb-4 max-h-96 overflow-y-auto">
+            <!-- Points will be added here dynamically -->
+          </div>
+          
+          <div class="flex gap-2 pt-4 border-t">
+            <button id="saveBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors">
+              Save
+            </button>
+            <button id="deleteAllBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors">
+              Delete All
+            </button>
+          </div>
+        </div>
+        
+        <!-- Map Panel -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-xl font-semibold mb-4">Map Preview</h2>
+          <div id="map" class="w-full h-96 border rounded"></div>
+        </div>
       </div>
     </main>
     <footer class="py-4 mt-auto">
@@ -40,6 +67,318 @@
     </footer>
     <script>
       document.getElementById('currentYear').textContent = new Date().getFullYear();
+      
+      // Map Maker functionality
+      let points = [];
+      let pointCounter = 0;
+      let map;
+      let markers = [];
+      let polyline = null;
+      
+      // Initialize map
+      function initMap() {
+        map = L.map('map').setView([45.5017, -73.5673], 10); // Default to Montreal
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+      }
+      
+      // Create point HTML
+      function createPointHTML(point) {
+        return `
+          <div class="point-item border rounded-lg p-3 bg-gray-50" data-point-id="${point.id}">
+            <div class="flex justify-between items-center cursor-pointer point-header" onclick="togglePoint(${point.id})">
+              <span class="font-medium point-name" ondblclick="editPointName(${point.id}, event)">${point.name}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500 expand-arrow">▼</span>
+                <button onclick="deletePoint(${point.id})" class="text-red-500 hover:text-red-700 text-sm">✕</button>
+              </div>
+            </div>
+            <div class="point-details mt-3 hidden">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Latitude</label>
+                  <input type="number" step="any" class="w-full text-xs border rounded px-2 py-1 coord-lat" value="${point.lat}" onchange="updatePoint(${point.id})">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Longitude</label>
+                  <input type="number" step="any" class="w-full text-xs border rounded px-2 py-1 coord-lng" value="${point.lng}" onchange="updatePoint(${point.id})">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Color</label>
+                  <input type="color" class="w-full h-8 border rounded point-color" value="${point.color}" onchange="updatePoint(${point.id})">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Size</label>
+                  <select class="w-full text-xs border rounded px-2 py-1 point-size" onchange="updatePoint(${point.id})">
+                    <option value="small" ${point.size === 'small' ? 'selected' : ''}>Small</option>
+                    <option value="medium" ${point.size === 'medium' ? 'selected' : ''}>Medium</option>
+                    <option value="large" ${point.size === 'large' ? 'selected' : ''}>Large</option>
+                  </select>
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Shape</label>
+                  <select class="w-full text-xs border rounded px-2 py-1 point-shape" onchange="updatePoint(${point.id})">
+                    <option value="circle" ${point.shape === 'circle' ? 'selected' : ''}>Circle</option>
+                    <option value="square" ${point.shape === 'square' ? 'selected' : ''}>Square</option>
+                    <option value="triangle" ${point.shape === 'triangle' ? 'selected' : ''}>Triangle</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Add new point
+      function addPoint() {
+        pointCounter++;
+        const newPoint = {
+          id: pointCounter,
+          name: `Point ${pointCounter}`,
+          lat: 45.5017,
+          lng: -73.5673,
+          color: '#3b82f6',
+          size: 'medium',
+          shape: 'circle'
+        };
+        
+        points.push(newPoint);
+        renderPoints();
+        updateMap();
+      }
+      
+      // Render points list
+      function renderPoints() {
+        const pointsList = document.getElementById('pointsList');
+        pointsList.innerHTML = points.map(point => createPointHTML(point)).join('');
+      }
+      
+      // Toggle point details
+      function togglePoint(pointId) {
+        const pointElement = document.querySelector(`[data-point-id="${pointId}"]`);
+        const details = pointElement.querySelector('.point-details');
+        const arrow = pointElement.querySelector('.expand-arrow');
+        
+        details.classList.toggle('hidden');
+        arrow.textContent = details.classList.contains('hidden') ? '▼' : '▲';
+      }
+      
+      // Edit point name
+      function editPointName(pointId, event) {
+        event.stopPropagation();
+        const nameElement = event.target;
+        
+        // Check if already editing to prevent duplicates
+        if (nameElement.style.display === 'none') return;
+        
+        const currentName = nameElement.textContent;
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentName;
+        input.className = 'font-medium bg-white border rounded px-1';
+        input.style.width = '120px';
+        
+        function finishEditing() {
+          const newName = input.value || currentName;
+          nameElement.textContent = newName;
+          nameElement.style.display = 'inline';
+          
+          // Remove the input element
+          if (input.parentNode) {
+            input.parentNode.removeChild(input);
+          }
+          
+          // Update point data
+          const point = points.find(p => p.id === pointId);
+          if (point) point.name = newName;
+        }
+        
+        input.onblur = function(e) {
+          finishEditing();
+        };
+        
+        input.onkeydown = function(e) {
+          if (e.key === 'Enter') {
+            finishEditing();
+          }
+          if (e.key === 'Escape') {
+            nameElement.style.display = 'inline';
+            if (input.parentNode) {
+              input.parentNode.removeChild(input);
+            }
+          }
+        };
+        
+        nameElement.style.display = 'none';
+        nameElement.parentNode.insertBefore(input, nameElement);
+        input.focus();
+        input.select();
+      }
+      
+      // Update point data
+      function updatePoint(pointId) {
+        const pointElement = document.querySelector(`[data-point-id="${pointId}"]`);
+        const point = points.find(p => p.id === pointId);
+        
+        if (point && pointElement) {
+          point.lat = parseFloat(pointElement.querySelector('.coord-lat').value) || point.lat;
+          point.lng = parseFloat(pointElement.querySelector('.coord-lng').value) || point.lng;
+          point.color = pointElement.querySelector('.point-color').value;
+          point.size = pointElement.querySelector('.point-size').value;
+          point.shape = pointElement.querySelector('.point-shape').value;
+          
+          updateMap();
+        }
+      }
+      
+      // Delete point
+      function deletePoint(pointId) {
+        points = points.filter(p => p.id !== pointId);
+        renderPoints();
+        updateMap();
+      }
+      
+      // Delete all points
+      function deleteAllPoints() {
+        if (confirm('Are you sure you want to delete all points?')) {
+          points = [];
+          renderPoints();
+          updateMap();
+        }
+      }
+      
+      // Save points
+      function savePoints() {
+        const dataStr = JSON.stringify(points, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'map-points.json';
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+      
+      // Update point input fields when dragged on map
+      function updatePointInputs(pointId, lat, lng) {
+        const pointElement = document.querySelector(`[data-point-id="${pointId}"]`);
+        if (pointElement) {
+          const latInput = pointElement.querySelector('.coord-lat');
+          const lngInput = pointElement.querySelector('.coord-lng');
+          if (latInput) latInput.value = lat.toFixed(6);
+          if (lngInput) lngInput.value = lng.toFixed(6);
+        }
+      }
+      
+      // Update only the polyline without recreating all markers
+      function updatePolyline() {
+        if (polyline) {
+          map.removeLayer(polyline);
+          polyline = null;
+        }
+        
+        if (points.length > 1) {
+          const latLngs = points.map(point => [point.lat, point.lng]);
+          polyline = L.polyline(latLngs, {color: '#3b82f6', weight: 2}).addTo(map);
+        }
+      }
+      
+      // Update map display
+      function updateMap() {
+        // Clear existing markers and polyline
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+        if (polyline) {
+          map.removeLayer(polyline);
+          polyline = null;
+        }
+        
+        if (points.length === 0) return;
+        
+        // Add markers
+        points.forEach(point => {
+          const sizeMap = { small: 5, medium: 8, large: 12 };
+          const radius = sizeMap[point.size];
+          
+          let marker;
+          if (point.shape === 'circle') {
+            marker = L.circleMarker([point.lat, point.lng], {
+              color: point.color,
+              fillColor: point.color,
+              fillOpacity: 0.7,
+              radius: radius
+            });
+            
+            // Convert to draggable marker since CircleMarkers can't be dragged
+            const iconHtml = `<div style="width:${radius*2}px;height:${radius*2}px;background:${point.color};border-radius:50%;border:2px solid ${point.color};"></div>`;
+            marker = L.marker([point.lat, point.lng], {
+              icon: L.divIcon({
+                html: iconHtml,
+                className: 'custom-marker',
+                iconSize: [radius*2, radius*2],
+                iconAnchor: [radius, radius]
+              }),
+              draggable: true
+            });
+          } else {
+            // For square and triangle
+            const iconHtml = point.shape === 'square' 
+              ? `<div style="width:${radius*2}px;height:${radius*2}px;background:${point.color};border:2px solid ${point.color};"></div>`
+              : `<div style="width:0;height:0;border-left:${radius}px solid transparent;border-right:${radius}px solid transparent;border-bottom:${radius*2}px solid ${point.color};margin-top:${radius}px;"></div>`;
+            
+            marker = L.marker([point.lat, point.lng], {
+              icon: L.divIcon({
+                html: iconHtml,
+                className: 'custom-marker',
+                iconSize: [radius*2, radius*2],
+                iconAnchor: [radius, radius]
+              }),
+              draggable: true
+            });
+          }
+          
+          // Add drag event listener
+          marker.on('dragend', function(e) {
+            const newLatLng = e.target.getLatLng();
+            point.lat = newLatLng.lat;
+            point.lng = newLatLng.lng;
+            
+            // Update the input fields in the UI
+            updatePointInputs(point.id, newLatLng.lat, newLatLng.lng);
+            
+            // Update the connecting lines
+            updatePolyline();
+          });
+          
+          marker.bindPopup(point.name);
+          marker.addTo(map);
+          markers.push(marker);
+        });
+        
+        // Add connecting lines
+        if (points.length > 1) {
+          const latLngs = points.map(point => [point.lat, point.lng]);
+          polyline = L.polyline(latLngs, {color: '#3b82f6', weight: 2}).addTo(map);
+        }
+        
+        // Fit map to show all points
+        if (points.length > 0) {
+          const group = new L.featureGroup(markers);
+          if (polyline) group.addLayer(polyline);
+          map.fitBounds(group.getBounds().pad(0.1));
+        }
+      }
+      
+      // Event listeners
+      document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        
+        document.getElementById('addPointBtn').addEventListener('click', addPoint);
+        document.getElementById('saveBtn').addEventListener('click', savePoints);
+        document.getElementById('deleteAllBtn').addEventListener('click', deleteAllPoints);
+      });
     </script>
   </body>
 </html>
