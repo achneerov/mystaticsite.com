@@ -75,6 +75,31 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '© OpenStreetMap contributors'
         }).addTo(map);
+        
+        // Add scale control
+        L.control.scale({
+          position: 'bottomright',
+          metric: true,
+          imperial: false
+        }).addTo(map);
+        
+        // Add double-click event to add points
+        map.on('dblclick', function(e) {
+          pointCounter++;
+          const newPoint = {
+            id: pointCounter,
+            name: `Point ${pointCounter}`,
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+            color: getRandomColor(),
+            size: 'medium',
+            shape: 'circle'
+          };
+          
+          points.unshift(newPoint);
+          renderPoints();
+          updateMap();
+        });
       }
       
       // Create point HTML
