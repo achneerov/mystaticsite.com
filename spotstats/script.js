@@ -1052,16 +1052,35 @@ function updatePlatformChart() {
         ([, a], [, b]) => b - a,
     );
 
+    let chartLabels = [];
+    let chartData = [];
+
+    if (sortedPlatforms.length > 5) {
+        const top4 = sortedPlatforms.slice(0, 4);
+        const others = sortedPlatforms.slice(4);
+        const othersSum = others.reduce((sum, [, value]) => sum + value, 0);
+
+        chartLabels = top4.map(([label]) => label);
+        chartLabels.push("Others");
+
+        chartData = top4.map(([, data]) => data);
+        chartData.push(othersSum);
+    } else {
+        chartLabels = sortedPlatforms.map(([label]) => label);
+        chartData = sortedPlatforms.map(([, data]) => data);
+    }
+
+
     // Create/update the doughnut chart
     if (charts.platformChart) charts.platformChart.destroy();
 
     charts.platformChart = new Chart(ctx, {
         type: "pie",
         data: {
-            labels: Object.keys(platforms),
+            labels: chartLabels,
             datasets: [
                 {
-                    data: Object.values(platforms),
+                    data: chartData,
                     backgroundColor: [
                         "#1db954",
                         "#ff6b6b",
@@ -1072,7 +1091,7 @@ function updatePlatformChart() {
                         "#eb4d4b",
                         "#6c5ce7",
                     ],
-                    borderWidth: 3,
+                    borderWidth: 1,
                     borderColor: "#000",
                 },
             ],
