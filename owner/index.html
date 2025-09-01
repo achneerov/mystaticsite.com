@@ -42,12 +42,13 @@
         />
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body class="bg-gray-100 min-h-screen flex flex-col">
+    <body class="bg-gray-100 min-h-screen flex flex-col overflow-hidden">
+        <canvas id="shapeCanvas" class="absolute inset-0 w-full h-full cursor-pointer"></canvas>
         <main
-            class="flex-grow container mx-auto py-12 flex justify-center items-center"
+            class="flex-grow container mx-auto py-12 flex justify-center items-center relative z-10 pointer-events-none"
         >
             <div
-                class="bg-white shadow-md rounded-2xl p-8 max-w-lg w-full text-center"
+                class="bg-white bg-opacity-90 shadow-md rounded-2xl p-8 max-w-lg w-full text-center backdrop-blur-sm pointer-events-auto"
             >
                 <h1 class="text-3xl font-bold text-gray-800 mb-6">
                     Hey, I'm Alex!
@@ -71,5 +72,282 @@
                 </div>
             </div>
         </main>
+
+        <script>
+            const canvas = document.getElementById('shapeCanvas');
+            const ctx = canvas.getContext('2d');
+            let shapes = [];
+            let isDragging = false;
+            let dragShape = null;
+            let dragOffset = { x: 0, y: 0 };
+            let lastMousePos = { x: 0, y: 0 };
+            let mouseVelocity = { x: 0, y: 0 };
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            class Shape {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 4;
+                    this.vy = (Math.random() - 0.5) * 4;
+                    this.size = 15 + Math.random() * 60;
+                    this.mass = this.size * 0.1; // Mass proportional to size
+                    this.rotation = 0;
+                    this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+                    this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                    this.type = Math.floor(Math.random() * 4); // 0: circle, 1: square, 2: triangle, 3: star
+                    this.bounce = 0.8;
+                }
+
+                update() {
+                    if (this !== dragShape) {
+                        this.x += this.vx;
+                        this.y += this.vy;
+                    }
+
+                    // Bounce off walls
+                    if (this.x + this.size > canvas.width || this.x - this.size < 0) {
+                        this.vx *= -this.bounce;
+                        this.x = Math.max(this.size, Math.min(canvas.width - this.size, this.x));
+                    }
+                    if (this.y + this.size > canvas.height || this.y - this.size < 0) {
+                        this.vy *= -this.bounce;
+                        this.y = Math.max(this.size, Math.min(canvas.height - this.size, this.y));
+                    }
+
+                    this.rotation += this.rotationSpeed;
+
+                    // Check collision with other shapes (including dragged shapes)
+                    shapes.forEach(other => {
+                        if (other !== this && this.collidesWith(other)) {
+                            this.handleCollision(other);
+                        }
+                    });
+                }
+
+                collidesWith(other) {
+                    const dx = this.x - other.x;
+                    const dy = this.y - other.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    return distance < (this.size + other.size) / 2;
+                }
+
+                handleCollision(other) {
+                    const dx = this.x - other.x;
+                    const dy = this.y - other.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance === 0) return;
+
+                    // Normalize collision vector
+                    const nx = dx / distance;
+                    const ny = dy / distance;
+
+                    // Separate shapes based on mass ratio
+                    const overlap = (this.size + other.size) / 2 - distance;
+                    const totalMass = this.mass + other.mass;
+                    const thisRatio = other.mass / totalMass;
+                    const otherRatio = this.mass / totalMass;
+                    
+                    this.x += nx * overlap * thisRatio;
+                    this.y += ny * overlap * thisRatio;
+                    other.x -= nx * overlap * otherRatio;
+                    other.y -= ny * overlap * otherRatio;
+
+                    // Calculate relative velocity in collision normal direction
+                    const relativeVelocityX = this.vx - other.vx;
+                    const relativeVelocityY = this.vy - other.vy;
+                    const velocityAlongNormal = relativeVelocityX * nx + relativeVelocityY * ny;
+
+                    // Don't resolve if velocities are separating
+                    if (velocityAlongNormal > 0) return;
+
+                    // Restitution (bounciness)
+                    const restitution = 0.8;
+
+                    // Calculate impulse scalar
+                    const impulse = -(1 + restitution) * velocityAlongNormal / totalMass;
+
+                    // Apply impulse to velocities (conservation of momentum)
+                    const impulseX = impulse * nx;
+                    const impulseY = impulse * ny;
+
+                    this.vx += impulseX * other.mass;
+                    this.vy += impulseY * other.mass;
+                    other.vx -= impulseX * this.mass;
+                    other.vy -= impulseY * this.mass;
+                }
+
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rotation);
+                    ctx.fillStyle = this.color;
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2;
+
+                    switch(this.type) {
+                        case 0: // Circle
+                            ctx.beginPath();
+                            ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                            ctx.fill();
+                            break;
+                        case 1: // Square
+                            ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                            break;
+                        case 2: // Triangle
+                            ctx.beginPath();
+                            ctx.moveTo(0, -this.size / 2);
+                            ctx.lineTo(-this.size / 2, this.size / 2);
+                            ctx.lineTo(this.size / 2, this.size / 2);
+                            ctx.closePath();
+                            ctx.fill();
+                            break;
+                        case 3: // Star
+                            ctx.beginPath();
+                            for (let i = 0; i < 10; i++) {
+                                const angle = (i * Math.PI) / 5;
+                                const radius = i % 2 === 0 ? this.size / 2 : this.size / 4;
+                                const x = Math.cos(angle) * radius;
+                                const y = Math.sin(angle) * radius;
+                                if (i === 0) ctx.moveTo(x, y);
+                                else ctx.lineTo(x, y);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                            break;
+                    }
+                    ctx.restore();
+                }
+
+                contains(x, y) {
+                    const dx = x - this.x;
+                    const dy = y - this.y;
+                    return Math.sqrt(dx * dx + dy * dy) < this.size / 2;
+                }
+            }
+
+            function init() {
+                resizeCanvas();
+                for (let i = 0; i < 25; i++) {
+                    shapes.push(new Shape());
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                shapes.forEach(shape => {
+                    shape.update();
+                    shape.draw();
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            // Mouse/touch events
+            function getEventPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
+
+            canvas.addEventListener('mousedown', (e) => {
+                const pos = getEventPos(e);
+                for (let i = shapes.length - 1; i >= 0; i--) {
+                    if (shapes[i].contains(pos.x, pos.y)) {
+                        isDragging = true;
+                        dragShape = shapes[i];
+                        dragOffset.x = pos.x - dragShape.x;
+                        dragOffset.y = pos.y - dragShape.y;
+                        lastMousePos = { x: pos.x, y: pos.y };
+                        mouseVelocity = { x: 0, y: 0 };
+                        dragShape.vx = 0;
+                        dragShape.vy = 0;
+                        break;
+                    }
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                const pos = getEventPos(e);
+                
+                // Change cursor when hovering over shapes
+                let hoveringOverShape = false;
+                for (let shape of shapes) {
+                    if (shape.contains(pos.x, pos.y)) {
+                        hoveringOverShape = true;
+                        break;
+                    }
+                }
+                canvas.style.cursor = hoveringOverShape ? 'grab' : 'default';
+                
+                if (isDragging && dragShape) {
+                    canvas.style.cursor = 'grabbing';
+                    
+                    // Calculate mouse velocity for throwing
+                    mouseVelocity.x = pos.x - lastMousePos.x;
+                    mouseVelocity.y = pos.y - lastMousePos.y;
+                    lastMousePos = { x: pos.x, y: pos.y };
+                    
+                    // Update dragged shape position and give it velocity for collision physics
+                    const newX = pos.x - dragOffset.x;
+                    const newY = pos.y - dragOffset.y;
+                    
+                    // Set velocity based on movement for collision calculations
+                    dragShape.vx = (newX - dragShape.x) * 2;
+                    dragShape.vy = (newY - dragShape.y) * 2;
+                    
+                    dragShape.x = newX;
+                    dragShape.y = newY;
+                }
+            });
+
+            canvas.addEventListener('mouseup', (e) => {
+                if (isDragging && dragShape) {
+                    // Apply throwing velocity based on mouse movement
+                    dragShape.vx = mouseVelocity.x * 0.8;
+                    dragShape.vy = mouseVelocity.y * 0.8;
+                }
+                isDragging = false;
+                dragShape = null;
+                canvas.style.cursor = 'default';
+            });
+
+            // Touch events
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                canvas.dispatchEvent(new MouseEvent('mousedown', {
+                    clientX: e.touches[0].clientX,
+                    clientY: e.touches[0].clientY
+                }));
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                canvas.dispatchEvent(new MouseEvent('mousemove', {
+                    clientX: e.touches[0].clientX,
+                    clientY: e.touches[0].clientY
+                }));
+            });
+
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                canvas.dispatchEvent(new MouseEvent('mouseup', {}));
+            });
+
+            window.addEventListener('resize', resizeCanvas);
+
+            init();
+            animate();
+        </script>
     </body>
 </html>
