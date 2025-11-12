@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (Object.keys(models).length === 0) {
         showStatus('No models loaded. Train one to get started!', 'info');
     }
+
+    // Load a sample MNIST image for comparison
+    await loadSampleMNISTImage();
+
+    // Initialize preview
+    updatePreview();
 });
 
 
@@ -504,6 +510,7 @@ function draw(e) {
 
 function stopDrawing() {
     isDrawing = false;
+    updatePreview();
 }
 
 function handleTouch(e) {
@@ -521,6 +528,83 @@ function clearCanvas() {
     canvasContext.fillStyle = 'white';
     canvasContext.fillRect(0, 0, canvas.width, canvas.height);
     document.getElementById('predictionsContainer').innerHTML = '';
+    updatePreview();
+}
+
+// Update the preview canvas to show the converted 28x28 image
+function updatePreview() {
+    const canvas = document.getElementById('drawCanvas');
+    const previewCanvas = document.getElementById('previewCanvas');
+    const previewCanvasLarge = document.getElementById('previewCanvasLarge');
+
+    if (!previewCanvas || !previewCanvasLarge) return;
+
+    const previewCtx = previewCanvas.getContext('2d');
+    const previewCtxLarge = previewCanvasLarge.getContext('2d');
+
+    // Create a temporary 28x28 canvas
+    previewCtx.fillStyle = 'white';
+    previewCtx.fillRect(0, 0, 28, 28);
+    previewCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 28, 28);
+
+    // Get image data and apply the same preprocessing as prediction
+    const imageData = previewCtx.getImageData(0, 0, 28, 28);
+    const data = imageData.data;
+
+    // Apply inversion (same as in prediction)
+    for (let i = 0; i < data.length; i += 4) {
+        // Convert to grayscale and normalize
+        const gray = data[i]; // Already grayscale from canvas
+        const normalized = gray / 255;
+        // Invert: black becomes white, white becomes black
+        const inverted = 1 - normalized;
+        const finalValue = inverted * 255;
+
+        data[i] = finalValue;     // R
+        data[i + 1] = finalValue; // G
+        data[i + 2] = finalValue; // B
+        // Alpha stays the same
+    }
+
+    previewCtx.putImageData(imageData, 0, 0);
+
+    // Scale up to the large preview canvas with pixelated rendering
+    previewCtxLarge.imageSmoothingEnabled = false;
+    previewCtxLarge.drawImage(previewCanvas, 0, 0, 28, 28, 0, 0, 140, 140);
+}
+
+// Load and display a sample MNIST image for comparison
+async function loadSampleMNISTImage() {
+    try {
+        const manifest = await fetch('./manifest.json').then(r => r.json());
+        if (!manifest.train || manifest.train.length === 0) return;
+
+        // Get a random sample
+        const randomIndex = Math.floor(Math.random() * Math.min(100, manifest.train.length));
+        const sampleFile = manifest.train[randomIndex];
+        const samplePath = `./mnist_images/train/${sampleFile}`;
+
+        const img = new Image();
+        img.src = samplePath;
+        await new Promise(resolve => img.onload = resolve);
+
+        const sampleCanvas = document.getElementById('sampleCanvas');
+        const sampleCanvasLarge = document.getElementById('sampleCanvasLarge');
+
+        if (!sampleCanvas || !sampleCanvasLarge) return;
+
+        const ctx = sampleCanvas.getContext('2d');
+        const ctxLarge = sampleCanvasLarge.getContext('2d');
+
+        ctx.drawImage(img, 0, 0, 28, 28);
+
+        // Scale up with pixelated rendering
+        ctxLarge.imageSmoothingEnabled = false;
+        ctxLarge.drawImage(sampleCanvas, 0, 0, 28, 28, 0, 0, 140, 140);
+
+    } catch (error) {
+        console.log('Could not load sample MNIST image:', error);
+    }
 }
 
 // Multi-model prediction

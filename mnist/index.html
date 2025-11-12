@@ -396,6 +396,51 @@
         .delete-model-btn:hover {
             background: #c82333;
         }
+
+        .preview-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .preview-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .preview-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .preview-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        #previewCanvas, #sampleCanvas {
+            display: none;
+        }
+
+        #previewCanvasLarge, #sampleCanvasLarge {
+            border: 1px solid #ddd;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -416,6 +461,23 @@
                     <div class="canvas-controls">
                         <button onclick="clearCanvas()">Clear Canvas</button>
                         <button onclick="predictMultiModel()">Predict</button>
+                    </div>
+
+                    <div class="preview-section">
+                        <h3>Preview (28x28)</h3>
+                        <div class="preview-grid">
+                            <div class="preview-item">
+                                <div class="preview-label">Your Drawing (Converted)</div>
+                                <canvas id="previewCanvas" width="28" height="28"></canvas>
+                                <canvas id="previewCanvasLarge" width="140" height="140"></canvas>
+                            </div>
+                            <div class="preview-item">
+                                <div class="preview-label">Real MNIST Sample</div>
+                                <canvas id="sampleCanvas" width="28" height="28"></canvas>
+                                <canvas id="sampleCanvasLarge" width="140" height="140"></canvas>
+                                <button onclick="loadSampleMNISTImage()" style="margin-top: 10px; padding: 6px 12px; font-size: 11px;">Load New Sample</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="predictionsContainer" class="predictions-container"></div>
