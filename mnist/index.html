@@ -379,6 +379,23 @@
             display: flex;
             justify-content: space-between;
         }
+
+        .model-size {
+            font-size: 11px;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .delete-model-btn {
+            background: #dc3545;
+            padding: 4px 8px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+
+        .delete-model-btn:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -389,19 +406,32 @@
         </header>
 
         <main>
-            <!-- Left Panel: Training & Model Management -->
+            <!-- Left Panel: Drawing Canvas & Multi-Model Predictions -->
+            <div>
+                <div class="panel">
+                    <h2>Draw & Test</h2>
+
+                    <canvas id="drawCanvas" width="200" height="200"></canvas>
+
+                    <div class="canvas-controls">
+                        <button onclick="clearCanvas()">Clear Canvas</button>
+                        <button onclick="predictMultiModel()">Predict</button>
+                    </div>
+
+                    <div id="predictionsContainer" class="predictions-container"></div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Training & Model Management -->
             <div>
                 <div class="panel">
                     <h2>Model Management</h2>
                     <div class="control-group">
                         <label>Available Models:</label>
-                        <select id="modelSelect">
-                            <option value="">Select a model...</option>
-                        </select>
+                        <div id="modelCheckboxList"></div>
                     </div>
 
-
-                    <button id="downloadBtn" onclick="downloadModel()" style="width: 100%; margin-top: 10px;">Download Selected Model</button>
+                    <button id="downloadSelectedBtn" onclick="downloadSelectedModels()" style="width: 100%; margin-top: 10px;" disabled>Download Selected Models</button>
                     <button id="importBtn" onclick="document.getElementById('fileInput').click()" style="width: 100%; margin-top: 10px;">Import Model from File</button>
                     <input type="file" id="fileInput" style="display: none;" accept=".json,.bin" multiple>
 
@@ -447,27 +477,6 @@
                     </div>
 
                     <div id="status" class="status"></div>
-                </div>
-            </div>
-
-            <!-- Right Panel: Drawing Canvas & Multi-Model Predictions -->
-            <div>
-                <div class="panel">
-                    <h2>Draw & Compare Models</h2>
-
-                    <div class="control-group">
-                        <label>Select Models to Compare:</label>
-                        <div id="modelCheckboxList"></div>
-                    </div>
-
-                    <canvas id="drawCanvas" width="280" height="280"></canvas>
-
-                    <div class="canvas-controls">
-                        <button onclick="clearCanvas()">Clear Canvas</button>
-                        <button onclick="predictMultiModel()">Predict</button>
-                    </div>
-
-                    <div id="predictionsContainer" class="predictions-container"></div>
                 </div>
             </div>
 

@@ -40,7 +40,7 @@ function createModel() {
 // Load MNIST data from local images
 async function loadMNISTData(numExamples = 1000) {
     // Load manifest with all available image files
-    const manifest = await fetch('/manifest.json').then(r => r.json());
+    const manifest = await fetch('./manifest.json').then(r => r.json());
 
     // Limit number of examples
     const selectedTrainFiles = manifest.train.slice(0, numExamples);
@@ -53,10 +53,10 @@ async function loadMNISTData(numExamples = 1000) {
     };
 
     // Create tf.data dataset from images
-    const trainImagePaths = selectedTrainFiles.map(f => `/mnist_images/train/${f}`);
+    const trainImagePaths = selectedTrainFiles.map(f => `./mnist_images/train/${f}`);
     const trainLabels = selectedTrainFiles.map(getLabel);
 
-    const testImagePaths = selectedTestFiles.map(f => `/mnist_images/test/${f}`);
+    const testImagePaths = selectedTestFiles.map(f => `./mnist_images/test/${f}`);
     const testLabels = selectedTestFiles.map(getLabel);
 
     // Create train dataset
@@ -208,19 +208,13 @@ async function trainAndSaveModel(modelName, epochs, batchSize, learningRate) {
 }
 
 // Update model list UI
-function updateModelList() {
-    const select = document.getElementById('modelSelect');
+async function updateModelList() {
     const checkboxList = document.getElementById('modelCheckboxList');
-
-    select.innerHTML = '<option value="">Select a model...</option>';
     checkboxList.innerHTML = '';
 
-    Object.entries(models).forEach(([id, modelData]) => {
-        // Add to dropdown
-        const option = document.createElement('option');
-        option.value = id;
-        option.textContent = `${modelData.name} (${(modelData.accuracy * 100).toFixed(1)}%)`;
-        select.appendChild(option);
+    for (const [id, modelData] of Object.entries(models)) {
+        // Calculate model size
+        const modelSize = await getModelSize(id);
 
         // Add to checkbox list
         const checkboxItem = document.createElement('div');
@@ -229,32 +223,122 @@ function updateModelList() {
             <input type="checkbox" id="model_${id}" value="${id}">
             <label for="model_${id}">
                 <span>${modelData.name}</span>
-                <span style="color: #999; font-size: 11px;">${(modelData.accuracy * 100).toFixed(1)}%</span>
+                <span style="display: flex; gap: 5px; align-items: center;">
+                    <span style="color: #999; font-size: 11px;">${(modelData.accuracy * 100).toFixed(1)}%</span>
+                    <span class="model-size">${modelSize}</span>
+                </span>
             </label>
+            <button class="delete-model-btn" onclick="deleteModel('${id}')">Delete</button>
         `;
         checkboxList.appendChild(checkboxItem);
+    }
+
+    // Add event listeners to checkboxes to update download button state
+    updateDownloadButtonState();
+    document.querySelectorAll('#modelCheckboxList input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateDownloadButtonState);
     });
 }
 
+// Update download button state based on checkbox selection
+function updateDownloadButtonState() {
+    const checkboxes = document.querySelectorAll('#modelCheckboxList input[type="checkbox"]:checked');
+    const downloadBtn = document.getElementById('downloadSelectedBtn');
+    if (downloadBtn) {
+        downloadBtn.disabled = checkboxes.length === 0;
+    }
+}
 
-// Download model
-async function downloadModel() {
-    const modelId = document.getElementById('modelSelect').value;
-    if (!modelId) {
-        showStatus('Please select a model to download', 'error');
+// Get model size from IndexedDB
+async function getModelSize(modelId) {
+    try {
+        // Estimate size from localStorage metadata and IndexedDB
+        const metadata = localStorage.getItem('model_' + modelId);
+        const metadataSize = metadata ? new Blob([metadata]).size : 0;
+
+        // For IndexedDB model, estimate based on typical model sizes
+        // A typical MNIST model is around 400-800 KB
+        const estimatedModelSize = 600 * 1024; // 600 KB estimate
+
+        const totalSize = metadataSize + estimatedModelSize;
+        return formatBytes(totalSize);
+    } catch (error) {
+        return 'Unknown';
+    }
+}
+
+// Format bytes to human-readable format
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
+
+
+// Download selected models
+async function downloadSelectedModels() {
+    const checkboxes = document.querySelectorAll('#modelCheckboxList input[type="checkbox"]:checked');
+    const selectedModelIds = Array.from(checkboxes).map(cb => cb.value);
+
+    if (selectedModelIds.length === 0) {
+        showStatus('Please select at least one model to download', 'error');
         return;
     }
 
     try {
-        const modelData = models[modelId];
-        const model = modelData.model;
+        for (const modelId of selectedModelIds) {
+            const modelData = models[modelId];
+            if (!modelData || !modelData.model) {
+                console.warn(`Model ${modelId} not found or not loaded`);
+                continue;
+            }
 
-        // Save using TensorFlow.js
-        await model.save('downloads://mnist_model');
-        showStatus('Model downloaded successfully!', 'success');
+            const model = modelData.model;
+            const safeName = modelData.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+            // Save using TensorFlow.js
+            await model.save(`downloads://mnist_model_${safeName}`);
+        }
+
+        showStatus(`${selectedModelIds.length} model(s) downloaded successfully!`, 'success');
     } catch (error) {
         console.error('Download error:', error);
-        showStatus('Error downloading model: ' + error.message, 'error');
+        showStatus('Error downloading models: ' + error.message, 'error');
+    }
+}
+
+// Delete model
+async function deleteModel(modelId) {
+    if (!confirm('Are you sure you want to delete this model?')) {
+        return;
+    }
+
+    try {
+        // Remove from IndexedDB
+        await tf.io.removeModel('indexeddb://mnist_model_' + modelId);
+
+        // Remove from localStorage
+        localStorage.removeItem('model_' + modelId);
+
+        // Update model list in storage
+        const modelList = JSON.parse(localStorage.getItem('modelList') || '[]');
+        const updatedList = modelList.filter(id => id !== modelId);
+        localStorage.setItem('modelList', JSON.stringify(updatedList));
+
+        // Remove from memory
+        if (models[modelId] && models[modelId].model) {
+            models[modelId].model.dispose();
+        }
+        delete models[modelId];
+
+        // Update UI
+        await updateModelList();
+        showStatus('Model deleted successfully', 'success');
+    } catch (error) {
+        console.error('Delete error:', error);
+        showStatus('Error deleting model: ' + error.message, 'error');
     }
 }
 
@@ -383,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         canvasContext.fillStyle = 'white';
         canvasContext.fillRect(0, 0, canvas.width, canvas.height);
         canvasContext.strokeStyle = 'black';
-        canvasContext.lineWidth = 20;
+        canvasContext.lineWidth = 15;
         canvasContext.lineCap = 'round';
         canvasContext.lineJoin = 'round';
 
@@ -463,7 +547,7 @@ async function predictMultiModel() {
         // Draw scaled down image
         smallCtx.fillStyle = 'white';
         smallCtx.fillRect(0, 0, 28, 28);
-        smallCtx.drawImage(canvas, 0, 0, 280, 280, 0, 0, 28, 28);
+        smallCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 28, 28);
 
         // Convert to tensor and INVERT (MNIST is white digits on black background)
         const tensor = tf.browser.fromPixels(smallCanvas, 1)
