@@ -1,0 +1,551 @@
+// MNIST MNIST Model Trainer & Predictor
+// Using TensorFlow.js
+
+// Global state
+let models = {};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load models from local storage
+    await loadModelsFromStorage();
+
+    // If no models exist, show info message
+    if (Object.keys(models).length === 0) {
+        showStatus('No models loaded. Train one to get started!', 'info');
+    }
+});
+
+
+// Create MNIST model
+function createModel() {
+    const model = tf.sequential({
+        layers: [
+            tf.layers.dense({ inputShape: [28 * 28], units: 128, activation: 'relu' }),
+            tf.layers.dropout({ rate: 0.2 }),
+            tf.layers.dense({ units: 64, activation: 'relu' }),
+            tf.layers.dropout({ rate: 0.2 }),
+            tf.layers.dense({ units: 10, activation: 'softmax' })
+        ]
+    });
+
+    model.compile({
+        optimizer: tf.train.adam(0.01),
+        loss: 'categoricalCrossentropy',
+        metrics: ['accuracy']
+    });
+
+    return model;
+}
+
+// Load MNIST data from local images
+async function loadMNISTData(numExamples = 1000) {
+    // Load manifest with all available image files
+    const manifest = await fetch('/manifest.json').then(r => r.json());
+
+    // Limit number of examples
+    const selectedTrainFiles = manifest.train.slice(0, numExamples);
+    const selectedTestFiles = manifest.test.slice(0, Math.floor(numExamples * 0.1));
+
+    // Parse filename to get label
+    const getLabel = (filename) => {
+        const match = filename.match(/_label_(\d+)/);
+        return match ? parseInt(match[1]) : 0;
+    };
+
+    // Create tf.data dataset from images
+    const trainImagePaths = selectedTrainFiles.map(f => `/mnist_images/train/${f}`);
+    const trainLabels = selectedTrainFiles.map(getLabel);
+
+    const testImagePaths = selectedTestFiles.map(f => `/mnist_images/test/${f}`);
+    const testLabels = selectedTestFiles.map(getLabel);
+
+    // Create train dataset
+    const trainDataset = tf.data.generator(async function* () {
+        for (let i = 0; i < trainImagePaths.length; i++) {
+            const img = new Image();
+            img.src = trainImagePaths[i];
+            await new Promise(resolve => img.onload = resolve);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 28;
+            canvas.height = 28;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 28, 28);
+
+            const tensor = tf.browser.fromPixels(canvas, 1).asType('float32').div(255);
+            const label = tf.oneHot(trainLabels[i], 10);
+
+            yield { xs: tensor, ys: label };
+        }
+    });
+
+    // Create test dataset
+    const testDataset = tf.data.generator(async function* () {
+        for (let i = 0; i < testImagePaths.length; i++) {
+            const img = new Image();
+            img.src = testImagePaths[i];
+            await new Promise(resolve => img.onload = resolve);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 28;
+            canvas.height = 28;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 28, 28);
+
+            const tensor = tf.browser.fromPixels(canvas, 1).asType('float32').div(255);
+            const label = tf.oneHot(testLabels[i], 10);
+
+            yield { xs: tensor, ys: label };
+        }
+    });
+
+    return { data: trainDataset, testData: testDataset };
+}
+
+// Train model
+async function trainModel() {
+    const epochs = parseInt(document.getElementById('epochs').value);
+    const batchSize = parseInt(document.getElementById('batchSize').value);
+    const learningRate = parseFloat(document.getElementById('learningRate').value);
+    const modelName = `Model ${new Date().toLocaleTimeString()}`;
+
+    await trainAndSaveModel(modelName, epochs, batchSize, learningRate);
+}
+
+async function trainAndSaveModel(modelName, epochs, batchSize, learningRate) {
+    try {
+        // Disable training button
+        document.getElementById('trainBtn').disabled = true;
+        document.getElementById('progressBar').style.display = 'block';
+
+        // Load MNIST data
+        showStatus('Loading MNIST dataset...', 'info');
+        const { data, testData } = await loadMNISTData();
+
+        // Create model
+        const model = createModel();
+
+        // Convert learning rate
+        if (model.optimizer && model.optimizer.learningRate !== undefined) {
+            model.optimizer.learningRate = learningRate;
+        }
+
+        showStatus('Training in progress...', 'info');
+
+        // Prepare training data (already normalized in loadMNISTData)
+        const trainDataset = data
+            .shuffle(10000)
+            .batch(batchSize)
+            .map(({ xs, ys }) => ({
+                xs: xs.reshape([-1, 28 * 28]),
+                ys
+            }));
+
+        // Prepare test data (already normalized in loadMNISTData)
+        const testDataset = testData
+            .batch(1000)
+            .map(({ xs, ys }) => ({
+                xs: xs.reshape([-1, 28 * 28]),
+                ys
+            }));
+
+        // Train
+        await model.fitDataset(trainDataset, {
+            epochs,
+            verbose: 0,
+            callbacks: {
+                onEpochEnd: (epoch, logs) => {
+                    const progress = ((epoch + 1) / epochs) * 100;
+                    document.getElementById('progressFill').style.width = progress + '%';
+                    document.getElementById('progressFill').textContent = Math.round(progress) + '%';
+                    document.getElementById('trainingInfo').innerHTML =
+                        `Epoch ${epoch + 1}/${epochs} - Loss: ${logs.loss.toFixed(4)}, Accuracy: ${logs.acc.toFixed(4)}`;
+                }
+            },
+            validationData: testDataset
+        });
+
+        // Evaluate on test set
+        const evalResult = await model.evaluateDataset(testDataset);
+        const testLoss = await evalResult[0].data();
+        const testAccuracy = await evalResult[1].data();
+
+        showStatus(`Model trained! Accuracy: ${(testAccuracy[0] * 100).toFixed(2)}%`, 'success');
+
+        // Save model
+        const modelId = Date.now().toString();
+        models[modelId] = {
+            id: modelId,
+            name: modelName,
+            model: model,
+            accuracy: testAccuracy[0],
+            loss: testLoss[0],
+            timestamp: new Date().toLocaleString()
+        };
+
+        // Save to local storage
+        await saveModelToStorage(modelId, modelName, model, testAccuracy[0], testLoss[0]);
+
+        // Update UI
+        updateModelList();
+
+        document.getElementById('progressBar').style.display = 'none';
+        document.getElementById('trainBtn').disabled = false;
+
+        // Show metrics
+        const metricsDiv = document.getElementById('metrics');
+        metricsDiv.style.display = 'grid';
+        document.getElementById('accuracy').textContent = (testAccuracy[0] * 100).toFixed(2) + '%';
+        document.getElementById('loss').textContent = testLoss[0].toFixed(4);
+
+        tf.dispose([evalResult[0], evalResult[1]]);
+
+    } catch (error) {
+        console.error('Training error:', error);
+        showStatus('Error during training: ' + error.message, 'error');
+        document.getElementById('trainBtn').disabled = false;
+    }
+}
+
+// Update model list UI
+function updateModelList() {
+    const select = document.getElementById('modelSelect');
+    const checkboxList = document.getElementById('modelCheckboxList');
+
+    select.innerHTML = '<option value="">Select a model...</option>';
+    checkboxList.innerHTML = '';
+
+    Object.entries(models).forEach(([id, modelData]) => {
+        // Add to dropdown
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = `${modelData.name} (${(modelData.accuracy * 100).toFixed(1)}%)`;
+        select.appendChild(option);
+
+        // Add to checkbox list
+        const checkboxItem = document.createElement('div');
+        checkboxItem.className = 'model-checkbox-item';
+        checkboxItem.innerHTML = `
+            <input type="checkbox" id="model_${id}" value="${id}">
+            <label for="model_${id}">
+                <span>${modelData.name}</span>
+                <span style="color: #999; font-size: 11px;">${(modelData.accuracy * 100).toFixed(1)}%</span>
+            </label>
+        `;
+        checkboxList.appendChild(checkboxItem);
+    });
+}
+
+
+// Download model
+async function downloadModel() {
+    const modelId = document.getElementById('modelSelect').value;
+    if (!modelId) {
+        showStatus('Please select a model to download', 'error');
+        return;
+    }
+
+    try {
+        const modelData = models[modelId];
+        const model = modelData.model;
+
+        // Save using TensorFlow.js
+        await model.save('downloads://mnist_model');
+        showStatus('Model downloaded successfully!', 'success');
+    } catch (error) {
+        console.error('Download error:', error);
+        showStatus('Error downloading model: ' + error.message, 'error');
+    }
+}
+
+// Import model
+document.getElementById('fileInput')?.addEventListener('change', async (e) => {
+    const files = e.target.files;
+    if (files.length === 0) return;
+
+    try {
+        showStatus('Importing model...', 'info');
+
+        // Load model from uploaded files
+        const model = await tf.loadLayersModel(tf.io.browserFiles(
+            [...files].filter(f => f.name.endsWith('.json'))[0],
+            [...files].filter(f => f.name.endsWith('.bin'))
+        ));
+
+        // Create model metadata
+        const modelId = Date.now().toString();
+        const modelName = `Imported Model ${new Date().toLocaleTimeString()}`;
+
+        models[modelId] = {
+            id: modelId,
+            name: modelName,
+            model: model,
+            accuracy: 0, // Unknown accuracy for imported models
+            loss: 0,
+            timestamp: new Date().toLocaleString()
+        };
+
+        // Save to storage
+        await saveModelToStorage(modelId, modelName, model, 0, 0);
+
+        updateModelList();
+        showStatus('Model imported successfully!', 'success');
+
+        // Clear file input
+        e.target.value = '';
+    } catch (error) {
+        console.error('Import error:', error);
+        showStatus('Error importing model: ' + error.message, 'error');
+    }
+});
+
+// Local storage functions
+async function saveModelToStorage(id, name, model, accuracy, loss) {
+    try {
+        // Save model using IndexedDB
+        await model.save('indexeddb://mnist_model_' + id);
+
+        // Save metadata
+        const metadata = {
+            id,
+            name,
+            accuracy,
+            loss,
+            timestamp: new Date().toLocaleString()
+        };
+        localStorage.setItem('model_' + id, JSON.stringify(metadata));
+
+        // Update model list in storage
+        const modelList = JSON.parse(localStorage.getItem('modelList') || '[]');
+        modelList.push(id);
+        localStorage.setItem('modelList', JSON.stringify(modelList));
+
+        showStatus(`Model "${name}" saved to browser storage`, 'success');
+    } catch (error) {
+        console.error('Storage error:', error);
+        showStatus('Error saving model: ' + error.message, 'error');
+    }
+}
+
+async function loadModelsFromStorage() {
+    try {
+        const modelList = JSON.parse(localStorage.getItem('modelList') || '[]');
+
+        for (const id of modelList) {
+            const metadata = JSON.parse(localStorage.getItem('model_' + id) || '{}');
+            if (metadata.id) {
+                // Try to load the actual model from IndexedDB
+                let model = null;
+                try {
+                    model = await tf.loadLayersModel('indexeddb://mnist_model_' + id);
+                } catch (e) {
+                    console.warn('Could not load model from IndexedDB:', id);
+                }
+
+                models[id] = {
+                    id: metadata.id,
+                    name: metadata.name,
+                    model: model, // Loaded from IndexedDB
+                    accuracy: metadata.accuracy,
+                    loss: metadata.loss,
+                    timestamp: metadata.timestamp
+                };
+            }
+        }
+
+        updateModelList();
+    } catch (error) {
+        console.error('Error loading models from storage:', error);
+    }
+}
+
+function showStatus(message, type) {
+    const statusEl = document.getElementById('status');
+    statusEl.textContent = message;
+    statusEl.className = `status show ${type}`;
+
+    if (type !== 'error') {
+        setTimeout(() => {
+            statusEl.classList.remove('show');
+        }, 5000);
+    }
+}
+
+// Canvas drawing functionality
+let isDrawing = false;
+let canvasContext = null;
+
+// Initialize canvas
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('drawCanvas');
+    if (canvas) {
+        canvasContext = canvas.getContext('2d');
+        canvasContext.fillStyle = 'white';
+        canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+        canvasContext.strokeStyle = 'black';
+        canvasContext.lineWidth = 20;
+        canvasContext.lineCap = 'round';
+        canvasContext.lineJoin = 'round';
+
+        // Mouse events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // Touch events for mobile
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouch);
+        canvas.addEventListener('touchend', stopDrawing);
+    }
+});
+
+function startDrawing(e) {
+    isDrawing = true;
+    const rect = e.target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    canvasContext.beginPath();
+    canvasContext.moveTo(x, y);
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    const rect = e.target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    canvasContext.lineTo(x, y);
+    canvasContext.stroke();
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+function handleTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    e.target.dispatchEvent(mouseEvent);
+}
+
+function clearCanvas() {
+    const canvas = document.getElementById('drawCanvas');
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+    document.getElementById('predictionsContainer').innerHTML = '';
+}
+
+// Multi-model prediction
+async function predictMultiModel() {
+    // Get selected models
+    const checkboxes = document.querySelectorAll('#modelCheckboxList input[type="checkbox"]:checked');
+    const selectedModelIds = Array.from(checkboxes).map(cb => cb.value);
+
+    if (selectedModelIds.length === 0) {
+        showStatus('Please select at least one model to compare', 'error');
+        return;
+    }
+
+    try {
+        // Prepare canvas data
+        const canvas = document.getElementById('drawCanvas');
+
+        // Create a temporary 28x28 canvas
+        const smallCanvas = document.createElement('canvas');
+        smallCanvas.width = 28;
+        smallCanvas.height = 28;
+        const smallCtx = smallCanvas.getContext('2d');
+
+        // Draw scaled down image
+        smallCtx.fillStyle = 'white';
+        smallCtx.fillRect(0, 0, 28, 28);
+        smallCtx.drawImage(canvas, 0, 0, 280, 280, 0, 0, 28, 28);
+
+        // Convert to tensor and INVERT (MNIST is white digits on black background)
+        const tensor = tf.browser.fromPixels(smallCanvas, 1)
+            .asType('float32')
+            .div(255)
+            .mul(-1)  // Invert: 0 becomes -1, 1 becomes 0
+            .add(1)   // Shift: -1 becomes 0, 0 becomes 1
+            .reshape([1, 28 * 28]);
+
+        // Get predictions from all selected models
+        const predictionsContainer = document.getElementById('predictionsContainer');
+        predictionsContainer.innerHTML = '';
+
+        for (const modelId of selectedModelIds) {
+            const modelData = models[modelId];
+            if (!modelData.model) {
+                console.warn(`Model ${modelId} not loaded`);
+                continue;
+            }
+
+            // Make prediction
+            const prediction = modelData.model.predict(tensor);
+            const probabilities = await prediction.data();
+
+            // Find predicted digit
+            const predictedDigit = probabilities.indexOf(Math.max(...probabilities));
+            const confidence = probabilities[predictedDigit];
+
+            // Create prediction display
+            const predictionDiv = document.createElement('div');
+            predictionDiv.className = 'model-prediction';
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'model-prediction-header';
+            headerDiv.innerHTML = `
+                <span>${modelData.name}</span>
+                <span class="predicted-digit">Predicted: ${predictedDigit} (${(confidence * 100).toFixed(1)}%)</span>
+            `;
+            predictionDiv.appendChild(headerDiv);
+
+            // Create histogram
+            const histogramContainer = document.createElement('div');
+            histogramContainer.className = 'histogram-container';
+
+            const histogram = document.createElement('div');
+            histogram.className = 'histogram';
+
+            for (let i = 0; i < 10; i++) {
+                const bar = document.createElement('div');
+                const probability = probabilities[i];
+                const height = probability * 100;
+
+                bar.className = 'histogram-bar';
+                bar.style.height = height + '%';
+                bar.title = `Digit ${i}: ${(probability * 100).toFixed(2)}%`;
+
+                const label = document.createElement('div');
+                label.className = 'histogram-bar-label';
+                label.textContent = i;
+                bar.appendChild(label);
+
+                if (probability > 0.05) {
+                    const value = document.createElement('div');
+                    value.className = 'histogram-bar-value';
+                    value.textContent = (probability * 100).toFixed(1) + '%';
+                    bar.appendChild(value);
+                }
+
+                histogram.appendChild(bar);
+            }
+
+            histogramContainer.appendChild(histogram);
+            predictionDiv.appendChild(histogramContainer);
+            predictionsContainer.appendChild(predictionDiv);
+
+            prediction.dispose();
+        }
+
+        tensor.dispose();
+
+    } catch (error) {
+        console.error('Prediction error:', error);
+        showStatus('Error during prediction: ' + error.message, 'error');
+    }
+}
