@@ -7,108 +7,150 @@
         "songs": [
             {
                 "name": "Intro",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "We Don't Care",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Graduation Day",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "All Falls Down (feat. Syleena Johnson)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "I'll Fly Away",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Spaceship (feat. GLC & Consequence)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Jesus Walks",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Never Let Me Down (feat. Jay-Z & J. Ivy)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Get Em High (feat. Talib Kweli & Common)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Workout Plan",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "The New Workout Plan",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Slow Jamz (Twista feat. Kanye West & Jamie Foxx)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Breathe In Breathe Out (feat. Ludacris)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "School Spirit Skit 1",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "School Spirit",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "School Spirit Skit 2",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Lil Jimmy Skit",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Two Words (feat. Mos Def, Freeway & The Boys Choir Of Harlem)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Through The Wire",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Family Business",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Last Call",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     },
@@ -120,108 +162,150 @@
         "songs": [
             {
                 "name": "Wake Up Mr. West",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Heard 'Em Say (feat. Adam Levine)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Touch The Sky (feat. Lupe Fiasco)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Gold Digger (feat. Jamie Foxx)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Skit #1",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Drive Slow (feat. Paul Wall & GLC)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "My Way Home (Common)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Crack Music (feat. The Game)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Roses",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Bring Me Down (feat. Brandy)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Addiction",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Skit #2",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Diamonds from Sierra Leone (Remix) (feat. Jay-Z)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "We Major (feat. Nas & Really Doe)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Skit #3",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Hey Mama",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Celebration",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Skit #4",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Gone (feat. Consequence & Cam'ron)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Diamonds from Sierra Leone",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Late",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     },
@@ -233,73 +317,101 @@
         "songs": [
             {
                 "name": "Good Morning",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Champion",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Stronger",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "I Wonder",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Good Life (feat. T-Pain)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Can't Tell Me Nothing",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Barry Bonds (feat. Lil Wayne)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Drunk and Hot Girls (feat. Mos Def)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Flashing Lights (feat. Dwele)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Everything I Am (feat. DJ Premier)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "The Glory",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Homecoming (feat. Chris Martin)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Big Brother",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Good Night (feat. Al Be Back & Mos Def)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     },
@@ -311,63 +423,87 @@
         "songs": [
             {
                 "name": "Say You Will",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Welcome to Heartbreak (feat. Kid Cudi)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Heartless",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Amazing (feat. Young Jeezy)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Love Lockdown",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Paranoid (feat. Mr Hudson)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "RoboCop",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Street Lights",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Bad News",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "See You in My Nightmares (feat. Lil Wayne)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Coldest Winter",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
-                "name": "Pinocchio Story (Freestyle Live from Singapore)",
-                "rating": "unrated",
-                "comments": ""
+                "name": "Pinocchio Story (Freestyle Live from Signapore)",
+                "albumRating": "unrated",
+                "shuffleRating": "12",
+                "albumRatingComments": "",
+                "shuffleRatingComments": "Wow this sucked, I liked the echo, but thats about it, also didnt like the backgorund noises of people clapping and whatnot. I really dont like this. (03-02-2026)"
             }
         ]
     },
@@ -379,68 +515,94 @@
         "songs": [
             {
                 "name": "Dark Fantasy",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Gorgeous (feat. Kid Cudi & Raekwon)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Power",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "All of the Lights (Interlude)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "All of the Lights",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Monster (feat. Jay-Z, Rick Ross, Nicki Minaj & Bon Iver)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "So Appalled (feat. Jay-Z, Pusha T, Prynce Cy Hi, Swizz Beatz & RZA)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Devil in a New Dress (feat. Rick Ross)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Runaway (feat. Pusha T)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Hell of a Life",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Blame Game (feat. John Legend)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Lost in the World (feat. Bon Iver)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Who Will Survive in America",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     },
@@ -452,53 +614,73 @@
         "songs": [
             {
                 "name": "On Sight",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Black Skinhead",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "I Am a God (feat. God)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "New Slaves (feat. Frank Ocean)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Hold My Liquor (feat. Chief Keef & Justin Vernon)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "I'm in It",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Blood on the Leaves",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Guilt Trip (feat. Kid Cudi)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Send It Up (feat. King L)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Bound 2 (feat. Charlie Wilson)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     },
@@ -510,103 +692,143 @@
         "songs": [
             {
                 "name": "Ultralight Beam",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Father Stretch My Hands Pt. 1",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Pt. 2",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Famous",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Feedback",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Low Lights",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Highlights",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Freestyle 4",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "I Love Kanye",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Waves",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "FML",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Real Friends",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Wolves",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Frank's Track",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Siiiiiiiilver Surffffeeeeer Intermission",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "30 Hours",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "No More Parties in LA (feat. Kendrick Lamar)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Facts (Charlie Heat Version)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Fade",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Saint Pablo",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     },
@@ -618,38 +840,52 @@
         "songs": [
             {
                 "name": "I Thought About Killing You",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Yikes",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "All Mine",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Wouldn't Leave (feat. PARTYNEXTDOOR)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "No Mistakes",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Ghost Town (feat. PARTYNEXTDOOR)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Violent Crimes",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     },
@@ -661,58 +897,80 @@
         "songs": [
             {
                 "name": "Every Hour (feat. Sunday Service Choir)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Selah",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Follow God",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Closed on Sunday",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "On God",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Everything We Need (feat. Ty Dolla $ign & Ant Clemons)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Water (feat. Ant Clemons)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "God Is",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Hands On (feat. Fred Hammond)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Use This Gospel (feat. Clipse & Kenny G)",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Jesus Is Lord",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     },
@@ -724,138 +982,192 @@
         "songs": [
             {
                 "name": "Donda Chant",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Jail",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "God Breathed",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Off the Grid",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Hurricane",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Praise God",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Jonah",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Ok Ok",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Junya",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Believe What I Say",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "24",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Remote Control",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Moon",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Heaven and Hell",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Donda",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Keep My Spirit Alive",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Jesus Lord",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "New Again",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Tell the Vision",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Lord I Need You",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Pure Souls",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Come to Life",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "No Child Left Behind",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Jail pt 2",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Ok Ok pt 2",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Junya pt 2",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             },
             {
                 "name": "Jesus Lord pt 2",
-                "rating": "unrated",
-                "comments": ""
+                "albumRating": "unrated",
+                "shuffleRating": "unrated",
+                "albumRatingComments": "",
+                "shuffleRatingComments": ""
             }
         ]
     }
