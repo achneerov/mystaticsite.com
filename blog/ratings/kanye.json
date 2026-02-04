@@ -1,0 +1,862 @@
+[
+    {
+        "album": "The College Dropout",
+        "year": 2004,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "Intro",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "We Don't Care",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Graduation Day",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "All Falls Down (feat. Syleena Johnson)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "I'll Fly Away",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Spaceship (feat. GLC & Consequence)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Jesus Walks",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Never Let Me Down (feat. Jay-Z & J. Ivy)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Get Em High (feat. Talib Kweli & Common)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Workout Plan",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "The New Workout Plan",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Slow Jamz (Twista feat. Kanye West & Jamie Foxx)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Breathe In Breathe Out (feat. Ludacris)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "School Spirit Skit 1",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "School Spirit",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "School Spirit Skit 2",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Lil Jimmy Skit",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Two Words (feat. Mos Def, Freeway & The Boys Choir Of Harlem)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Through The Wire",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Family Business",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Last Call",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "Late Registration",
+        "year": 2005,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "Wake Up Mr. West",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Heard 'Em Say (feat. Adam Levine)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Touch The Sky (feat. Lupe Fiasco)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Gold Digger (feat. Jamie Foxx)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Skit #1",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Drive Slow (feat. Paul Wall & GLC)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "My Way Home (Common)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Crack Music (feat. The Game)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Roses",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Bring Me Down (feat. Brandy)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Addiction",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Skit #2",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Diamonds from Sierra Leone (Remix) (feat. Jay-Z)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "We Major (feat. Nas & Really Doe)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Skit #3",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Hey Mama",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Celebration",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Skit #4",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Gone (feat. Consequence & Cam'ron)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Diamonds from Sierra Leone",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Late",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "Graduation",
+        "year": 2007,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "Good Morning",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Champion",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Stronger",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "I Wonder",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Good Life (feat. T-Pain)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Can't Tell Me Nothing",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Barry Bonds (feat. Lil Wayne)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Drunk and Hot Girls (feat. Mos Def)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Flashing Lights (feat. Dwele)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Everything I Am (feat. DJ Premier)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "The Glory",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Homecoming (feat. Chris Martin)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Big Brother",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Good Night (feat. Al Be Back & Mos Def)",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "808s & Heartbreak",
+        "year": 2008,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "Say You Will",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Welcome to Heartbreak (feat. Kid Cudi)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Heartless",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Amazing (feat. Young Jeezy)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Love Lockdown",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Paranoid (feat. Mr Hudson)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "RoboCop",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Street Lights",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Bad News",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "See You in My Nightmares (feat. Lil Wayne)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Coldest Winter",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Pinocchio Story (Freestyle Live from Singapore)",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "My Beautiful Dark Twisted Fantasy",
+        "year": 2010,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "Dark Fantasy",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Gorgeous (feat. Kid Cudi & Raekwon)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Power",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "All of the Lights (Interlude)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "All of the Lights",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Monster (feat. Jay-Z, Rick Ross, Nicki Minaj & Bon Iver)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "So Appalled (feat. Jay-Z, Pusha T, Prynce Cy Hi, Swizz Beatz & RZA)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Devil in a New Dress (feat. Rick Ross)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Runaway (feat. Pusha T)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Hell of a Life",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Blame Game (feat. John Legend)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Lost in the World (feat. Bon Iver)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Who Will Survive in America",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "Yeezus",
+        "year": 2013,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "On Sight",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Black Skinhead",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "I Am a God (feat. God)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "New Slaves (feat. Frank Ocean)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Hold My Liquor (feat. Chief Keef & Justin Vernon)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "I'm in It",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Blood on the Leaves",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Guilt Trip (feat. Kid Cudi)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Send It Up (feat. King L)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Bound 2 (feat. Charlie Wilson)",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "The Life of Pablo",
+        "year": 2016,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "Ultralight Beam",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Father Stretch My Hands Pt. 1",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Pt. 2",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Famous",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Feedback",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Low Lights",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Highlights",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Freestyle 4",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "I Love Kanye",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Waves",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "FML",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Real Friends",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Wolves",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Frank's Track",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Siiiiiiiilver Surffffeeeeer Intermission",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "30 Hours",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "No More Parties in LA (feat. Kendrick Lamar)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Facts (Charlie Heat Version)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Fade",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Saint Pablo",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "ye",
+        "year": 2018,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "I Thought About Killing You",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Yikes",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "All Mine",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Wouldn't Leave (feat. PARTYNEXTDOOR)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "No Mistakes",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Ghost Town (feat. PARTYNEXTDOOR)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Violent Crimes",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "Jesus Is King",
+        "year": 2019,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "Every Hour (feat. Sunday Service Choir)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Selah",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Follow God",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Closed on Sunday",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "On God",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Everything We Need (feat. Ty Dolla $ign & Ant Clemons)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Water (feat. Ant Clemons)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "God Is",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Hands On (feat. Fred Hammond)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Use This Gospel (feat. Clipse & Kenny G)",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Jesus Is Lord",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    },
+    {
+        "album": "Donda",
+        "year": 2021,
+        "rating": "unrated",
+        "comments": "",
+        "songs": [
+            {
+                "name": "Donda Chant",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Jail",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "God Breathed",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Off the Grid",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Hurricane",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Praise God",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Jonah",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Ok Ok",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Junya",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Believe What I Say",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "24",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Remote Control",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Moon",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Heaven and Hell",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Donda",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Keep My Spirit Alive",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Jesus Lord",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "New Again",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Tell the Vision",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Lord I Need You",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Pure Souls",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Come to Life",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "No Child Left Behind",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Jail pt 2",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Ok Ok pt 2",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Junya pt 2",
+                "rating": "unrated",
+                "comments": ""
+            },
+            {
+                "name": "Jesus Lord pt 2",
+                "rating": "unrated",
+                "comments": ""
+            }
+        ]
+    }
+]
