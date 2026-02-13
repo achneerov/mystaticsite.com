@@ -13,6 +13,10 @@
     <link rel="icon" type="image/x-icon" href="../images/favicon/favicon.ico" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         *,
         *::before,
@@ -345,6 +349,139 @@
             background: #1f1f1f;
             color: #d4d4d4;
             border-bottom-left-radius: 4px;
+            white-space: normal;
+        }
+
+        /* ── Markdown inside AI bubbles ── */
+        .msg-bubble.ai-b p {
+            margin: 0 0 8px 0;
+        }
+
+        .msg-bubble.ai-b p:last-child {
+            margin-bottom: 0;
+        }
+
+        .msg-bubble.ai-b h1,
+        .msg-bubble.ai-b h2,
+        .msg-bubble.ai-b h3,
+        .msg-bubble.ai-b h4,
+        .msg-bubble.ai-b h5,
+        .msg-bubble.ai-b h6 {
+            color: #e5e5e5;
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+
+        .msg-bubble.ai-b h1 {
+            font-size: 1.15rem;
+        }
+
+        .msg-bubble.ai-b h2 {
+            font-size: 1.05rem;
+        }
+
+        .msg-bubble.ai-b h3 {
+            font-size: 0.95rem;
+        }
+
+        .msg-bubble.ai-b ul,
+        .msg-bubble.ai-b ol {
+            margin: 6px 0;
+            padding-left: 20px;
+        }
+
+        .msg-bubble.ai-b li {
+            margin: 3px 0;
+        }
+
+        .msg-bubble.ai-b code {
+            background: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.82rem;
+            color: #10b981;
+        }
+
+        .msg-bubble.ai-b pre {
+            background: #0d0d0d;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: #262626;
+            border: 1px solid #333;
+            color: #a3a3a3;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            z-index: 1;
+        }
+
+        .copy-btn:hover {
+            background: #333;
+            color: #e5e5e5;
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+            color: #fff;
+            border-color: #10b981;
+        }
+
+        .msg-bubble.ai-b pre code {
+            background: none;
+            padding: 0;
+            color: #d4d4d4;
+            font-size: 0.8rem;
+        }
+
+        .msg-bubble.ai-b blockquote {
+            border-left: 3px solid #10b981;
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #a3a3a3;
+        }
+
+        .msg-bubble.ai-b table {
+            border-collapse: collapse;
+            margin: 8px 0;
+            width: 100%;
+            font-size: 0.82rem;
+        }
+
+        .msg-bubble.ai-b th,
+        .msg-bubble.ai-b td {
+            border: 1px solid #333;
+            padding: 6px 10px;
+            text-align: left;
+        }
+
+        .msg-bubble.ai-b th {
+            background: #262626;
+            color: #e5e5e5;
+        }
+
+        .msg-bubble.ai-b hr {
+            border: none;
+            border-top: 1px solid #333;
+            margin: 12px 0;
+        }
+
+        .msg-bubble.ai-b a {
+            color: #10b981;
+            text-decoration: underline;
         }
 
         @keyframes fadeIn {
@@ -939,7 +1076,7 @@
                 for await (const chunk of stream) {
                     const delta = chunk.choices?.[0]?.delta?.content || "";
                     fullReply += delta;
-                    aiEl.querySelector('.msg-bubble').textContent = fullReply;
+                    aiEl.querySelector('.msg-bubble').innerHTML = renderMarkdown(fullReply);
                     chatArea.scrollTop = chatArea.scrollHeight;
                 }
 
@@ -968,7 +1105,8 @@
             if (isUser) {
                 row.innerHTML = `<div class="msg-bubble user-b">${escapeHTML(text)}</div><div class="msg-avatar user-av">You</div>`;
             } else {
-                row.innerHTML = `<div class="msg-avatar ai-av">AI</div><div class="msg-bubble ai-b">${escapeHTML(text)}</div>`;
+                const rendered = text ? renderMarkdown(text) : '';
+                row.innerHTML = `<div class="msg-avatar ai-av">AI</div><div class="msg-bubble ai-b">${rendered}</div>`;
             }
             chatArea.appendChild(row);
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -989,6 +1127,39 @@
             d.textContent = str;
             return d.innerHTML;
         }
+
+        function renderMarkdown(text) {
+            try {
+                const renderer = new marked.Renderer();
+                renderer.code = function ({ text: code, lang }) {
+                    let highlighted;
+                    if (lang && hljs.getLanguage(lang)) {
+                        highlighted = hljs.highlight(code, { language: lang }).value;
+                    } else {
+                        highlighted = hljs.highlightAuto(code).value;
+                    }
+                    const langLabel = lang ? `<span style="position:absolute;top:7px;left:12px;font-size:0.65rem;color:#525252;">${escapeHTML(lang)}</span>` : '';
+                    return `<pre>${langLabel}<button class="copy-btn" onclick="copyCode(this)">Copy</button><code>${highlighted}</code></pre>`;
+                };
+                return marked.parse(text, { breaks: true, renderer });
+            } catch {
+                return escapeHTML(text);
+            }
+        }
+
+        function copyCode(btn) {
+            const pre = btn.closest('pre');
+            const code = pre.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        }
+        window.copyCode = copyCode;
 
         /* ══ Mobile sidebar ══ */
         function toggleSidebar() {
