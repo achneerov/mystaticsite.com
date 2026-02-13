@@ -770,12 +770,11 @@
 
         /* ══ Sidebar rendering ══ */
         function renderChatList() {
-            const sorted = [...chats].sort((a, b) => b.updatedAt - a.updatedAt);
             if (chats.length === 0) {
                 chatListEl.innerHTML = '<div class="chat-list-empty">No conversations yet</div>';
                 return;
             }
-            chatListEl.innerHTML = sorted.map(c => {
+            chatListEl.innerHTML = chats.map(c => {
                 const isActive = c.id === activeChatId;
                 return `<div class="chat-list-item ${isActive ? 'active' : ''}" onclick="switchChat('${c.id}')">
                 <span class="chat-list-item-title">${escapeHTML(c.title)}</span>
@@ -788,10 +787,16 @@
 
         /* ══ Chat actions ══ */
         function newChat() {
-            activeChatId = null;
+            // Create a visible chat entry immediately
+            const id = 'chat_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+            const chat = { id, title: 'New Chat', model: modelSelect.value, messages: [], updatedAt: Date.now() };
+            chats.push(chat);
+            activeChatId = id;
+            saveChats();
             renderChatArea();
             renderChatList();
             closeSidebar();
+            userInput.focus();
         }
 
         function switchChat(id) {
@@ -894,7 +899,14 @@
             userInput.value = "";
 
             let chat = getActiveChat();
-            if (!chat) chat = createChat(text);
+            if (!chat) {
+                chat = createChat(text);
+            } else if (chat.messages.length === 0) {
+                // Rename "New Chat" to the first message
+                chat.title = text.length > 40 ? text.slice(0, 40) + '…' : text;
+                saveChats();
+                renderChatList();
+            }
 
             welcomeScreen.style.display = 'none';
             if (welcomeScreen.parentElement === chatArea) chatArea.removeChild(welcomeScreen);
@@ -903,6 +915,7 @@
             chat.messages.push({ role: "user", content: text });
             chat.updatedAt = Date.now();
             saveChats();
+            renderChatList();
 
             isGenerating = true;
             sendBtn.disabled = true;
@@ -933,6 +946,7 @@
                 chat.messages.push({ role: "assistant", content: fullReply });
                 chat.updatedAt = Date.now();
                 saveChats();
+                renderChatList();
             } catch (err) {
                 console.error(err);
                 typingEl.remove();
