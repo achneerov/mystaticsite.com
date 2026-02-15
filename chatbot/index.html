@@ -1055,6 +1055,35 @@
     <!-- Lightbox -->
     <div class="lightbox" id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" src="" alt="Preview" /></div>
 
+    <!-- ══════════════ WebGPU Limits Patch ══════════════ -->
+    <!-- Older @mlc-ai/web-runtime doesn't request maxComputeInvocationsPerWorkgroup -->
+    <!-- This patch ensures the limit is always included when requestDevice() is called -->
+    <script>
+        if (typeof navigator !== 'undefined' && navigator.gpu && GPUAdapter && GPUAdapter.prototype.requestDevice) {
+            const _origRequestDevice = GPUAdapter.prototype.requestDevice;
+            GPUAdapter.prototype.requestDevice = async function (descriptor) {
+                descriptor = descriptor || {};
+                descriptor.requiredLimits = descriptor.requiredLimits || {};
+                const limits = descriptor.requiredLimits;
+                // Inject higher compute limits if not already specified
+                const computeKeys = [
+                    'maxComputeInvocationsPerWorkgroup',
+                    'maxComputeWorkgroupSizeX',
+                    'maxComputeWorkgroupSizeY',
+                    'maxComputeWorkgroupSizeZ',
+                ];
+                for (const key of computeKeys) {
+                    if (limits[key] === undefined && this.limits[key] !== undefined) {
+                        limits[key] = this.limits[key];
+                    }
+                }
+                console.log('[WebGPU Patch] requestDevice with limits:', JSON.stringify(limits));
+                return _origRequestDevice.call(this, descriptor);
+            };
+            console.log('[WebGPU Patch] GPUAdapter.requestDevice patched for compute limits');
+        }
+    </script>
+
     <!-- ══════════════ WebLLM + App Logic ══════════════ -->
     <script type="module">
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
@@ -1327,6 +1356,7 @@
             };
 
             try {
+                // Compute limits are handled by the GPUAdapter monkey-patch above
                 engine = await webllm.CreateMLCEngine(modelId, { initProgressCallback });
                 currentModelId = modelId;
                 progressArea.classList.remove("show");
@@ -1335,7 +1365,7 @@
                 userInput.disabled = false;
                 userInput.focus();
             } catch (err) {
-                console.error(err);
+                console.error("Model load error:", err);
                 progressLabel.textContent = "❌ " + (err.message || "Failed to load model.");
                 modelSelect.disabled = false;
             } finally {
