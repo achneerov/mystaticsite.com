@@ -1109,8 +1109,7 @@
         window.downloadGeneratedImage = downloadGeneratedImage;
 
         /* ══ Image upload handling ══ */
-        fileInput.addEventListener("change", (e) => {
-            const files = Array.from(e.target.files);
+        function handleImageFiles(files) {
             files.forEach(f => {
                 if (!f.type.startsWith("image/")) return;
                 const reader = new FileReader();
@@ -1129,7 +1128,25 @@
                 };
                 reader.readAsDataURL(f);
             });
+        }
+
+        fileInput.addEventListener("change", (e) => {
+            handleImageFiles(Array.from(e.target.files));
             fileInput.value = ""; // reset so same file can be re-selected
+        });
+
+        // Drag-and-drop image support
+        chatArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            chatArea.style.outline = "2px dashed #a78bfa";
+        });
+        chatArea.addEventListener("dragleave", () => {
+            chatArea.style.outline = "";
+        });
+        chatArea.addEventListener("drop", (e) => {
+            e.preventDefault();
+            chatArea.style.outline = "";
+            handleImageFiles(Array.from(e.dataTransfer.files));
         });
 
         function resizeImage(dataUrl, maxDim) {
